@@ -13,16 +13,25 @@ class CustomTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final curvedborder = BorderRadius.circular(90);
     return TextField(
       controller: controller,
       decoration: InputDecoration(
-        enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
+        border: OutlineInputBorder(
+          borderRadius: curvedborder,
+          borderSide: BorderSide.none,
         ),
-        focusedBorder: const OutlineInputBorder(
+
+        // enabledBorder: OutlineInputBorder(
+        //   borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
+        // ),
+        fillColor: Theme.of(context).colorScheme.tertiary,
+        filled: true,
+        focusedBorder: OutlineInputBorder(
+          borderRadius: curvedborder,
           borderSide: BorderSide(
             width: 2,
-            color: Colors.indigo,
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
         hintText: hintText,

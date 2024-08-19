@@ -15,7 +15,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Nonghai',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ThemeData().colorScheme.copyWith(
+              primary: const Color(0xffC8A48A),
+              secondary: const Color(0xffE8E8E8),
+              surface: const Color(0xffF2F2F2), // background
+              tertiary: const Color(0xffFfffff), //textfield
+            ),
         useMaterial3: true,
       ),
       initialRoute: '/login',
