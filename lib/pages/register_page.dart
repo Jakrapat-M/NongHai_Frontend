@@ -33,6 +33,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: Center(
           child: Padding(
@@ -40,7 +41,7 @@ class _RegisterPageState extends State<RegisterPage> {
             child: Column(
               children: [
                 const Icon(Icons.chat, size: 100),
-                const SizedBox(height: 50),
+
                 const Text('Regiester', style: TextStyle(fontSize: 30)),
                 // Email
                 const SizedBox(height: 50),
@@ -78,12 +79,9 @@ class _RegisterPageState extends State<RegisterPage> {
                     const Text("Already have an account?"),
                     TextButton(
                       onPressed: () => {
-                        if (Navigator.canPop(context))
-                          {Navigator.pop(context)}
-                        else
-                          {
-                            Navigator.pushNamed(context, '/login'),
-                          }
+                        (Navigator.canPop(context))
+                            ? Navigator.pop(context)
+                            : Navigator.pushNamed(context, '/login'),
                       },
                       child: const Text("Sign In",
                           style: TextStyle(

@@ -16,7 +16,7 @@ class CustomButton1 extends StatelessWidget {
         child: FilledButton(
           onPressed: onTap,
           style: ButtonStyle(
-            backgroundColor: WidgetStateProperty.all(Colors.deepPurple[300]),
+            backgroundColor: WidgetStateProperty.all(Theme.of(context).colorScheme.primary),
             minimumSize: WidgetStateProperty.all(const Size(double.infinity, 50)),
           ),
           child: Text(text),

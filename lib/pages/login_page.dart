@@ -24,6 +24,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: Center(
           child: Padding(
@@ -31,7 +32,7 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               children: [
                 const Icon(Icons.chat, size: 100),
-                const Text('Chat App', style: TextStyle(fontSize: 30)),
+                const Text('NongHai', style: TextStyle(fontSize: 30)),
                 // Email
                 const SizedBox(height: 50),
                 Padding(
