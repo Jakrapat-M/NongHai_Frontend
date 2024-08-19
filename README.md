@@ -1,7 +1,19 @@
 # NongHai_Frontend
 
+## Clean flutter
+```bash
+flutter clean
+```
+
+## Get Dependency
+```bash
+$ flutter pub get
+```
+
 Select device
 
-Run with out debuging or
+## Run or Run with out debuging or
 
-## flutter run
+```bash
+$ flutter run
+```
