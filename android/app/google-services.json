@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "973892922290",
+    "project_id": "nonghai-6e629",
+    "storage_bucket": "nonghai-6e629.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:973892922290:android:a3f29a8a49ff93cfbc92ab",
+        "android_client_info": {
+          "package_name": "com.nonghai"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBSEnAXsi4AHUsi2I88gZSuIzItoiRSQxE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
