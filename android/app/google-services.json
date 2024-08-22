@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:973892922290:android:a3f29a8a49ff93cfbc92ab",
+        "mobilesdk_app_id": "1:973892922290:android:eb72eb28888b21b1bc92ab",
         "android_client_info": {
-          "package_name": "com.nonghai"
+          "package_name": "com.example.nonghai"
         }
       },
       "oauth_client": [],
