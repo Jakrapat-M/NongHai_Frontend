@@ -48,7 +48,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions web = FirebaseOptions(
     apiKey: 'AIzaSyD1FLzE_iiOWchPl1gjvYo4TLUiE2VnU5A',
-    appId: '1:973892922290:web:e3706f35aa2d3b3cbc92ab',
+    appId: '1:973892922290:web:fd7fe8d520b8579ebc92ab',
     messagingSenderId: '973892922290',
     projectId: 'nonghai-6e629',
     authDomain: 'nonghai-6e629.firebaseapp.com',
@@ -57,7 +57,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyBSEnAXsi4AHUsi2I88gZSuIzItoiRSQxE',
-    appId: '1:973892922290:android:a3f29a8a49ff93cfbc92ab',
+    appId: '1:973892922290:android:eb72eb28888b21b1bc92ab',
     messagingSenderId: '973892922290',
     projectId: 'nonghai-6e629',
     storageBucket: 'nonghai-6e629.appspot.com',
@@ -65,10 +65,11 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyDuIWNfdPT9dPo4TdgyRbBOtdrd63KTdqQ',
-    appId: '1:973892922290:ios:c2063648f09654c2bc92ab',
+    appId: '1:973892922290:ios:4a1491477df6b78ebc92ab',
     messagingSenderId: '973892922290',
     projectId: 'nonghai-6e629',
     storageBucket: 'nonghai-6e629.appspot.com',
     iosBundleId: 'com.example.nonghai',
   );
+
 }
