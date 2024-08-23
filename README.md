@@ -6,8 +6,12 @@ flutter clean
 ```
 
 ## Get Dependency
+
 ```bash
 $ flutter pub get
+$ flutter pub add firebase_core
+$ flutter pub add firebase_auth
+$ flutter pub add cloud_firestore
 ```
 
 Select device
