@@ -2,8 +2,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:nonghai/firebase_options.dart';
 import 'package:nonghai/pages/bottom_nav_page.dart';
+import 'package:nonghai/pages/home_page.dart';
 import 'package:nonghai/pages/login_page.dart';
 import 'package:nonghai/pages/register_page.dart';
+import 'package:nonghai/services/auth/auth_service.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,6 +39,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => const BottomNavPage(page: 0),
         '/login': (context) => const LoginPage(),
         '/register': (context) => const RegisterPage(),
+        '/home': (context) => const HomePage(),
       },
     );
   }
