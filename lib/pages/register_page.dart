@@ -1,9 +1,13 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:nonghai/components/custom_button.dart';
 import 'package:nonghai/components/custom_text_field.dart';
+import 'package:nonghai/services/auth/auth_service.dart';
+// import 'package:provider/provider.dart';
 
 class RegisterPage extends StatefulWidget {
-  const RegisterPage({super.key});
+  final void Function()? onTap;
+  const RegisterPage({super.key, required this.onTap});
 
   @override
   State<RegisterPage> createState() => _RegisterPageState();
@@ -14,20 +18,41 @@ class _RegisterPageState extends State<RegisterPage> {
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
-  //TODO: Implement sign up logic
-  void signUp() {
-    // final email = emailController.text;
-    // final password = passwordController.text;
-    // final confirmPassword = confirmPasswordController.text;
-
-    // if (password != confirmPassword) {
-    //   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-    //     content: Text("Passwords do not match"),
-    //   ));
-    //   return;
-    // }
-
-    // // Sign up logic
+  void signUp(BuildContext context) {
+    if (passwordController.text == confirmPasswordController.text) {
+      //get auth service
+      final authService = AuthService();
+      try {
+        authService.signUpWithEmailandPassword(emailController.text, passwordController.text);
+        //navigate to homepage after sign up
+      } catch (e) {
+        showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+                  title: const Text('Error'),
+                  content: Text(e.toString()),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('OK'),
+                    ),
+                  ],
+                ));
+      }
+    } else {
+      showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+                title: const Text('Password does not match'),
+                content: Text(e.toString()),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('OK'),
+                  ),
+                ],
+              ));
+    }
   }
 
   @override
@@ -42,7 +67,7 @@ class _RegisterPageState extends State<RegisterPage> {
               children: [
                 const Icon(Icons.chat, size: 100),
 
-                const Text('Regiester', style: TextStyle(fontSize: 30)),
+                const Text('Register', style: TextStyle(fontSize: 30)),
                 // Email
                 const SizedBox(height: 50),
                 Padding(
@@ -67,16 +92,27 @@ class _RegisterPageState extends State<RegisterPage> {
                       obscureText: true),
                 ),
 
-                //button
+                //register button
                 const SizedBox(height: 50),
                 CustomButton1(
                   text: "Register",
-                  onTap: signUp,
+                  onTap: () => signUp(context),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text("Already have an account?"),
+                    // GestureDetector(
+                    //   onTap: widget.onTap,
+                    //   child: const Text(
+                    //     'Sign In',
+                    //     style: TextStyle(
+                    //       fontWeight: FontWeight.bold,
+                    //       fontSize: 16,
+                    //       color: Colors.deepPurple
+                    //     ),
+                    //   ),
+                    // ),
                     TextButton(
                       onPressed: () => {
                         (Navigator.canPop(context))
