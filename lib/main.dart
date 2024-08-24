@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:nonghai/pages/nfc_page.dart';
 import 'package:nonghai/services/auth/login_or_registoer.dart';
 import 'package:nonghai/firebase_options.dart';
 import 'package:nonghai/pages/home_page.dart';
@@ -33,11 +34,12 @@ class MyApp extends StatelessWidget {
             ),
         useMaterial3: true,
       ),
-      initialRoute: '/',
+      initialRoute: '/nfc',
       routes: {
         '/': (context) => const AuthGate(),
         '/loginOrRegister': (context) => const LoginOrRegistoer(),
         '/home': (context) => const HomePage(),
+        '/nfc': (context) => const NfcPage(),
       },
     );
   }
