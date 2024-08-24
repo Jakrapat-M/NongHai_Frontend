@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:nonghai/auth/login_or_registoer.dart';
+import 'package:nonghai/services/auth/login_or_registoer.dart';
 import 'package:nonghai/pages/bottom_nav_page.dart';
 
 class AuthGate extends StatelessWidget {
