@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:nonghai/components/custom_button.dart';
 import 'package:nonghai/components/custom_text_field.dart';
-import 'package:nonghai/pages/home_page.dart';
 import 'package:nonghai/services/auth/auth_service.dart';
-import 'package:provider/provider.dart';
+// import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
-  // final void Function()? onTap;
-  // const LoginPage({super.key, required this.onTap});
-  const LoginPage({super.key});
+  final void Function()? onTap;
+  const LoginPage({super.key, required this.onTap});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -18,23 +16,12 @@ class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
-  //TODO: Implement sign in logic
-  void signIn() async {
+  void signIn() {
     // final email = emailController.text;
     // final password = passwordController.text;
-    final authService = Provider.of<AuthService>(context, listen: false);
+    final authService = AuthService();
     try {
-      await authService.signInWithEmailandPassword(
-          emailController.text, passwordController.text);
-
-      //go to homepage after login
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(
-            builder: (context) =>
-                const HomePage()), // Ensure HomePage is imported
-        (Route<dynamic> route) => false,
-      );
+      authService.signInWithEmailandPassword(emailController.text, passwordController.text);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(e.toString()),
@@ -62,18 +49,14 @@ class _LoginPageState extends State<LoginPage> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: CustomTextField(
-                      controller: emailController,
-                      hintText: "Email",
-                      obscureText: false),
+                      controller: emailController, hintText: "Email", obscureText: false),
                 ),
 
                 // Password
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: CustomTextField(
-                      controller: passwordController,
-                      hintText: "Password",
-                      obscureText: true),
+                      controller: passwordController, hintText: "Password", obscureText: true),
                 ),
 
                 //sign in button
@@ -88,26 +71,11 @@ class _LoginPageState extends State<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text("Don't have an account?"),
-                    // GestureDetector(
-                    //   onTap: widget.onTap,
-                    //   child: const Text(
-                    //     'Sign In',
-                    //     style: TextStyle(
-                    //       fontWeight: FontWeight.bold,
-                    //       fontSize: 16,
-                    //       color: Colors.deepPurple
-                    //     ),
-                    //   ),
-                    // ),
                     TextButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/register');
-                      },
+                      onPressed: () {},
                       child: const Text("Sign Up",
                           style: TextStyle(
-                              color: Colors.deepPurple,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold)),
+                              color: Colors.deepPurple, fontSize: 16, fontWeight: FontWeight.bold)),
                     ),
                   ],
                 ),
