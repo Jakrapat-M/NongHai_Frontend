@@ -19,12 +19,11 @@ class _BottomNavPageState extends State<BottomNavPage> {
     _selectedPageIndex = widget.page;
   }
 
-  static const List<Widget> _widgetOptions = <Widget>[
+  static final List<Widget> _widgetOptions = <Widget>[
     ChatHomePage(),
-    HomePage(),
-    Placeholder(),
+    const HomePage(),
+    const Placeholder(),
   ];
-
 
   @override
   Widget build(BuildContext context) {
