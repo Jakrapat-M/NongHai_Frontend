@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:nonghai/components/user_tile.dart';
 import 'package:nonghai/pages/chat_room_page.dart';
@@ -46,14 +48,19 @@ class ChatHomePage extends StatelessWidget {
   }
 
   Widget _buildUserListItem(Map<String, dynamic> userData, BuildContext context) {
-    return UserTile(
-        text: userData["email"],
-        onTap: () {
-          // navigate to chat room
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => ChatRoomPage(receiverEmail: userData["email"])));
-        });
+    if (userData["email"] != _authService.getCurrentUser()!.email) {
+      return UserTile(
+          text: userData["email"],
+          onTap: () {
+            // navigate to chat room
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => ChatRoomPage(
+                        receiverEmail: userData["email"], receiverID: userData["uid"])));
+          });
+    } else {
+      return const SizedBox();
+    }
   }
 }
