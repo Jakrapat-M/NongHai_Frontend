@@ -5,7 +5,7 @@ import 'package:nfc_manager/nfc_manager.dart';
 
 class NfcPage extends StatefulWidget {
 
-  const NfcPage({Key? key}) : super(key: key);
+  const NfcPage({super.key});
 
   @override
   State<NfcPage> createState() => _NfcPageState();
@@ -18,7 +18,7 @@ class _NfcPageState extends State<NfcPage> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(title: Text('NfcManager Plugin Example')),
+        appBar: AppBar(title: const Text('NfcManager Plugin Example')),
         body: SafeArea(
           child: FutureBuilder<bool>(
             future: NfcManager.instance.isAvailable(),
@@ -31,8 +31,8 @@ class _NfcPageState extends State<NfcPage> {
                       Flexible(
                         flex: 2,
                         child: Container(
-                          margin: EdgeInsets.all(4),
-                          constraints: BoxConstraints.expand(),
+                          margin: const EdgeInsets.all(4),
+                          constraints: const BoxConstraints.expand(),
                           decoration: BoxDecoration(border: Border.all()),
                           child: SingleChildScrollView(
                             child: ValueListenableBuilder<dynamic>(
@@ -46,19 +46,19 @@ class _NfcPageState extends State<NfcPage> {
                       Flexible(
                         flex: 3,
                         child: GridView.count(
-                          padding: EdgeInsets.all(4),
+                          padding: const EdgeInsets.all(4),
                           crossAxisCount: 2,
                           childAspectRatio: 4,
                           crossAxisSpacing: 4,
                           mainAxisSpacing: 4,
                           children: [
                             ElevatedButton(
-                                child: Text('Tag Read'), onPressed: _tagRead),
+                                child: const Text('Tag Read'), onPressed: _tagRead),
                             ElevatedButton(
-                                child: Text('Ndef Write'),
+                                child: const Text('Ndef Write'),
                                 onPressed: _ndefWrite),
                             ElevatedButton(
-                                child: Text('Ndef Write Lock'),
+                                child: const Text('Ndef Write Lock'),
                                 onPressed: _ndefWriteLock),
                           ],
                         ),

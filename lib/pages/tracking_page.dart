@@ -13,13 +13,11 @@ class _TrackingPageState extends State<TrackingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: CustomAppBar(title: 'Tracking'),
+      appBar: const CustomAppBar(title: 'Tracking'),
       body: const SafeArea(
         child: Center(
           child: Column(
-            children:[
-              
-            ],
+            children: [],
           ),
         ),
       ),

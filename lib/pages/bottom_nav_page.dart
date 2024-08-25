@@ -25,7 +25,6 @@ class _BottomNavPageState extends State<BottomNavPage> {
     Placeholder(),
   ];
 
-
   @override
   Widget build(BuildContext context) {
     return Stack(

@@ -1,9 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/cupertino.dart';
+// import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
+// import 'package:flutter/painting.dart';
+// import 'package:flutter/rendering.dart';
+// import 'package:flutter/widgets.dart';
 import 'package:nonghai/pages/nfc_page.dart';
 import 'package:nonghai/pages/tracking_page.dart';
 import 'package:nonghai/services/auth/login_or_registoer.dart';

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
 
-  CustomAppBar({required this.title});
+  const CustomAppBar({super.key, required this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -13,19 +13,18 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
       elevation: Theme.of(context).appBarTheme.elevation,
       iconTheme: Theme.of(context).appBarTheme.iconTheme,
+      leadingWidth: 100,
       leading: Row(
         children: [
-          const SizedBox(width: 30),
-          SizedBox(
+          Container(
+            margin: const EdgeInsets.only(left: 30),
             width: 51,
             height: 51,
-            child: Container(
-              decoration: BoxDecoration(
+            decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: Theme.of(context).colorScheme.secondaryContainer,
             ),
-            child: const Icon(Icons.arrow_back_rounded,size: 36),
-            ),
+            child: const Icon(Icons.arrow_back_rounded, size: 36),
           ),
         ],
       ),
