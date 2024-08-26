@@ -23,7 +23,8 @@ class _RegisterPageState extends State<RegisterPage> {
       //get auth service
       final authService = AuthService();
       try {
-        authService.signUpWithEmailandPassword(emailController.text, passwordController.text);
+        authService.signUpWithEmailandPassword(
+            emailController.text, passwordController.text);
         //navigate to homepage after sign up
       } catch (e) {
         showDialog(
@@ -73,14 +74,18 @@ class _RegisterPageState extends State<RegisterPage> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: CustomTextField(
-                      controller: emailController, hintText: "Email", obscureText: false),
+                      controller: emailController,
+                      hintText: "Email",
+                      obscureText: false),
                 ),
 
                 // Password
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: CustomTextField(
-                      controller: passwordController, hintText: "Password", obscureText: true),
+                      controller: passwordController,
+                      hintText: "Password",
+                      obscureText: true),
                 ),
 
                 // Confirm Password
@@ -102,27 +107,26 @@ class _RegisterPageState extends State<RegisterPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text("Already have an account?"),
-                    // GestureDetector(
-                    //   onTap: widget.onTap,
-                    //   child: const Text(
-                    //     'Sign In',
-                    //     style: TextStyle(
-                    //       fontWeight: FontWeight.bold,
-                    //       fontSize: 16,
-                    //       color: Colors.deepPurple
-                    //     ),
-                    //   ),
-                    // ),
                     TextButton(
-                      onPressed: () => {
-                        (Navigator.canPop(context))
-                            ? Navigator.pop(context)
-                            : Navigator.pushNamed(context, '/login'),
-                      },
-                      child: const Text("Sign In",
-                          style: TextStyle(
-                              color: Colors.deepPurple, fontSize: 16, fontWeight: FontWeight.bold)),
+                      onPressed: widget.onTap,
+                      child: const Text(
+                        'Sign In',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Colors.deepPurple),
+                      ),
                     ),
+                    // TextButton(
+                    //   onPressed: () => {
+                    //     (Navigator.canPop(context))
+                    //         ? Navigator.pop(context)
+                    //         : Navigator.pushNamed(context, '/login'),
+                    //   },
+                    //   child: const Text("Sign In",
+                    //       style: TextStyle(
+                    //           color: Colors.deepPurple, fontSize: 16, fontWeight: FontWeight.bold)),
+                    // ),
                   ],
                 ),
               ],
