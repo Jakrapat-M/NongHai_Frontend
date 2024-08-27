@@ -21,14 +21,13 @@ class _LoginPageState extends State<LoginPage> {
     // final password = passwordController.text;
     final authService = AuthService();
     try {
-      authService.signInWithEmailandPassword(emailController.text, passwordController.text);
+      authService.signInWithEmailandPassword(
+          emailController.text, passwordController.text);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(e.toString()),
       ));
     }
-
-    // Sign in logic
   }
 
   @override
@@ -49,14 +48,18 @@ class _LoginPageState extends State<LoginPage> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: CustomTextField(
-                      controller: emailController, hintText: "Email", obscureText: false),
+                      controller: emailController,
+                      hintText: "Email",
+                      obscureText: false),
                 ),
 
                 // Password
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: CustomTextField(
-                      controller: passwordController, hintText: "Password", obscureText: true),
+                      controller: passwordController,
+                      hintText: "Password",
+                      obscureText: true),
                 ),
 
                 //sign in button
@@ -72,11 +75,21 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     const Text("Don't have an account?"),
                     TextButton(
-                      onPressed: () {},
-                      child: const Text("Sign Up",
-                          style: TextStyle(
-                              color: Colors.deepPurple, fontSize: 16, fontWeight: FontWeight.bold)),
+                      onPressed: widget.onTap,
+                      child: const Text(
+                        'Sign Up',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Colors.deepPurple),
+                      ),
                     ),
+                    // TextButton(
+                    //   onPressed: onTap,
+                    //   child: const Text("Sign Up",
+                    //       style: TextStyle(
+                    //           color: Colors.deepPurple, fontSize: 16, fontWeight: FontWeight.bold)),
+                    // ),
                   ],
                 ),
               ],
