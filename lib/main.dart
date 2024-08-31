@@ -37,13 +37,14 @@ class MyApp extends StatelessWidget {
               surface: const Color(0xffF2F2F2), // background
               tertiary: const Color(0xffFfffff), //textfield
               secondaryContainer: const Color(0xffE8E8E8), //container
+              secondaryFixed: const Color(0xff2C3F50), //container
             ),
         useMaterial3: true,
         textTheme: const TextTheme(
-          headlineMedium: TextStyle(fontSize: 24, fontWeight: FontWeight.bold,color: Color(0xff2C3F50)),
-          bodyLarge: TextStyle(fontSize: 14,fontWeight: FontWeight.bold, color: Color(0xff2C3F50)),
-          bodyMedium: TextStyle(fontSize: 14,fontWeight: FontWeight.normal, color: Color(0xff2C3F50)),
-          bodySmall: TextStyle(fontSize: 12,fontWeight: FontWeight.normal, color: Color(0xff8C8C8C)),
+          headlineMedium: TextStyle(fontSize: 24, fontWeight: FontWeight.w500,color: Color(0xff2C3F50),fontFamily: 'Fredoka'),
+          bodyLarge: TextStyle(fontSize: 14,fontWeight: FontWeight.w500, color: Color(0xff2C3F50),fontFamily: 'Fredoka'),
+          bodyMedium: TextStyle(fontSize: 14,fontWeight: FontWeight.w400, color: Color(0xff2C3F50),fontFamily: 'Fredoka'),
+          bodySmall: TextStyle(fontSize: 14,fontWeight: FontWeight.w400, color: Color(0xff8C8C8C),fontFamily: 'Fredoka'),
         ),
         appBarTheme: const AppBarTheme(
           titleTextStyle: TextStyle(fontSize: 36, fontWeight: FontWeight.w500 ,color: Color(0xff2C3F50),fontFamily: 'Fredoka'),
