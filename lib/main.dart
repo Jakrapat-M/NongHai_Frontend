@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 // import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 // import 'package:flutter/painting.dart';
 // import 'package:flutter/rendering.dart';
 // import 'package:flutter/widgets.dart';
@@ -15,6 +16,7 @@ import 'package:nonghai/services/auth/auth_gate.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: '.env');
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -41,18 +43,38 @@ class MyApp extends StatelessWidget {
             ),
         useMaterial3: true,
         textTheme: const TextTheme(
-          headlineMedium: TextStyle(fontSize: 24, fontWeight: FontWeight.w500,color: Color(0xff2C3F50),fontFamily: 'Fredoka'),
-          bodyLarge: TextStyle(fontSize: 14,fontWeight: FontWeight.w500, color: Color(0xff2C3F50),fontFamily: 'Fredoka'),
-          bodyMedium: TextStyle(fontSize: 14,fontWeight: FontWeight.w400, color: Color(0xff2C3F50),fontFamily: 'Fredoka'),
-          bodySmall: TextStyle(fontSize: 14,fontWeight: FontWeight.w400, color: Color(0xff8C8C8C),fontFamily: 'Fredoka'),
+          headlineMedium: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.w500,
+              color: Color(0xff2C3F50),
+              fontFamily: 'Fredoka'),
+          bodyLarge: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: Color(0xff2C3F50),
+              fontFamily: 'Fredoka'),
+          bodyMedium: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              color: Color(0xff2C3F50),
+              fontFamily: 'Fredoka'),
+          bodySmall: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              color: Color(0xff8C8C8C),
+              fontFamily: 'Fredoka'),
         ),
         appBarTheme: const AppBarTheme(
-          titleTextStyle: TextStyle(fontSize: 36, fontWeight: FontWeight.w500 ,color: Color(0xff2C3F50),fontFamily: 'Fredoka'),
+          titleTextStyle: TextStyle(
+              fontSize: 36,
+              fontWeight: FontWeight.w500,
+              color: Color(0xff2C3F50),
+              fontFamily: 'Fredoka'),
           backgroundColor: Colors.transparent,
           elevation: 0,
           centerTitle: true,
-          iconTheme: IconThemeData(color: Color(0xff2C3F50),size: 36),
-      ),
+          iconTheme: IconThemeData(color: Color(0xff2C3F50), size: 36),
+        ),
       ),
       initialRoute: '/tracking',
       routes: {
@@ -60,7 +82,10 @@ class MyApp extends StatelessWidget {
         '/loginOrRegister': (context) => const LoginOrRegistoer(),
         '/home': (context) => const HomePage(),
         '/nfc': (context) => const NfcPage(),
-        '/tracking': (context) => const TrackingPage(),
+        '/tracking': (context) => const TrackingPage(
+            petId: '318f9090-1613-4016-8d16-0f2de8223564',
+            petName: 'Ella',
+            petImage: 'assets/images/test.jpg'),
       },
     );
   }
