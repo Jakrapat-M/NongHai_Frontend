@@ -28,8 +28,9 @@ class MyApp extends StatelessWidget {
         colorScheme: ThemeData().colorScheme.copyWith(
               primary: const Color(0xffC8A48A),
               secondary: const Color(0xffE8E8E8),
-              surface: const Color(0xffF2F2F2), // background
+              surface: const Color(0xffF2F2F2), // page background
               tertiary: const Color(0xffFfffff), //textfield
+              onSurface: const Color(0xff2C3F50), //blue surface(box/button)
             ),
         useMaterial3: true,
       ),
