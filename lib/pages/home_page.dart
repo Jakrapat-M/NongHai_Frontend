@@ -19,6 +19,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    const cards = 2;
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: Stack(
@@ -144,22 +145,22 @@ class _HomePageState extends State<HomePage> {
                         ),
                         SizedBox(
                           width: double.maxFinite,
-                          height: MediaQuery.of(context).size.height * 0.4,
+                          height: MediaQuery.of(context).size.height * 0.41,
                           child: GridView.builder(
                             padding: EdgeInsets.zero,
-                            itemCount:
-                                6, // Total number of items (n regular cards + 1 button card)
+                            itemCount: cards +
+                                1, // Total number of items (n regular cards + 1 button card)
                             gridDelegate:
                                 const SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 2, // 2 cards per row
                               mainAxisSpacing: 15.0, // Spacing between rows
                               crossAxisSpacing: 12.0, // Spacing between columns
                               childAspectRatio:
-                                  2 / 2.5, // Aspect ratio of the cards
+                                  2.05 / 2.6, // Aspect ratio of the cards
                             ),
                             itemBuilder: (context, index) {
                               // Check if it's the last index (index n) to place the button card
-                              if (index >= 5) {
+                              if (index >= cards) {
                                 return Card(
                                   color: Colors.transparent,
                                   margin: const EdgeInsets.all(8.0),
@@ -172,6 +173,10 @@ class _HomePageState extends State<HomePage> {
                                       // Define your add button action here
                                     },
                                     borderRadius: BorderRadius.circular(8),
+                                    splashColor: Colors
+                                        .transparent, // Remove ripple effect
+                                    highlightColor: Colors
+                                        .transparent, // Remove highlight effect
                                     child: Center(
                                       child: Container(
                                         width: 55,
@@ -179,6 +184,14 @@ class _HomePageState extends State<HomePage> {
                                         decoration: const BoxDecoration(
                                           color: Colors.white,
                                           shape: BoxShape.circle,
+                                          // boxShadow: [
+                                          //   BoxShadow(
+                                          //     color: Colors.black.withOpacity(0.2), // Shadow color with opacity
+                                          //     spreadRadius: 2, // How much the shadow spreads
+                                          //     blurRadius: 5, // How soft the shadow is
+                                          //     offset: Offset(0, 3), // The position of the shadow (x, y)
+                                          //   ),
+                                          // ],
                                         ),
                                         child: Icon(
                                           Icons.add,
@@ -192,7 +205,7 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                 );
                               } else {
-                                // Regular cards for indices 0 to n
+                                // Regular cards for indices 0 to n-1
                                 return Card(
                                   color: Theme.of(context).colorScheme.tertiary,
                                   margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
@@ -212,21 +225,72 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                           child: Image.asset(
                                             'assets/images/meme2.jpg',
-                                            height: 50,
-                                            width: 50,
+                                            height: 40,
+                                            width: 40,
                                             fit: BoxFit.cover,
                                           ),
                                         ),
                                       ),
                                       Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                          'Card Label $index', // Replace with your label text
-                                          style: const TextStyle(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
+                                        padding: const EdgeInsets.fromLTRB(
+                                            8, 5, 8, 5),
+                                        child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    'Card Label $index',
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .labelLarge,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ],
+                                              ),
+                                              // ค่อยมาเปลี่ยนเป็น data1-data2 (sex-year)
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    'Female - 1 Year',
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .labelMedium,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                  const Spacer(),
+                                                  //add logic if status=safe then green
+                                                  Container(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 11,
+                                                        vertical: 1.5),
+                                                    decoration: BoxDecoration(
+                                                        color: Theme.of(context)
+                                                            .colorScheme
+                                                            .surfaceBright,
+                                                        shape:
+                                                            BoxShape.rectangle,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(8)),
+                                                    child: Text(
+                                                      'Safe',
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .labelSmall,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ]),
                                       ),
                                     ],
                                   ),
