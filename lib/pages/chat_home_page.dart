@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:nonghai/components/user_tile.dart';
 import 'package:nonghai/pages/chat_room_page.dart';
@@ -50,7 +48,8 @@ class ChatHomePage extends StatelessWidget {
   Widget _buildUserListItem(Map<String, dynamic> userData, BuildContext context) {
     if (userData["email"] != _authService.getCurrentUser()!.email) {
       return UserTile(
-          text: userData["email"],
+          userLabel: userData["email"],
+          receiverID: userData["uid"],
           onTap: () {
             // navigate to chat room
             Navigator.push(

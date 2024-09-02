@@ -58,4 +58,20 @@ class ChatService {
         .orderBy('timestamp', descending: false)
         .snapshots();
   }
+
+  // get last message
+  Stream<QuerySnapshot>getLastMessage(String userID, otherUserID) {
+    // Construct chat room id
+    List<String> ids = [userID, otherUserID];
+    ids.sort();
+    String chatRoomID = ids.join('_');
+
+    return _firestore
+        .collection('chat_rooms')
+        .doc(chatRoomID)
+        .collection('messages')
+        .orderBy('timestamp', descending: true)
+        .limit(1)
+        .snapshots();
+  }
 }
