@@ -76,7 +76,7 @@ class MyApp extends StatelessWidget {
           iconTheme: IconThemeData(color: Color(0xff2C3F50), size: 36),
         ),
       ),
-      initialRoute: '/tracking',
+      initialRoute: '/',
       routes: {
         '/': (context) => const AuthGate(),
         '/loginOrRegister': (context) => const LoginOrRegistoer(),

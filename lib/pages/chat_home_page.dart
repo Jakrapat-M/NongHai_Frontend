@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nonghai/components/custom_appbar.dart';
 import 'package:nonghai/components/user_tile.dart';
 import 'package:nonghai/pages/chat_room_page.dart';
 import 'package:nonghai/services/auth/auth_service.dart';
@@ -14,11 +15,9 @@ class ChatHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(kToolbarHeight),
-        child: AppBar(
-          title: const Text("Chat"),
-        ),
+      appBar: const CustomAppBar(
+        title: 'Chat',
+        noBackButton: true,
       ),
       body: SafeArea(child: _buildChatRoomList()),
     );
