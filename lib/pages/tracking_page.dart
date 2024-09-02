@@ -1,7 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:nonghai/components/custom_appbar.dart';
 import 'package:nonghai/components/tracking_object.dart';
 import 'package:nonghai/services/caller.dart';
+import 'package:nonghai/types/tracking_info.dart';
 
 class TrackingPage extends StatefulWidget {
   final String petId;
@@ -18,21 +20,23 @@ class TrackingPage extends StatefulWidget {
 }
 
 class _TrackingPageState extends State<TrackingPage> {
-  var trackingData;
+  List<TrackingInfo> trackingInfo = [];
   void getTracking() async {
-    // fetch data
     try {
       final resp = await Caller.dio.get(
         '/tracking/getTracking?petId=${widget.petId}',
       );
       if (resp.statusCode == 200) {
         setState(() {
-          trackingData = resp.data;
+          trackingInfo = resp.data['data']['tracking_info']
+              .map<TrackingInfo>((e) => TrackingInfo.fromJson(e))
+              .toList();
         });
-        print(resp.data);
       }
     } catch (e) {
-      print('Network error occurred: $e');
+      if (kDebugMode) {
+        print('Network error occurred: $e');
+      }
     }
   }
 
@@ -69,20 +73,27 @@ class _TrackingPageState extends State<TrackingPage> {
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
               const SizedBox(height: 20),
-              const TrackingObject(
-                  dateTime: '11:11:00 AM , 11 March 2024',
-                  username: 'username',
-                  phone: 'phone',
-                  chat: 'chat',
-                  address:
-                      '45 prachautid prachautid prachautid prachautid bangkok thailand '),
-              const TrackingObject(
-                  dateTime: '11:11:00 AM , 11 March 2024',
-                  username: 'username',
-                  phone: 'phone',
-                  chat: 'chat',
-                  address:
-                      '45 prachautid prachautid prachautid prachautid bangkok thailand ')
+              Expanded(
+                child: ListView.builder(
+                  itemCount: trackingInfo.length,
+                  itemBuilder: (context, index) {
+                    return Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 330),
+                        child: TrackingObject(
+                          key: Key(trackingInfo[index].trackingId),
+                          username: trackingInfo[index].finderName,
+                          phone: trackingInfo[index].finderPhone,
+                          address: trackingInfo[index].address,
+                          chat: trackingInfo[index].finderChat,
+                          image: trackingInfo[index].finderImage,
+                          dateTime: trackingInfo[index].createdAt.toString(),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
             ],
           ),
         ),

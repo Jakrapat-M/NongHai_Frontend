@@ -5,7 +5,8 @@ class TrackingObject extends StatelessWidget {
   final String username;
   final String phone;
   final String chat;
-  final String address;
+  final String? address;
+  final String? image;
 
   const TrackingObject(
       {super.key,
@@ -13,7 +14,8 @@ class TrackingObject extends StatelessWidget {
       required this.username,
       required this.phone,
       required this.chat,
-      required this.address});
+      this.address,
+      this.image});
 
   @override
   Widget build(BuildContext context) {
@@ -61,8 +63,8 @@ class TrackingObject extends StatelessWidget {
                                 backgroundColor: Theme.of(context)
                                     .colorScheme
                                     .secondaryContainer,
-                                foregroundImage:
-                                    const AssetImage('assets/images/test.jpg'),
+                                foregroundImage: AssetImage(
+                                    image ?? 'assets/images/test.jpg'),
                               ),
                               Padding(
                                 padding:
@@ -125,7 +127,7 @@ class TrackingObject extends StatelessWidget {
                       SizedBox(
                         width: 250,
                         child: Text(
-                          address,
+                          address ?? 'No address provided',
                           style: Theme.of(context).textTheme.bodySmall,
                           overflow: TextOverflow.ellipsis,
                           maxLines: 2,
