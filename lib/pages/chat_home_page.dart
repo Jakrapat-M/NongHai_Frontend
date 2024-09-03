@@ -9,8 +9,8 @@ class ChatHomePage extends StatelessWidget {
   ChatHomePage({super.key});
 
   // chat & auth services
-  final _chatService = ChatService();
-  final _authService = AuthService();
+  final chatService = ChatService();
+  final authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +25,7 @@ class ChatHomePage extends StatelessWidget {
 
   Widget _buildChatRoomList() {
     return StreamBuilder(
-      stream: _chatService.getUsersStream(),
+      stream: chatService.getUsersStream(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return const Center(child: Text('Something went wrong'));
@@ -45,7 +45,7 @@ class ChatHomePage extends StatelessWidget {
   }
 
   Widget _buildUserListItem(Map<String, dynamic> userData, BuildContext context) {
-    if (userData["email"] != _authService.getCurrentUser()!.email) {
+    if (userData["email"] != authService.getCurrentUser()!.email) {
       return UserTile(
           userLabel: userData["email"],
           receiverID: userData["uid"],

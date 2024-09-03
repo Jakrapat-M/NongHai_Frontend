@@ -16,6 +16,14 @@ class ChatService {
         .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
   }
 
+  // get chat room stream
+  Stream<List<Map<String, dynamic>>> getChatRoomStream() {
+    return _firestore
+        .collection('chat_rooms')
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
+  }
+
 // send message
   Future<void> sendMessage(String receiverID, message) async {
     // get current user
@@ -60,7 +68,7 @@ class ChatService {
   }
 
   // get last message
-  Stream<QuerySnapshot>getLastMessage(String userID, otherUserID) {
+  Stream<QuerySnapshot> getLastMessage(String userID, otherUserID) {
     // Construct chat room id
     List<String> ids = [userID, otherUserID];
     ids.sort();

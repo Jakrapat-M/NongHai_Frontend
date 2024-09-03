@@ -21,23 +21,5 @@ class CustomButton1 extends StatelessWidget {
           ),
           child: Text(text),
         ));
-    // return GestureDetector(
-    //   onTap: onTap,
-
-    //   child: Container(
-    //     width: double.infinity,
-    //     padding: const EdgeInsets.all(10),
-    //     decoration: BoxDecoration(
-    //       color: Colors.deepPurple[300],
-    //       borderRadius: BorderRadius.circular(10),
-    //     ),
-    //     child: Center(
-    //       child: Text(
-    //         text,
-    //         style: TextStyle(color: Color.fromARGB(255, 255, 255, 255), fontSize: 20),
-    //       ),
-    //     ),
-    //   ),
-    // );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:nonghai/components/chat_bubble.dart';
+import 'package:nonghai/components/custom_appbar.dart';
 import 'package:nonghai/services/auth/auth_service.dart';
 import 'package:nonghai/services/chat/chat_service.dart';
 
@@ -53,6 +54,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   // scroll comtroller
   final ScrollController _scrollController = ScrollController();
   void scrollDown() {
+    if (!_scrollController.hasClients) return;
     _scrollController.animateTo(
       0.0,
       duration: const Duration(milliseconds: 300),
@@ -72,10 +74,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        title: Text(widget.receiverEmail),
-      ),
+      appBar: CustomAppBar(title: widget.receiverEmail),
       body: SafeArea(
         child: Column(
           children: [
