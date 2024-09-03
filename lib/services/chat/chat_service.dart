@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:nonghai/models/message.dart';
+import 'package:nonghai/services/caller.dart';
 
 class ChatService {
 // get instance of firestore
@@ -28,13 +29,11 @@ class ChatService {
   Future<void> sendMessage(String receiverID, message) async {
     // get current user
     final currentUserID = _auth.currentUser!.uid;
-    final currentUserEmail = _auth.currentUser!.email!;
     final timestamp = Timestamp.now();
 
     // create new message
     Message newMessage = Message(
       senderID: currentUserID,
-      senderEmail: currentUserEmail,
       receiverID: receiverID,
       message: message,
       timestamp: timestamp,
@@ -44,7 +43,8 @@ class ChatService {
     List<String> ids = [currentUserID, receiverID];
     ids.sort();
     String chatRoomID = ids.join('_');
-    // add message to database
+
+    // add message to firestore
     await _firestore
         .collection('chat_rooms')
         .doc(chatRoomID)
@@ -81,5 +81,30 @@ class ChatService {
         .orderBy('timestamp', descending: true)
         .limit(1)
         .snapshots();
+  }
+
+  // create chat room in database
+  Future<void> createChatRoom(String receiverID) async {
+    // get current user
+    final currentUserID = _auth.currentUser!.uid;
+
+    // Construct chat room id
+    List<String> ids = [currentUserID, receiverID];
+    ids.sort();
+    String chatRoomID = ids.join('_');
+
+    // create chat room
+    try {
+      final resp = await Caller.dio.post(
+        '/chat/createChatRoom',
+        data: {
+          'chat_id': chatRoomID,
+          'user_id_1': currentUserID,
+          'user_id_2': receiverID,
+        },
+      );
+    } catch (e) {
+      print('Error creating chat room: $e');
+    }
   }
 }
