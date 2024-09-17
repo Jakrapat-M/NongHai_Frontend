@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:nonghai/pages/chat_home_page.dart';
+import 'package:nonghai/pages/chat/chat_home_page.dart';
 import 'package:nonghai/pages/home_page.dart';
 
 class BottomNavPage extends StatefulWidget {

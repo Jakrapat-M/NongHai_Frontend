@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:nonghai/components/custom_appbar.dart';
 import 'package:nonghai/components/user_tile.dart';
-import 'package:nonghai/pages/chat_room_page.dart';
+import 'package:nonghai/pages/chat/chat_room_page.dart';
 import 'package:nonghai/services/auth/auth_service.dart';
 import 'package:nonghai/services/caller.dart';
 import 'package:nonghai/services/chat/chat_service.dart';
@@ -19,6 +19,7 @@ class ChatHomePage extends StatelessWidget {
       final resp = await Caller.dio
           .get('/chat/getChatRoom', data: {"user_id": authService.getCurrentUser()!.uid});
       if (resp.statusCode == 200) {
+        // Return the chat room data including 'updated_at'
         return resp.data['data'];
       }
     } catch (e) {
@@ -56,9 +57,18 @@ class ChatHomePage extends StatelessWidget {
 
         final chatRoomData = chatRoomSnapshot.data as List<dynamic>;
 
+        // Create a map of user_id to updated_at for sorting
+        final Map<String, DateTime> chatRoomUserUpdatedAtMap = {};
+        for (var room in chatRoomData) {
+          // Assuming 'updated_at' is a timestamp string, convert it to DateTime
+          DateTime updatedAt = DateTime.parse(room['updated_at']);
+          chatRoomUserUpdatedAtMap[room['user_id_1']] = updatedAt;
+          chatRoomUserUpdatedAtMap[room['user_id_2']] = updatedAt;
+        }
+
         // Combine both user_id_1 and user_id_2 into one set
-        final chatRoomUserIds =
-            chatRoomData.expand((room) => [room['user_id_1'], room['user_id_2']]).toSet();
+        final chatRoomUserIds = chatRoomUserUpdatedAtMap.keys.toSet();
+        print('chatRoomUserIds: $chatRoomUserIds');
 
         return StreamBuilder(
           stream: chatService.getUsersStream(),
@@ -79,6 +89,17 @@ class ChatHomePage extends StatelessWidget {
               return chatRoomUserIds.contains(user["uid"]);
             }).toList();
 
+            // Sort filteredUsersList based on the 'updated_at' field
+            filteredUsersList.sort((a, b) {
+              DateTime aUpdatedAt = chatRoomUserUpdatedAtMap[a["uid"]]!;
+              DateTime bUpdatedAt = chatRoomUserUpdatedAtMap[b["uid"]]!;
+              return bUpdatedAt.compareTo(aUpdatedAt); // Sort in descending order
+            });
+
+            // if (kDebugMode) {
+            //   print('filteredUserList: $filteredUsersList');
+            // }
+
             return ListView(
               children: filteredUsersList
                   .map<Widget>((userData) => _buildUserListItem(userData, context))
@@ -93,16 +114,21 @@ class ChatHomePage extends StatelessWidget {
   Widget _buildUserListItem(Map<String, dynamic> userData, BuildContext context) {
     if (userData["email"] != authService.getCurrentUser()!.email) {
       return UserTile(
-          userLabel: userData["email"],
-          receiverID: userData["uid"],
-          onTap: () {
-            // navigate to chat room
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => ChatRoomPage(
-                        receiverEmail: userData["email"], receiverID: userData["uid"])));
-          });
+        userLabel: userData["email"],
+        receiverID: userData["uid"],
+        onTap: () {
+          // navigate to chat room
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ChatRoomPage(
+                receiverEmail: userData["email"],
+                receiverID: userData["uid"],
+              ),
+            ),
+          );
+        },
+      );
     } else {
       return const SizedBox();
     }
