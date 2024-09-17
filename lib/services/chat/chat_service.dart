@@ -43,13 +43,27 @@ class ChatService {
     List<String> ids = [currentUserID, receiverID];
     ids.sort();
     String chatRoomID = ids.join('_');
-
-    // add message to firestore
-    await _firestore
-        .collection('chat_rooms')
-        .doc(chatRoomID)
-        .collection('messages')
-        .add(newMessage.toMap());
+    try {
+      // add message to firestore
+      await _firestore
+          .collection('chat_rooms')
+          .doc(chatRoomID)
+          .collection('messages')
+          .add(newMessage.toMap());
+    } finally {
+      print('chatRoomID: $chatRoomID');
+      print('senderID: $currentUserID');
+      final resp = await Caller.dio.post(
+        '/chat/setUnread',
+        data: {
+          'chat_id': chatRoomID,
+          'sender_id': currentUserID,
+        },
+      );
+      if (resp.statusCode == 200) {
+        print('Unread message set');
+      }
+    }
   }
 
 // get messages
@@ -58,6 +72,14 @@ class ChatService {
     List<String> ids = [userID, otherUserID];
     ids.sort();
     String chatRoomID = ids.join('_');
+
+    Caller.dio.post(
+      '/chat/setRead',
+      data: {
+        'chat_id': chatRoomID,
+        'sender_id': userID,
+      },
+    );
 
     return _firestore
         .collection('chat_rooms')
@@ -68,11 +90,8 @@ class ChatService {
   }
 
   // get last message
-  Stream<QuerySnapshot> getLastMessage(String userID, otherUserID) {
+  Stream<QuerySnapshot> getLastMessage(String chatRoomID) {
     // Construct chat room id
-    List<String> ids = [userID, otherUserID];
-    ids.sort();
-    String chatRoomID = ids.join('_');
 
     return _firestore
         .collection('chat_rooms')
@@ -95,7 +114,7 @@ class ChatService {
 
     // create chat room
     try {
-      final resp = await Caller.dio.post(
+      await Caller.dio.post(
         '/chat/createChatRoom',
         data: {
           'chat_id': chatRoomID,
