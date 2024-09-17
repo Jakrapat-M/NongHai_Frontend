@@ -9,7 +9,7 @@ import 'package:nonghai/services/chat/chat_service.dart';
 import 'package:nonghai/types/chat_room_data.dart';
 
 class ChatHomePage extends StatefulWidget {
-  ChatHomePage({super.key});
+  const ChatHomePage({super.key});
 
   @override
   State<ChatHomePage> createState() => _ChatHomePageState();
@@ -39,6 +39,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
   Widget build(BuildContext context) {
     if (kDebugMode) {
       print("current user: ${authService.getCurrentUser()!.email}");
+      print("current user id: ${authService.getCurrentUser()!.uid}");
     }
     return Scaffold(
       appBar: const CustomAppBar(
@@ -61,6 +62,10 @@ class _ChatHomePageState extends State<ChatHomePage> {
           return const Center(child: CircularProgressIndicator());
         }
 
+        if (chatRoomSnapshot.data == null) {
+          return const Center(child: Text('No chat room found'));
+        }
+
         final chatRoomData = chatRoomSnapshot.data as List<dynamic>;
 
         // Create a map of user_id to updated_at for sorting
@@ -74,7 +79,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
 
         // Combine both user_id_1 and user_id_2 into one set
         final chatRoomUserIds = chatRoomUserUpdatedAtMap.keys.toSet();
-
+        print('chatRoomUserIds: $chatRoomUserIds');
         return StreamBuilder(
           stream: chatService.getUsersStream(),
           builder: (context, snapshot) {
