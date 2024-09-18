@@ -86,6 +86,7 @@ class ChatService {
         .doc(chatRoomID)
         .collection('messages')
         .orderBy('timestamp', descending: false)
+        //.limitToLast(50)
         .snapshots();
   }
 
