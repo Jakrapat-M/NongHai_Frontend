@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:io';
 
@@ -10,13 +11,19 @@ class Caller {
   static String _getLocalIp() {
     if (Platform.isIOS) {
       // Use localhost for iOS Simulator
+      if (kDebugMode) {
+        print('Using IOS_API_URL');
+      }
       return 'IOS_API_URL';
     } else if (Platform.isAndroid) {
       // Android emulator uses 10.0.2.2 to refer to the host machine
+      if (kDebugMode) {
+        print('Using ANDROID_API_URL');
+      }
       return 'ANDROID_API_URL';
     } else {
       // Fallback for other platforms if needed
-      return '127.0.0.1';
+      return 'IOS_API_URL';
     }
   }
 
