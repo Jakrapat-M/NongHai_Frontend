@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:nonghai/models/message.dart';
 import 'package:nonghai/services/caller.dart';
 
@@ -63,6 +66,56 @@ class ChatService {
       if (resp.statusCode == 200) {
         print('Unread message set');
       }
+    }
+  }
+
+  Future<void> sendImageMessage(String receiverID, File imageFile) async {
+    // Get current user
+    final currentUserID = _auth.currentUser!.uid;
+    final timestamp = Timestamp.now();
+
+    // Construct chat room id
+    List<String> ids = [currentUserID, receiverID];
+    ids.sort();
+    String chatRoomID = ids.join('_');
+
+    try {
+      // Upload image to Firebase Storage
+      String fileName = 'chat_images/$chatRoomID/${timestamp.seconds}.png';
+      final storageRef = FirebaseStorage.instance.ref().child(fileName);
+      final uploadTask = storageRef.putFile(File(imageFile.path));
+      final snapshot = await uploadTask.whenComplete(() {});
+      final downloadUrl = await snapshot.ref.getDownloadURL();
+
+      // Create new message with image URL
+      Message newMessage = Message(
+        senderID: currentUserID,
+        receiverID: receiverID,
+        message: '[Image]', // Placeholder message
+        timestamp: timestamp,
+        imageUrl: downloadUrl, // Add imageUrl to the message
+      );
+
+      // Add message to Firestore
+      await _firestore
+          .collection('chat_rooms')
+          .doc(chatRoomID)
+          .collection('messages')
+          .add(newMessage.toMap());
+
+      // Call the server to set unread status
+      // final resp = await Caller.dio.post(
+      //   '/chat/setUnread',
+      //   data: {
+      //     'chat_id': chatRoomID,
+      //     'sender_id': currentUserID,
+      //   },
+      // );
+      // if (resp.statusCode == 200) {
+      //   print('Unread message set');
+      // }
+    } catch (e) {
+      print('Error sending image message: $e');
     }
   }
 
