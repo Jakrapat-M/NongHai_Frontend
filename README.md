@@ -20,6 +20,7 @@ $ flutter pub get
 $ flutter pub add firebase_core
 $ flutter pub add firebase_auth
 $ flutter pub add cloud_firestore
+$ flutter pub add http
 ```
 
 Select device
