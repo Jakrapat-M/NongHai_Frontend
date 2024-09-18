@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:url_launcher/url_launcher_string.dart';
+import 'package:intl/intl.dart';
 
 class TrackingObject extends StatelessWidget {
-  final String dateTime;
+  final DateTime dateTime;
   final String username;
   final String phone;
   final String chat;
@@ -27,7 +27,6 @@ class TrackingObject extends StatelessWidget {
     if (lat != null && long != null) {
       Uri url = Uri.parse(
           'https://www.google.com/maps/search/?api=1&query=$lat,$long');
-      print(url);
       if (!await launchUrl(
         url,
         mode: LaunchMode.externalApplication,
@@ -47,6 +46,8 @@ class TrackingObject extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String dateTime =
+        DateFormat('hh:mm:ss a, dd MMMM yyyy').format(this.dateTime);
     return Column(
       children: [
         // date Time
@@ -81,6 +82,7 @@ class TrackingObject extends StatelessWidget {
                       children: [
                         Container(
                           padding: const EdgeInsets.all(5),
+                          width: 200,
                           decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(20)),
@@ -97,9 +99,11 @@ class TrackingObject extends StatelessWidget {
                               Padding(
                                 padding:
                                     const EdgeInsets.only(left: 10, right: 10),
-                                child: Text(username,
-                                    style:
-                                        Theme.of(context).textTheme.bodyMedium),
+                                child: Text(
+                                  username,
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
                             ],
                           ),

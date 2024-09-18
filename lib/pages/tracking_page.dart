@@ -89,7 +89,7 @@ class _TrackingPageState extends State<TrackingPage> {
                           long: trackingInfo[index].long,
                           chat: trackingInfo[index].finderChat,
                           image: trackingInfo[index].finderImage,
-                          dateTime: trackingInfo[index].createdAt.toString(),
+                          dateTime: trackingInfo[index].createdAt,
                         ),
                       ),
                     );

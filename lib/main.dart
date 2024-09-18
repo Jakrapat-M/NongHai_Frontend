@@ -14,6 +14,7 @@ import 'package:nonghai/pages/home_page.dart';
 import 'package:nonghai/services/auth/auth_gate.dart';
 // import 'package:nonghai/services/auth/auth_service.dart';
 // import 'package:provider/provider.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,6 +22,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await initializeDateFormatting('th_TH', null);
 
   runApp(const MyApp());
 }
