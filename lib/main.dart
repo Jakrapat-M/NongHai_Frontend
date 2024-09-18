@@ -2,10 +2,11 @@ import 'package:firebase_core/firebase_core.dart';
 // import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:nonghai/pages/nfc_page.dart';
 // import 'package:flutter/painting.dart';
 // import 'package:flutter/rendering.dart';
 // import 'package:flutter/widgets.dart';
-import 'package:nonghai/pages/nfc_page.dart';
+import 'package:nonghai/pages/test_nfc_page.dart';
 import 'package:nonghai/pages/tracking_page.dart';
 import 'package:nonghai/services/auth/login_or_registoer.dart';
 import 'package:nonghai/firebase_options.dart';
@@ -58,6 +59,16 @@ class MyApp extends StatelessWidget {
               fontWeight: FontWeight.w400,
               color: Color(0xff2C3F50),
               fontFamily: 'Fredoka'),
+          labelMedium: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              color: Color(0xffC8A48A),
+              fontFamily: 'Fredoka'),
+          labelSmall: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              color: Color(0xffFfffff),
+              fontFamily: 'Fredoka'),
           bodySmall: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w400,
@@ -76,11 +87,12 @@ class MyApp extends StatelessWidget {
           iconTheme: IconThemeData(color: Color(0xff2C3F50), size: 36),
         ),
       ),
-      initialRoute: '/tracking',
+      initialRoute: '/nfc',
       routes: {
         '/': (context) => const AuthGate(),
         '/loginOrRegister': (context) => const LoginOrRegistoer(),
         '/home': (context) => const HomePage(),
+        '/testnfc': (context) => const TestNfcPage(),
         '/nfc': (context) => const NfcPage(),
         '/tracking': (context) => const TrackingPage(
             petId: '318f9090-1613-4016-8d16-0f2de8223564',
