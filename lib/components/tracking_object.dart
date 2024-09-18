@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class TrackingObject extends StatelessWidget {
   final String dateTime;
@@ -7,6 +9,8 @@ class TrackingObject extends StatelessWidget {
   final String chat;
   final String? address;
   final String? image;
+  final double? lat;
+  final double? long;
 
   const TrackingObject(
       {super.key,
@@ -15,7 +19,31 @@ class TrackingObject extends StatelessWidget {
       required this.phone,
       required this.chat,
       this.address,
+      this.lat,
+      this.long,
       this.image});
+
+  Future<void> _launchMap() async {
+    if (lat != null && long != null) {
+      Uri url = Uri.parse(
+          'https://www.google.com/maps/search/?api=1&query=$lat,$long');
+      print(url);
+      if (!await launchUrl(
+        url,
+        mode: LaunchMode.externalApplication,
+      )) {
+        throw Exception('Could not launch $url');
+      }
+    }
+  }
+
+  Future<void> _makePhoneCall() async {
+    final Uri launchUri = Uri(
+      scheme: 'tel',
+      path: phone,
+    );
+    await launchUrl(launchUri);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -98,7 +126,7 @@ class TrackingObject extends StatelessWidget {
                             backgroundColor: Colors.white,
                             child: IconButton(
                               icon: const Icon(Icons.phone_rounded),
-                              onPressed: () {},
+                              onPressed: _makePhoneCall,
                               color:
                                   Theme.of(context).colorScheme.secondaryFixed,
                               iconSize: 18,
@@ -118,7 +146,7 @@ class TrackingObject extends StatelessWidget {
                           backgroundColor: Colors.white,
                           child: IconButton(
                             icon: const Icon(Icons.location_pin),
-                            onPressed: () {},
+                            onPressed: _launchMap,
                             color: Theme.of(context).colorScheme.secondaryFixed,
                             iconSize: 18,
                           ),

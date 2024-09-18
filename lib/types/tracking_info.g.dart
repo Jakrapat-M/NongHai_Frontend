@@ -13,7 +13,7 @@ TrackingInfo _$TrackingInfoFromJson(Map<String, dynamic> json) => TrackingInfo(
       finderPhone: json['finder_phone'] as String,
       finderImage: json['finder_image'] as String?,
       lat: (json['lat'] as num?)?.toDouble(),
-      lng: (json['lng'] as num?)?.toDouble(),
+      long: (json['long'] as num?)?.toDouble(),
       address: json['address'] as String?,
       createdAt: DateTime.parse(json['created_at'] as String),
     );
@@ -26,7 +26,7 @@ Map<String, dynamic> _$TrackingInfoToJson(TrackingInfo instance) =>
       'finder_phone': instance.finderPhone,
       'finder_image': instance.finderImage,
       'lat': instance.lat,
-      'lng': instance.lng,
+      'long': instance.long,
       'address': instance.address,
       'created_at': instance.createdAt.toIso8601String(),
     };

@@ -85,6 +85,8 @@ class _TrackingPageState extends State<TrackingPage> {
                           username: trackingInfo[index].finderName,
                           phone: trackingInfo[index].finderPhone,
                           address: trackingInfo[index].address,
+                          lat: trackingInfo[index].lat,
+                          long: trackingInfo[index].long,
                           chat: trackingInfo[index].finderChat,
                           image: trackingInfo[index].finderImage,
                           dateTime: trackingInfo[index].createdAt.toString(),

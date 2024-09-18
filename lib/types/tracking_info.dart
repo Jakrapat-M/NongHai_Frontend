@@ -21,8 +21,8 @@ class TrackingInfo {
   @JsonKey(name: 'lat')
   double? lat;
 
-  @JsonKey(name: 'lng')
-  double? lng;
+  @JsonKey(name: 'long')
+  double? long;
 
   @JsonKey(name: 'address')
   String? address;
@@ -37,7 +37,7 @@ class TrackingInfo {
     required this.finderPhone,
     this.finderImage,
     this.lat,
-    this.lng,
+    this.long,
     this.address,
     required this.createdAt,
   });

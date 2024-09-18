@@ -87,7 +87,7 @@ class MyApp extends StatelessWidget {
           iconTheme: IconThemeData(color: Color(0xff2C3F50), size: 36),
         ),
       ),
-      initialRoute: '/nfc',
+      initialRoute: '/tracking',
       routes: {
         '/': (context) => const AuthGate(),
         '/loginOrRegister': (context) => const LoginOrRegistoer(),
@@ -95,7 +95,7 @@ class MyApp extends StatelessWidget {
         '/testnfc': (context) => const TestNfcPage(),
         '/nfc': (context) => const NfcPage(),
         '/tracking': (context) => const TrackingPage(
-            petId: '318f9090-1613-4016-8d16-0f2de8223564',
+            petId: '550e8400-e29b-41d4-a716-446655440000',
             petName: 'Ella',
             petImage: 'assets/images/test.jpg'),
       },
