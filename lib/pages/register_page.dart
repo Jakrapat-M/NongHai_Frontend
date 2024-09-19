@@ -8,6 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:nonghai/services/caller.dart';
 // import 'package:provider/provider.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -40,9 +41,8 @@ class _RegisterPageState extends State<RegisterPage> {
       final authService = AuthService();
       try {
         // Sign up with Firebase
-        UserCredential userCredential =
-            await authService.signUpWithEmailandPassword(
-                emailController.text, passwordController.text);
+        UserCredential userCredential = await authService.signUpWithEmailandPassword(
+            emailController.text, passwordController.text);
 
         // Get the Firebase User's UID
         String uid = userCredential.user!.uid;
@@ -50,8 +50,7 @@ class _RegisterPageState extends State<RegisterPage> {
         // Prepare the data for the createUser API
         final userData = {
           "id": uid,
-          "username":
-              emailController.text.split('@')[0], // Example username from email
+          "username": emailController.text.split('@')[0], // Example username from email
           "name": "mairu",
           "surname": "maiiiiru",
           "email": emailController.text,
@@ -63,18 +62,14 @@ class _RegisterPageState extends State<RegisterPage> {
         };
 
         // Call the createUser API
-        final response = await http.post(
-          Uri.parse("$apiUrl/user/createUser"), // Adjust to your API URL
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer nonghai",
-          },
-          body: jsonEncode(userData),
+        final response = await Caller.dio.post(
+          ("/user/createUser"), // Adjust to your API URL
+          data: userData,
         );
 
         // Check if API call was successful
         if (response.statusCode == 201) {
-          print('resp: ${response.body}');
+          print('resp: ${response.data}');
           Navigator.pushNamed(context, '/home');
         } else {
           // Handle error from API
@@ -83,7 +78,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 context: context,
                 builder: (context) => AlertDialog(
                       title: const Text('API Error'),
-                      content: Text(response.body),
+                      content: Text(response.data),
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.pop(context),
@@ -140,18 +135,14 @@ class _RegisterPageState extends State<RegisterPage> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: CustomTextField(
-                      controller: emailController,
-                      hintText: "Email",
-                      obscureText: false),
+                      controller: emailController, hintText: "Email", obscureText: false),
                 ),
 
                 // Password
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: CustomTextField(
-                      controller: passwordController,
-                      hintText: "Password",
-                      obscureText: true),
+                      controller: passwordController, hintText: "Password", obscureText: true),
                 ),
 
                 // Confirm Password
@@ -181,9 +172,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       },
                       child: const Text("Sign In",
                           style: TextStyle(
-                              color: Colors.deepPurple,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold)),
+                              color: Colors.deepPurple, fontSize: 16, fontWeight: FontWeight.bold)),
                     ),
                   ],
                 ),

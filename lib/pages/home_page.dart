@@ -5,6 +5,7 @@ import 'package:nonghai/services/auth/auth_service.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:nonghai/services/caller.dart';
 // import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -19,13 +20,8 @@ class _HomePageState extends State<HomePage> {
   var _username, _address, _phone, _image;
   int _petCount = 0;
   List<dynamic> _pets = [], _petDetails = [];
-  String apiUrl = "", token = "";
 
   Future<void> fetchUserData() async {
-    await dotenv.load(fileName: ".env");
-
-    apiUrl = dotenv.env['API_URL']!;
-    token = dotenv.env['TOKEN']!;
     // Get the UID of the current user
     final uid = FirebaseAuth.instance.currentUser?.uid;
 
@@ -38,41 +34,39 @@ class _HomePageState extends State<HomePage> {
       if (kDebugMode) {
         print('id=$uid');
       }
-      final response = await http.get(
-        Uri.parse("$apiUrl/user/$uid"), // Replace with your server's IP address
-        headers: {
-          "Authorization": "Bearer nonghai",
-        },
+      final response = await Caller.dio.get(
+        "/user/$uid", // Replace with your server's IP address
       );
 
       if (response.statusCode == 200) {
-        final userData = jsonDecode(response.body);
-        setState(() {
-          _username = userData['data']['username'];
-          _address = userData['data']['address'];
-          _phone = userData['data']['phone'];
-          _pets = userData['data']['pets'] ??
-              []; // Get pets, default to empty list if null
-          _petCount = _pets != []
-              ? _pets.length
-              : 0; // Count number of pets, 0 if _pets is null
-          // Prepare pet details for display
-          _petDetails = _pets.map((pet) {
-            return {
-              'name': pet['name'],
-              'sex': pet['sex'],
-              'age': pet['age'],
-              'img': pet['image'],
-            };
-          }).toList();
-          _image = userData['data']['image'] ?? '';
-        });
-        print('User data retrieved successfully: $userData');
-        print(_petCount);
-        print(_petDetails);
+        try {
+          final userData = response.data;
+          setState(() {
+            _username = userData['data']['username'];
+            _address = userData['data']['address'];
+            _phone = userData['data']['phone'];
+            _pets = userData['data']['pets'] ?? []; // Get pets, default to empty list if null
+            _petCount = _pets != [] ? _pets.length : 0; // Count number of pets, 0 if _pets is null
+            // Prepare pet details for display
+            _petDetails = _pets.map((pet) {
+              return {
+                'name': pet['name'],
+                'sex': pet['sex'],
+                'age': pet['age'],
+                'img': pet['image'],
+              };
+            }).toList();
+            _image = userData['data']['image'] ?? '';
+          });
+          print('User data retrieved successfully: $userData');
+          print(_petCount);
+          print(_petDetails);
+        } catch (e) {
+          print('Error occurred: $e');
+        }
       } else {
         print('Failed to fetch user data: ${response.statusCode}');
-        print('Response body: ${response.body}');
+        print('Response body: ${response.data}');
       }
     } catch (e) {
       print('Error occurred: $e');
@@ -100,9 +94,7 @@ class _HomePageState extends State<HomePage> {
               height: 45, // Adjust the size as needed
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Theme.of(context)
-                    .colorScheme
-                    .secondary, // Background color of the circle
+                color: Theme.of(context).colorScheme.secondary, // Background color of the circle
               ),
               child: const Center(
                 child: Icon(
@@ -209,10 +201,7 @@ class _HomePageState extends State<HomePage> {
                         const Padding(
                           padding: EdgeInsets.fromLTRB(0, 15, 0, 12),
                           child: Row(
-                            children: [
-                              Text('Your Family',
-                                  style: TextStyle(fontSize: 16))
-                            ],
+                            children: [Text('Your Family', style: TextStyle(fontSize: 16))],
                           ),
                         ),
                         SizedBox(
@@ -222,13 +211,11 @@ class _HomePageState extends State<HomePage> {
                             padding: EdgeInsets.zero,
                             itemCount: _petCount +
                                 1, // Total number of items (n regular cards + 1 button card)
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 2, // 2 cards per row
                               mainAxisSpacing: 15.0, // Spacing between rows
                               crossAxisSpacing: 12.0, // Spacing between columns
-                              childAspectRatio:
-                                  2.05 / 2.6, // Aspect ratio of the cards
+                              childAspectRatio: 2.05 / 2.6, // Aspect ratio of the cards
                             ),
                             itemBuilder: (context, index) {
                               // Check if it's the last index (index n) to place the button card
@@ -245,18 +232,15 @@ class _HomePageState extends State<HomePage> {
                                       // Define your add button action here
                                     },
                                     borderRadius: BorderRadius.circular(8),
-                                    splashColor: Colors
-                                        .transparent, // Remove ripple effect
-                                    highlightColor: Colors
-                                        .transparent, // Remove highlight effect
+                                    splashColor: Colors.transparent, // Remove ripple effect
+                                    highlightColor: Colors.transparent, // Remove highlight effect
                                     child: GestureDetector(
                                       onTap: () async {
                                         final authService = AuthService();
                                         await authService.signOut();
                                         // Navigate to login or handle post-signout logic
                                         if (mounted) {
-                                          Navigator.pushReplacementNamed(
-                                              context, '/');
+                                          Navigator.pushReplacementNamed(context, '/');
                                         }
                                       },
                                       child: Center(
@@ -278,9 +262,7 @@ class _HomePageState extends State<HomePage> {
                                           child: Icon(
                                             Icons.add,
                                             size: 23,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onSurface,
+                                            color: Theme.of(context).colorScheme.onSurface,
                                           ),
                                         ),
                                       ),
@@ -303,17 +285,14 @@ class _HomePageState extends State<HomePage> {
                                         width: double.infinity,
                                         height: 155,
                                         child: ClipRRect(
-                                          borderRadius:
-                                              const BorderRadius.vertical(
+                                          borderRadius: const BorderRadius.vertical(
                                             top: Radius.circular(8),
                                           ),
-                                          child: pet['img'] != '' &&
-                                                  pet['img'] != null
+                                          child: pet['img'] != '' && pet['img'] != null
                                               ? Image.network(
                                                   pet['img'],
                                                   fit: BoxFit.cover,
-                                                  errorBuilder: (context, error,
-                                                      stackTrace) {
+                                                  errorBuilder: (context, error, stackTrace) {
                                                     return Image.asset(
                                                       'assets/images/meme2.jpg', // Default image
                                                       fit: BoxFit.cover,
@@ -327,62 +306,43 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                       ),
                                       Padding(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            8, 5, 8, 5),
+                                        padding: const EdgeInsets.fromLTRB(8, 5, 8, 5),
                                         child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.end,
+                                            mainAxisAlignment: MainAxisAlignment.end,
                                             children: [
                                               Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
+                                                mainAxisAlignment: MainAxisAlignment.start,
                                                 children: [
                                                   Text(
                                                     pet['name'],
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .labelLarge,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
+                                                    style: Theme.of(context).textTheme.labelLarge,
+                                                    overflow: TextOverflow.ellipsis,
                                                   ),
                                                 ],
                                               ),
                                               // ค่อยมาเปลี่ยนเป็น data1-data2 (sex-year)
                                               Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
+                                                mainAxisAlignment: MainAxisAlignment.start,
                                                 children: [
                                                   Text(
-                                                    pet['sex'] +
-                                                        ' - ' +
-                                                        pet['age'],
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .labelMedium,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
+                                                    pet['sex'] + ' - ' + pet['age'],
+                                                    style: Theme.of(context).textTheme.labelMedium,
+                                                    overflow: TextOverflow.ellipsis,
                                                   ),
                                                   const Spacer(),
                                                   //add logic if status=safe then green
                                                   Container(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: 11,
-                                                        vertical: 1.5),
+                                                    padding: const EdgeInsets.symmetric(
+                                                        horizontal: 11, vertical: 1.5),
                                                     decoration: BoxDecoration(
                                                         color: Theme.of(context)
                                                             .colorScheme
                                                             .surfaceBright,
-                                                        shape:
-                                                            BoxShape.rectangle,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(8)),
+                                                        shape: BoxShape.rectangle,
+                                                        borderRadius: BorderRadius.circular(8)),
                                                     child: Text(
                                                       'Safe',
-                                                      style: Theme.of(context)
-                                                          .textTheme
-                                                          .labelSmall,
+                                                      style: Theme.of(context).textTheme.labelSmall,
                                                     ),
                                                   ),
                                                 ],
