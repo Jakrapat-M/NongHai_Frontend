@@ -46,8 +46,7 @@ class MyApp extends StatelessWidget {
             onSurface: const Color(0xff2C3F50), //blue surface(box/button)
             secondaryContainer: const Color(0xffE8E8E8), //container
             secondaryFixed: const Color(0xff2C3F50), //container
-            surfaceBright:
-                const Color(0xff5DB671), // green container box(status)
+            surfaceBright: const Color(0xff5DB671), // green container box(status)
             onErrorContainer: Colors.red // red container box(status)
             ),
         useMaterial3: true,
@@ -87,16 +86,16 @@ class MyApp extends StatelessWidget {
               fontSize: 11,
               fontWeight: FontWeight.w600,
               color: Color(0xff1E1E1E)),
-          labelMedium: TextStyle(
-              fontFamily: 'Fredoka',
-              fontSize: 9,
-              fontWeight: FontWeight.w500,
-              color: Color(0xff5C5C5C)),
-          labelSmall: TextStyle(
-              fontFamily: 'Fredoka',
-              fontSize: 8,
-              fontWeight: FontWeight.w600,
-              color: Color(0xffffffff)),
+          // labelMedium: TextStyle(
+          //     fontFamily: 'Fredoka',
+          //     fontSize: 9,
+          //     fontWeight: FontWeight.w500,
+          //     color: Color(0xff5C5C5C)),
+          // labelSmall: TextStyle(
+          //     fontFamily: 'Fredoka',
+          //     fontSize: 8,
+          //     fontWeight: FontWeight.w600,
+          //     color: Color(0xffffffff)),
         ),
         appBarTheme: const AppBarTheme(
           titleTextStyle: TextStyle(
