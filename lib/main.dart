@@ -12,6 +12,7 @@ import 'package:nonghai/services/auth/login_or_registoer.dart';
 import 'package:nonghai/firebase_options.dart';
 import 'package:nonghai/pages/home_page.dart';
 import 'package:nonghai/services/auth/auth_gate.dart';
+import 'package:nonghai/services/noti/noti_service.dart';
 // import 'package:nonghai/services/auth/auth_service.dart';
 // import 'package:provider/provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -22,6 +23,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await NotiService().init();
   await initializeDateFormatting('th_TH', null);
 
   runApp(const MyApp());
@@ -89,7 +91,7 @@ class MyApp extends StatelessWidget {
           iconTheme: IconThemeData(color: Color(0xff2C3F50), size: 36),
         ),
       ),
-      initialRoute: '/tracking',
+      initialRoute: '/',
       routes: {
         '/': (context) => const AuthGate(),
         '/loginOrRegister': (context) => const LoginOrRegistoer(),

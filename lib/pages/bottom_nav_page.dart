@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:nonghai/pages/chat_home_page.dart';
+import 'package:nonghai/pages/chat/chat_home_page.dart';
 import 'package:nonghai/pages/home_page.dart';
 
 class BottomNavPage extends StatefulWidget {
@@ -19,10 +19,10 @@ class _BottomNavPageState extends State<BottomNavPage> {
     _selectedPageIndex = widget.page;
   }
 
-  static const List<Widget> _widgetOptions = <Widget>[
+  static final List<Widget> _widgetOptions = <Widget>[
     ChatHomePage(),
-    HomePage(),
-    Placeholder(),
+    const HomePage(),
+    const Placeholder(),
   ];
 
   @override
