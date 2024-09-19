@@ -82,10 +82,15 @@ class ChatService {
     try {
       // Upload image to Firebase Storage
       String fileName = 'chat_images/$chatRoomID/${timestamp.seconds}.png';
+      print('Setting image fileName to $fileName Done');
       final storageRef = FirebaseStorage.instance.ref().child(fileName);
+      print('StorageRef to $storageRef Done');
       final uploadTask = storageRef.putFile(File(imageFile.path));
+      print('Uploading image to $uploadTask Done');
       final snapshot = await uploadTask.whenComplete(() {});
+      print('Snapshot to $snapshot Done');
       final downloadUrl = await snapshot.ref.getDownloadURL();
+      print('DownloadUrl to $downloadUrl Done');
 
       // Create new message with image URL
       Message newMessage = Message(
