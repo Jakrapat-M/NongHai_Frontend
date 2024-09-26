@@ -162,11 +162,13 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
       child: data["imageUrl"] != null
           ? Padding(
               padding: const EdgeInsets.symmetric(vertical: 5.0),
-              child: Image.network(
-                data["imageUrl"],
-                width: 200,
-                height: 200,
-                fit: BoxFit.cover,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Image.network(
+                  data["imageUrl"],
+                  height: MediaQuery.of(context).size.width * 0.50,
+                  fit: BoxFit.fitHeight,
+                ),
               ),
             )
           : ChatBubble(
