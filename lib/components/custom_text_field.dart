@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
+  final TextStyle? hintStyle;
   final bool obscureText;
   const CustomTextField({
     super.key,
     required this.controller,
     required this.hintText,
+    required this.hintStyle,
     required this.obscureText,
   });
 
@@ -35,6 +37,7 @@ class CustomTextField extends StatelessWidget {
           ),
         ),
         hintText: hintText,
+        hintStyle: hintStyle,
       ),
       obscureText: obscureText,
     );

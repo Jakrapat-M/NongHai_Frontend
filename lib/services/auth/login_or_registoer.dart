@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:nonghai/pages/login_page.dart';
-import 'package:nonghai/pages/register_page.dart';
+import 'package:nonghai/pages/auth/login_page.dart';
+import 'package:nonghai/pages/auth/register_page.dart';
 
 class LoginOrRegistoer extends StatefulWidget {
   const LoginOrRegistoer({super.key});

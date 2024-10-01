@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:nonghai/pages/chat_home_page.dart';
-import 'package:nonghai/pages/home_page.dart';
+import 'package:nonghai/pages/chat/chat_home_page.dart';
+import 'package:nonghai/pages/auth/home_page.dart';
 
 class BottomNavPage extends StatefulWidget {
   const BottomNavPage({super.key, required this.page});
@@ -62,25 +62,33 @@ class _BottomNavPageState extends State<BottomNavPage> {
             elevation: 0,
           ),
         ),
-        Positioned(
-          bottom: 8, // Adjust this value to control the pop-out effect
-          left: MediaQuery.of(context).size.width / 2 -
-              36, // Adjust the offset to center the button
-          child: SizedBox(
-            width: 70,
-            height: 70,
-            child: FloatingActionButton(
-              elevation: 1,
-              backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-              shape: const CircleBorder(),
-              onPressed: () {
-                setState(() {
-                  _selectedPageIndex = 1; // Set to the index of the Home page
-                });
-              },
-              child: const Icon(
-                Icons.home,
-                size: 30,
+        SafeArea(
+          child: Container(
+            alignment: Alignment.bottomCenter,
+            padding: const EdgeInsets.only(bottom: 10),
+            child: Positioned(
+              bottom: MediaQuery.of(context).size.height *
+                  0.02, // Adjust this value to control the pop-out effect
+              // left: MediaQuery.of(context).size.width / 2 - 35, // Center the button
+              child: SizedBox(
+                width: 70,
+                height: 70,
+                child: FloatingActionButton(
+                  elevation: 1,
+                  backgroundColor:
+                      Theme.of(context).appBarTheme.backgroundColor,
+                  shape: const CircleBorder(),
+                  onPressed: () {
+                    setState(() {
+                      _selectedPageIndex =
+                          1; // Set to the index of the Home page
+                    });
+                  },
+                  child: const Icon(
+                    Icons.home,
+                    size: 30,
+                  ),
+                ),
               ),
             ),
           ),

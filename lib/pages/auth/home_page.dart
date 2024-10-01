@@ -19,63 +19,80 @@ class _HomePageState extends State<HomePage> {
   var _username, _address, _phone, _image;
   int _petCount = 0;
   List<dynamic> _pets = [], _petDetails = [];
-  String apiUrl = "", token = "";
+  bool _isLoading = true;
+  String _errorMessage = '';
 
   Future<void> fetchUserData() async {
-    await dotenv.load(fileName: ".env");
-
-    apiUrl = dotenv.env['API_URL']!;
-    token = dotenv.env['TOKEN']!;
-    // Get the UID of the current user
     final uid = FirebaseAuth.instance.currentUser?.uid;
 
     if (uid == null) {
-      print('No user is currently signed in.');
+      setState(() {
+        _errorMessage = 'No user is currently signed in.';
+        _isLoading = false;
+      });
       return;
     }
 
     try {
-      if (kDebugMode) {
-        print('id=$uid');
-      }
-      final response = await http.get(
-        Uri.parse("$apiUrl/user/$uid"), // Replace with your server's IP address
-        headers: {
-          "Authorization": "Bearer nonghai",
-        },
+      final response = await Caller.dio.get(
+        "/user/$uid",
       );
 
+      // Log the entire API response for debugging
+      print('API response data: ${response.data}');
+
       if (response.statusCode == 200) {
-        final userData = jsonDecode(response.body);
+        final userData = response.data;
+
+        // Check if username, phone, and address are null or missing
+        if (userData['data'] == null ||
+            userData['data']['username'] == null ||
+            userData['data']['phone'] == null ||
+            userData['data']['address'] == null) {
+          throw Exception(
+              "Required user data (username, phone, or address) is missing.");
+        }
+
         setState(() {
           _username = userData['data']['username'];
           _address = userData['data']['address'];
           _phone = userData['data']['phone'];
-          _pets = userData['data']['pets'] ??
-              []; // Get pets, default to empty list if null
-          _petCount = _pets != []
-              ? _pets.length
-              : 0; // Count number of pets, 0 if _pets is null
-          // Prepare pet details for display
+
+          // Log the user data to check what was retrieved
+          print('Username: $_username, Address: $_address, Phone: $_phone');
+
+          // Pets data can be null, provide fallback
+          _pets = userData['data']['pets'] ?? [];
+          _petCount = _pets.length;
+
+          // Map pet details
           _petDetails = _pets.map((pet) {
             return {
-              'name': pet['name'],
-              'sex': pet['sex'],
-              'age': pet['age'],
-              'img': pet['image'],
+              'name': pet['name'] ?? 'No name',
+              'sex': pet['sex'] ?? 'Unknown',
+              'age': pet['age'] != null ? pet['age'].toString() : 'Unknown age',
+              'img': pet['image'] ?? '',
             };
           }).toList();
+
+          // Log the pet details to see if they're correctly parsed
+          print('Pet details: $_petDetails');
+
+          // Set image, fallback to empty string if null
           _image = userData['data']['image'] ?? '';
+          _isLoading = false;
         });
-        print('User data retrieved successfully: $userData');
-        print(_petCount);
-        print(_petDetails);
       } else {
-        print('Failed to fetch user data: ${response.statusCode}');
-        print('Response body: ${response.body}');
+        setState(() {
+          _errorMessage = 'Failed to fetch user data: ${response.statusCode}';
+          _isLoading = false;
+        });
       }
     } catch (e) {
-      print('Error occurred: $e');
+      setState(() {
+        _errorMessage = 'Error occurred: $e';
+        _isLoading = false;
+      });
     }
   }
 
@@ -88,6 +105,24 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     // const cards = 2;
+    if (_isLoading) {
+      // Show a loading spinner while fetching data
+      return Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+    if (_errorMessage.isNotEmpty) {
+      return Scaffold(
+        body: Center(
+          child: Text(
+            _errorMessage,
+            style: const TextStyle(color: Colors.red, fontSize: 18),
+          ),
+        ),
+      );
+    }
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: Stack(
@@ -358,7 +393,7 @@ class _HomePageState extends State<HomePage> {
                                                         pet['age'],
                                                     style: Theme.of(context)
                                                         .textTheme
-                                                        .labelMedium,
+                                                        .displayMedium,
                                                     overflow:
                                                         TextOverflow.ellipsis,
                                                   ),
@@ -382,7 +417,7 @@ class _HomePageState extends State<HomePage> {
                                                       'Safe',
                                                       style: Theme.of(context)
                                                           .textTheme
-                                                          .labelSmall,
+                                                          .displaySmall,
                                                     ),
                                                   ),
                                                 ],
