@@ -21,6 +21,8 @@ class _ChatHomePageState extends State<ChatHomePage> {
 
   final authService = AuthService();
 
+  final currentUserId = AuthService().getCurrentUser()!.uid;
+  final currentEmail = AuthService().getCurrentUser()!.email;
   getChatRoom() async {
     try {
       final resp = await Caller.dio
@@ -38,8 +40,8 @@ class _ChatHomePageState extends State<ChatHomePage> {
   @override
   Widget build(BuildContext context) {
     if (kDebugMode) {
-      print("current user: ${authService.getCurrentUser()!.email}");
-      print("current user id: ${authService.getCurrentUser()!.uid}");
+      print("current user: $currentEmail");
+      print("current user id: $currentUserId");
     }
     return Scaffold(
       appBar: const CustomAppBar(
@@ -79,7 +81,6 @@ class _ChatHomePageState extends State<ChatHomePage> {
 
         // Combine both user_id_1 and user_id_2 into one set
         final chatRoomUserIds = chatRoomUserUpdatedAtMap.keys.toSet();
-        print('chatRoomUserIds: $chatRoomUserIds');
         return StreamBuilder(
           stream: chatService.getUsersStream(),
           builder: (context, snapshot) {
@@ -142,7 +143,18 @@ class _ChatHomePageState extends State<ChatHomePage> {
           )
               .then((value) {
             // Refresh the chat room list
+            List<String> ids = [currentUserId, userData["uid"]];
+            ids.sort();
+            String chatRoomID = ids.join('_');
             setState(() {
+              // mark chat as read where navigate back from chat room
+              Caller.dio.post(
+                '/chat/setRead',
+                data: {
+                  'chat_id': chatRoomID,
+                  'sender_id': currentUserId,
+                },
+              );
               //refresh chat room list
             });
           });
