@@ -1,11 +1,11 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:nfc_manager/nfc_manager.dart';
+import 'package:nonghai/components/custom_appbar.dart';
+import 'package:nonghai/components/custom_button.dart';
 
 class NfcPage extends StatefulWidget {
-
-  const NfcPage({super.key});
+  final String petId;
+  const NfcPage({super.key, required this.petId});
 
   @override
   State<NfcPage> createState() => _NfcPageState();
@@ -13,119 +13,151 @@ class NfcPage extends StatefulWidget {
 
 class _NfcPageState extends State<NfcPage> {
   ValueNotifier<dynamic> result = ValueNotifier(null);
+  bool isWriting = false; // To control the progress indicator and button state
+  late NdefMessage message;
+
+  @override
+  void initState() {
+    super.initState();
+    message = NdefMessage([
+      NdefRecord.createUri(
+          Uri.parse('https://nonghai.ryyyyyy.com/tracking#${widget.petId}')),
+    ]);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(title: const Text('NfcManager Plugin Example')),
-        body: SafeArea(
-          child: FutureBuilder<bool>(
-            future: NfcManager.instance.isAvailable(),
-            builder: (context, ss) => ss.data != true
-                ? Center(child: Text('NfcManager.isAvailable(): ${ss.data}'))
-                : Flex(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    direction: Axis.vertical,
-                    children: [
-                      Flexible(
-                        flex: 2,
-                        child: Container(
-                          margin: const EdgeInsets.all(4),
-                          constraints: const BoxConstraints.expand(),
-                          decoration: BoxDecoration(border: Border.all()),
-                          child: SingleChildScrollView(
-                            child: ValueListenableBuilder<dynamic>(
-                              valueListenable: result,
-                              builder: (context, value, _) =>
-                                  Text('${value ?? ''}'),
-                            ),
+    return Scaffold(
+      appBar: const CustomAppBar(title: 'Scan NFC'),
+      body: SafeArea(
+        child: FutureBuilder(
+          future: NfcManager.instance.isAvailable(),
+          builder: (context, snapshot) {
+            if (snapshot.data != true) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.phonelink_erase_rounded,
+                      size: 125,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      'NFC is not available for this device',
+                      style: Theme.of(context).textTheme.labelMedium,
+                    ),
+                  ],
+                ),
+              );
+            }
+            return Padding(
+              padding: const EdgeInsets.all(50.0),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.speaker_phone_rounded,
+                      size: 125,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      'HOLD Your Pet-Collar Tag at the back of your phone',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                      textAlign: TextAlign.center,
+                    ),
+                    Text(
+                      '*Please do not move or remove the tag before scanning is complete',
+                      style: Theme.of(context).textTheme.labelMedium,
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 20),
+                    isWriting
+                        ? const CircularProgressIndicator() // Show Circular Progress when writing
+                        : CustomButton1(
+                            onTap: _ndefWrite,
+                            text: 'Write to NFC Tag',
                           ),
-                        ),
-                      ),
-                      Flexible(
-                        flex: 3,
-                        child: GridView.count(
-                          padding: const EdgeInsets.all(4),
-                          crossAxisCount: 2,
-                          childAspectRatio: 4,
-                          crossAxisSpacing: 4,
-                          mainAxisSpacing: 4,
-                          children: [
-                            ElevatedButton(
-                                child: const Text('Tag Read'), onPressed: _tagRead),
-                            ElevatedButton(
-                                child: const Text('Ndef Write'),
-                                onPressed: _ndefWrite),
-                            ElevatedButton(
-                                child: const Text('Ndef Write Lock'),
-                                onPressed: _ndefWriteLock),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-          ),
+                  ],
+                ),
+              ),
+            );
+          },
         ),
       ),
     );
   }
 
-  void _tagRead() {
-    NfcManager.instance.startSession(onDiscovered: (NfcTag tag) async {
-      result.value = tag.data;
-      NfcManager.instance.stopSession();
+  void _ndefWrite() async {
+    setState(() {
+      isWriting = true; // Start progress indicator
     });
-  }
 
-  void _ndefWrite() {
     NfcManager.instance.startSession(onDiscovered: (NfcTag tag) async {
       var ndef = Ndef.from(tag);
+
       if (ndef == null || !ndef.isWritable) {
         result.value = 'Tag is not ndef writable';
         NfcManager.instance.stopSession(errorMessage: result.value);
+
+        if (mounted) {
+          setState(() {
+            isWriting = false; // Stop progress indicator
+          });
+        }
         return;
       }
-
-      NdefMessage message = NdefMessage([
-        NdefRecord.createText('Hello World!'),
-        NdefRecord.createUri(Uri.parse('https://flutter.dev')),
-        NdefRecord.createMime(
-            'text/plain', Uint8List.fromList('Hello'.codeUnits)),
-        NdefRecord.createExternal(
-            'com.example', 'mytype', Uint8List.fromList('mydata'.codeUnits)),
-      ]);
 
       try {
         await ndef.write(message);
         result.value = 'Success to "Ndef Write"';
-        NfcManager.instance.stopSession();
+        NfcManager.instance
+            .stopSession(); // Stop the session to prevent immediate reading
+
+        if (mounted) {
+          _showDialog(context, 'Write Success');
+        }
       } catch (e) {
         result.value = e;
         NfcManager.instance.stopSession(errorMessage: result.value.toString());
-        return;
+
+        if (mounted) {
+          _showDialog(context, 'Error: $e');
+        }
+      } finally {
+        if (mounted) {
+          setState(() {
+            isWriting = false; // Stop progress indicator
+          });
+        }
       }
     });
   }
+}
 
-  void _ndefWriteLock() {
-    NfcManager.instance.startSession(onDiscovered: (NfcTag tag) async {
-      var ndef = Ndef.from(tag);
-      if (ndef == null) {
-        result.value = 'Tag is not ndef';
-        NfcManager.instance.stopSession(errorMessage: result.value.toString());
-        return;
-      }
-
-      try {
-        await ndef.writeLock();
-        result.value = 'Success to "Ndef Write Lock"';
-        NfcManager.instance.stopSession();
-      } catch (e) {
-        result.value = e;
-        NfcManager.instance.stopSession(errorMessage: result.value.toString());
-        return;
-      }
-    });
-  }
+// Method to show success dialog
+void _showDialog(BuildContext context, String message) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Center(
+            child: Text(message,
+                style: Theme.of(context).textTheme.headlineMedium)),
+        actions: [
+          TextButton(
+            child: Center(
+                child:
+                    Text('OK', style: Theme.of(context).textTheme.labelMedium)),
+            onPressed: () {
+              Navigator.of(context).pop(); // Close the dialog
+            },
+          ),
+        ],
+      );
+    },
+  );
 }
