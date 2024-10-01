@@ -1,16 +1,20 @@
+import 'dart:async';
+import 'package:app_links/app_links.dart';
 import 'package:firebase_core/firebase_core.dart';
 // import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:nonghai/pages/nfc_page.dart';
 // import 'package:flutter/painting.dart';
 // import 'package:flutter/rendering.dart';
 // import 'package:flutter/widgets.dart';
-import 'package:nonghai/pages/nfc_page.dart';
+import 'package:nonghai/pages/test_nfc_page.dart';
 import 'package:nonghai/pages/tracking_page.dart';
 import 'package:nonghai/services/auth/login_or_registoer.dart';
 import 'package:nonghai/firebase_options.dart';
 import 'package:nonghai/pages/auth/home_page.dart';
 import 'package:nonghai/services/auth/auth_gate.dart';
+import 'package:nonghai/services/noti/noti_service.dart';
 // import 'package:nonghai/services/auth/auth_service.dart';
 // import 'package:provider/provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -25,17 +29,68 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
+  await NotiService().init();
+  await initializeDateFormatting('th_TH', null);
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  final _navigatorKey = GlobalKey<NavigatorState>();
+  late AppLinks _appLinks;
+  StreamSubscription<Uri>? _linkSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    initDeepLinks();
+  }
+
+  @override
+  void dispose() {
+    _linkSubscription?.cancel();
+    super.dispose();
+  }
+
+  Future<void> initDeepLinks() async {
+    _appLinks = AppLinks();
+
+    // Handle links
+    _linkSubscription = _appLinks.uriLinkStream.listen((uri) {
+      debugPrint('onAppLink: $uri');
+      openAppLink(uri);
+    });
+  }
+
+  void openAppLink(Uri uri) {
+    final fragment = uri.fragment;
+
+    // Print the full URI for debugging purposes
+    debugPrint('Navigating to: $fragment');
+
+    // Navigate to TrackingPage
+    _navigatorKey.currentState?.push(MaterialPageRoute(
+      builder: (context) {
+        return TrackingPage(
+          petId: fragment,
+          petName: 'Ella',
+          petImage: 'petImage',
+        );
+      },
+    ));
+  }
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: _navigatorKey,
       title: 'Nonghai',
       theme: ThemeData(
         colorScheme: ThemeData().colorScheme.copyWith(
@@ -66,6 +121,16 @@ class MyApp extends StatelessWidget {
               fontSize: 14,
               fontWeight: FontWeight.w400,
               color: Color(0xff2C3F50),
+              fontFamily: 'Fredoka'),
+          labelMedium: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              color: Color(0xffC8A48A),
+              fontFamily: 'Fredoka'),
+          labelSmall: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              color: Color(0xffFfffff),
               fontFamily: 'Fredoka'),
           bodySmall: TextStyle(
               fontSize: 14,
@@ -115,20 +180,20 @@ class MyApp extends StatelessWidget {
           iconTheme: IconThemeData(color: Color(0xff2C3F50), size: 25),
         ),
       ),
-      initialRoute: '/',
+      initialRoute: '/nfc',
       routes: {
         '/': (context) => const AuthGate(),
         '/loginOrRegister': (context) => const LoginOrRegistoer(),
         '/home': (context) => const HomePage(),
+        '/testnfc': (context) => const TestNfcPage(),
         '/addProfileImage': (context) => const AddProfilePage(),
         '/addContact': (context) => const AddContactPage(),
         '/addPetProfileImage': (context) => const AddPetProfilePage(),
-        // '/testnfc': (context) => const TestNfcPage(),
-        // '/nfc': (context) => const NfcPage(
-        //       petId: '550e8400-e29b-41d4-a716-446655440000',
-        //     ),
+        '/nfc': (context) => const NfcPage(
+              petId: '550e8400-e29b-41d4-a716-446655440000',
+            ),
         '/tracking': (context) => const TrackingPage(
-            petId: '318f9090-1613-4016-8d16-0f2de8223564',
+            petId: '550e8400-e29b-41d4-a716-446655440000',
             petName: 'Ella',
             petImage: 'assets/images/test.jpg'),
       },

@@ -5,6 +5,7 @@ import 'package:nonghai/services/auth/auth_service.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:nonghai/services/caller.dart';
 // import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -393,7 +394,7 @@ class _HomePageState extends State<HomePage> {
                                                         pet['age'],
                                                     style: Theme.of(context)
                                                         .textTheme
-                                                        .displayMedium,
+                                                        .labelMedium,
                                                     overflow:
                                                         TextOverflow.ellipsis,
                                                   ),
@@ -417,7 +418,7 @@ class _HomePageState extends State<HomePage> {
                                                       'Safe',
                                                       style: Theme.of(context)
                                                           .textTheme
-                                                          .displaySmall,
+                                                          .labelSmall,
                                                     ),
                                                   ),
                                                 ],

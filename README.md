@@ -9,6 +9,7 @@ flutter pub add firebase_auth
 ```
 
 ## Clean flutter
+
 ```bash
 flutter clean
 ```
@@ -29,4 +30,10 @@ Select device
 
 ```bash
 $ flutter run
+```
+
+## Genearate .g file (JsonSerialized)
+
+```bash
+$ dart run build_runner build --delete-conflicting-outputs
 ```
