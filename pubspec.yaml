@@ -36,7 +36,7 @@ dependencies:
   cupertino_icons: ^1.0.6
   firebase_core: ^3.3.0
   firebase_auth: ^5.1.4
-  firebase_messaging: ^15.0.4
+  firebase_messaging: ^15.1.2
   provider:
   cloud_firestore: ^5.2.1
   nfc_manager: ^3.5.0
