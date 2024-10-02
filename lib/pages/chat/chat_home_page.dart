@@ -132,7 +132,6 @@ class _ChatHomePageState extends State<ChatHomePage> {
         onTap: () {
           MaterialPageRoute materialPageRoute = MaterialPageRoute(
             builder: (context) => ChatRoomPage(
-              receiverEmail: userData["email"],
               receiverID: userData["uid"],
             ),
           );

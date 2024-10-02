@@ -9,10 +9,9 @@ import 'package:nonghai/services/chat/chat_service.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ChatRoomPage extends StatefulWidget {
-  final String receiverEmail;
   final String receiverID;
 
-  ChatRoomPage({super.key, required this.receiverEmail, required this.receiverID});
+  const ChatRoomPage({super.key, required this.receiverID});
 
   @override
   State<ChatRoomPage> createState() => _ChatRoomPageState();
@@ -29,6 +28,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   final _focusNode = FocusNode();
 
   final ImagePicker _picker = ImagePicker();
+  
+  final String receiverName = 'Get receiver name';
 
   @override
   void initState() {
@@ -105,7 +106,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(title: widget.receiverEmail),
+      appBar: CustomAppBar(title: receiverName),
       body: SafeArea(
         child: Column(
           children: [

@@ -4,7 +4,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:nonghai/models/message.dart';
+import 'package:nonghai/models/notification.dart';
 import 'package:nonghai/services/caller.dart';
+import 'package:nonghai/services/noti/noti_service.dart';
+import 'package:nonghai/services/noti/send_noti_service.dart';
 
 class ChatService {
 // get instance of firestore
@@ -66,6 +69,7 @@ class ChatService {
       if (resp.statusCode == 200) {
         print('Unread message set');
       }
+      sendChatNoti(currentUserID, receiverID, message);
     }
   }
 
@@ -184,5 +188,21 @@ class ChatService {
     } catch (e) {
       print('Error creating chat room: $e');
     }
+  }
+
+  // sent notification
+  Future<void> sendChatNoti(String chatWith, String receiverID, String message) async {
+    SendNotiService sendNotiService = SendNotiService();
+    sendNotiService.sendNotification(
+      NotificationEntity(
+        sentTo: receiverID,
+        title: 'New Message',
+        body: message,
+        notificationData: {
+          'navigateto': 'chat',
+          'chat_with': chatWith,
+        },
+      ),
+    );
   }
 }
