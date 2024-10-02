@@ -35,17 +35,19 @@ class _RegisterPageState extends State<RegisterPage> {
   // }
 
   void createAccount(BuildContext context) {
-    if (passwordController.text == confirmPasswordController.text) {
+    if (passwordController.text == confirmPasswordController.text &&
+        passwordController.text.length >= 6) {
       final userData = {
         "id": "",
         "username": usernameController.text,
-        "name": "mairu",
-        "surname": "maiiiiru",
+        "name": "-",
+        "surname": "-",
         "email": emailController.text,
-        "phone": "123456789",
-        "address": "kmutt",
-        "latitude": 40.712776,
-        "longitude": -74.005974,
+        "password": passwordController.text,
+        "phone": "-",
+        "address": "-",
+        "latitude": 13.7540,
+        "longitude": 100.5014, // latitude / longitude of TH
         "image": ""
       };
       // Navigate to Add Profile Image page and pass userData
@@ -56,88 +58,9 @@ class _RegisterPageState extends State<RegisterPage> {
         showDialog(
             context: context,
             builder: (context) => AlertDialog(
-                  title: const Text('Password does not match'),
-                  content: const Text('Please ensure your passwords match.'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('OK'),
-                    ),
-                  ],
-                ));
-      }
-    }
-  }
-
-  void signUp(BuildContext context) async {
-    // getEnv();
-    // print(apiUrl);
-    if (passwordController.text == confirmPasswordController.text) {
-      // Get auth service
-      final authService = AuthService();
-      try {
-        // Sign up with Firebase
-        UserCredential userCredential =
-            await authService.signUpWithEmailandPassword(
-                emailController.text, passwordController.text);
-
-        // Get the Firebase User's UID
-        String uid = userCredential.user!.uid;
-
-        // Prepare the data for the createUser API
-        final userData = {
-          "id": uid,
-          "username":
-              emailController.text.split('@')[0], // Example username from email
-          "name": "mairu",
-          "surname": "maiiiiru",
-          "email": emailController.text,
-          "phone": "123456789",
-          "address": "kmutt",
-          "latitude": 40.712776,
-          "longitude": -74.005974,
-          "image": ""
-        };
-
-        // Call the createUser API
-        final response = await Caller.dio.post(
-          ("/user/createUser"), // Adjust to your API URL
-          data: userData,
-        );
-
-        // Check if API call was successful
-        if (response.statusCode == 201) {
-          print('resp: ${response.data}');
-          Navigator.pushNamed(context, '/home');
-        } else {
-          // Handle error from API
-          if (mounted) {
-            showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                      title: const Text('API Error'),
-                      content: Text(response.data),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text('OK'),
-                        ),
-                      ],
-                    ));
-          }
-        }
-      } catch (e) {
-        // Handle Firebase sign-up error
-        print('Error occurred: ${e.toString()}');
-      }
-    } else {
-      // Handle password mismatch
-      if (mounted) {
-        showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-                  title: const Text('Password does not match'),
-                  content: const Text('Please ensure your passwords match.'),
+                  title: const Text('Invalid Password'),
+                  content: const Text(
+                      'Please ensure your password has at least 6 characters and matched.'),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(context),

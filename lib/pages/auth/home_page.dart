@@ -15,16 +15,16 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-// เหลือเอาข้อมูลสัตว์เลี้ยงมาโชว์
 class _HomePageState extends State<HomePage> {
   var _username, _address, _phone, _image;
   int _petCount = 0;
   List<dynamic> _pets = [], _petDetails = [];
   bool _isLoading = true;
   String _errorMessage = '';
+  String uid = "";
 
   Future<void> fetchUserData() async {
-    final uid = FirebaseAuth.instance.currentUser?.uid;
+    uid = FirebaseAuth.instance.currentUser!.uid;
 
     if (uid == null) {
       setState(() {
@@ -57,7 +57,15 @@ class _HomePageState extends State<HomePage> {
         setState(() {
           _username = userData['data']['username'];
           _address = userData['data']['address'];
-          _phone = userData['data']['phone'];
+          // _phone = userData['data']['phone'];
+
+          // Check if phone contains '/' and extract the number after it
+          String fetchedPhone = userData['data']['phone'];
+          if (fetchedPhone.contains('/')) {
+            _phone = fetchedPhone.split('/').last; // Get the part after '/'
+          } else {
+            _phone = fetchedPhone; // No '/' present, use the full phone number
+          }
 
           // Log the user data to check what was retrieved
           print('Username: $_username, Address: $_address, Phone: $_phone');
@@ -105,6 +113,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    print(uid);
     // const cards = 2;
     if (_isLoading) {
       // Show a loading spinner while fetching data
@@ -140,11 +149,21 @@ class _HomePageState extends State<HomePage> {
                     .colorScheme
                     .secondary, // Background color of the circle
               ),
-              child: const Center(
-                child: Icon(
-                  Icons.edit,
-                  size: 28,
-                  color: Color(0xff333333),
+              child: GestureDetector(
+                onTap: () async {
+                  final authService = AuthService();
+                  await authService.signOut();
+                  // Navigate to login or handle post-signout logic
+                  if (mounted) {
+                    Navigator.pushReplacementNamed(context, '/');
+                  }
+                },
+                child: const Center(
+                  child: Icon(
+                    Icons.edit,
+                    size: 28,
+                    color: Color(0xff333333),
+                  ),
                 ),
               ),
             ),
@@ -270,59 +289,54 @@ class _HomePageState extends State<HomePage> {
                               // Check if it's the last index (index n) to place the button card
                               if (index >= _petCount) {
                                 return Card(
-                                  color: Colors.transparent,
-                                  margin: const EdgeInsets.all(8.0),
-                                  elevation: 0,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: InkWell(
-                                    onTap: () {
-                                      // Define your add button action here
-                                    },
-                                    borderRadius: BorderRadius.circular(8),
-                                    splashColor: Colors
-                                        .transparent, // Remove ripple effect
-                                    highlightColor: Colors
-                                        .transparent, // Remove highlight effect
-                                    child: GestureDetector(
-                                      onTap: () async {
-                                        final authService = AuthService();
-                                        await authService.signOut();
-                                        // Navigate to login or handle post-signout logic
-                                        if (mounted) {
-                                          Navigator.pushReplacementNamed(
-                                              context, '/');
-                                        }
+                                    color: Colors.transparent,
+                                    margin: const EdgeInsets.all(8.0),
+                                    elevation: 0,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: InkWell(
+                                      onTap: () {
+                                        // Define your add button action here
                                       },
-                                      child: Center(
-                                        child: Container(
-                                          width: 55,
-                                          height: 55,
-                                          decoration: const BoxDecoration(
-                                            color: Colors.white,
-                                            shape: BoxShape.circle,
-                                            // boxShadow: [
-                                            //   BoxShadow(
-                                            //     color: Colors.black.withOpacity(0.2), // Shadow color with opacity
-                                            //     spreadRadius: 2, // How much the shadow spreads
-                                            //     blurRadius: 5, // How soft the shadow is
-                                            //     offset: Offset(0, 3), // The position of the shadow (x, y)
-                                            //   ),
-                                            // ],
-                                          ),
-                                          child: Icon(
-                                            Icons.add,
-                                            size: 23,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onSurface,
+                                      borderRadius: BorderRadius.circular(8),
+                                      splashColor: Colors
+                                          .transparent, // Remove ripple effect
+                                      highlightColor: const Color.fromRGBO(0, 0,
+                                          0, 0), // Remove highlight effect
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          Navigator.pushNamed(
+                                              context, '/addPetProfileImage');
+                                        },
+                                        child: Center(
+                                          child: Container(
+                                            width: 55,
+                                            height: 55,
+                                            decoration: const BoxDecoration(
+                                              color: Colors.white,
+                                              shape: BoxShape.circle,
+                                              // boxShadow: [
+                                              //   BoxShadow(
+                                              //     color: Colors.black.withOpacity(0.2), // Shadow color with opacity
+                                              //     spreadRadius: 2, // How much the shadow spreads
+                                              //     blurRadius: 5, // How soft the shadow is
+                                              //     offset: Offset(0, 3), // The position of the shadow (x, y)
+                                              //   ),
+                                              // ],
+                                            ),
+                                            child: Icon(
+                                              Icons.add,
+                                              size: 23,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurface,
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  ),
-                                );
+                                      // ),
+                                    ));
                               } else {
                                 final pet = _petDetails[index];
                                 // Regular cards for indices 0 to n-1
@@ -394,7 +408,7 @@ class _HomePageState extends State<HomePage> {
                                                         pet['age'],
                                                     style: Theme.of(context)
                                                         .textTheme
-                                                        .labelMedium,
+                                                        .displayMedium,
                                                     overflow:
                                                         TextOverflow.ellipsis,
                                                   ),
@@ -418,7 +432,7 @@ class _HomePageState extends State<HomePage> {
                                                       'Safe',
                                                       style: Theme.of(context)
                                                           .textTheme
-                                                          .labelSmall,
+                                                          .displaySmall,
                                                     ),
                                                   ),
                                                 ],

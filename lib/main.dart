@@ -20,8 +20,10 @@ import 'package:nonghai/services/noti/noti_service.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 import 'pages/auth/add_contact_page.dart';
+import 'pages/auth/add_pet_info_page.dart';
 import 'pages/auth/add_pet_profile_page.dart';
 import 'pages/auth/add_profile_page.dart';
+import 'pages/auth/additional_note_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -180,7 +182,7 @@ class _MyAppState extends State<MyApp> {
           iconTheme: IconThemeData(color: Color(0xff2C3F50), size: 25),
         ),
       ),
-      initialRoute: '/nfc',
+      initialRoute: '/',
       routes: {
         '/': (context) => const AuthGate(),
         '/loginOrRegister': (context) => const LoginOrRegistoer(),
@@ -189,6 +191,10 @@ class _MyAppState extends State<MyApp> {
         '/addProfileImage': (context) => const AddProfilePage(),
         '/addContact': (context) => const AddContactPage(),
         '/addPetProfileImage': (context) => const AddPetProfilePage(),
+        '/addPetInfo': (context) => const AddPetInfoPage(),
+        '/additionalNote': (context) => const AdditionalNotePage(
+              petData: {},
+            ),
         '/nfc': (context) => const NfcPage(
               petId: '550e8400-e29b-41d4-a716-446655440000',
             ),

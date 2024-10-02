@@ -1,8 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 
 import '../../components/custom_button.dart';
 import '../../components/custom_text_field.dart';
+import '../../services/auth/auth_service.dart';
+import '../../services/caller.dart';
 
 class AddContactPage extends StatefulWidget {
   // final void Function()? onTap;
@@ -27,7 +30,7 @@ class _AddContactPageState extends State<AddContactPage> {
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
   }
 
-  void _createUser(BuildContext context) {
+  Future<void> _createUser(BuildContext context) async {
     if (_phoneNumber != null &&
         nameController.text != null &&
         surnameController.text != null &&
@@ -45,6 +48,52 @@ class _AddContactPageState extends State<AddContactPage> {
         userData!['address'] = addrController.text;
       }
       print(userData);
+      //call api here to create user then go to next page
+      final authService = AuthService();
+      try {
+        // Sign up with Firebase
+        UserCredential userCredential =
+            await authService.signUpWithEmailandPassword(
+                userData!['email'], userData!['password']);
+
+        // Get the Firebase User's UID
+        String uid = userCredential.user!.uid;
+
+        // Update userData to include the UID and remove the password
+        userData!['id'] = uid;
+        userData!.remove('password');
+
+        // Call the createUser API
+        final response = await Caller.dio.post(
+          "/user/createUser",
+          data: userData,
+        );
+
+        // Check if API call was successful
+        if (response.statusCode == 201) {
+          print('resp: ${response.data}');
+          Navigator.pushNamed(context, '/addPetProfileImage', arguments: uid);
+        } else {
+          // Handle error from API
+          if (mounted) {
+            showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                      title: const Text('API Error'),
+                      content: Text(response.data.toString()),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('OK'),
+                        ),
+                      ],
+                    ));
+          }
+        }
+      } catch (e) {
+        // Handle Firebase sign-up error
+        print('Error occurred: ${e.toString()}');
+      }
     } else {
       _showAlertDialog();
     }
@@ -61,7 +110,7 @@ class _AddContactPageState extends State<AddContactPage> {
             TextButton(
               child: Text('OK'),
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop();
               },
             ),
           ],
