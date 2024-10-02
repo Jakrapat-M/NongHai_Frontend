@@ -22,28 +22,34 @@ import 'package:intl/date_symbol_data_local.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await dotenv.load(fileName: '.env');
+
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  await NotificationService().initialize();
+  final navigatorKey = GlobalKey<NavigatorState>();
+  final notificationService = NotificationService(navigatorKey: navigatorKey);
 
+  await notificationService.initialize();
+  await notificationService.initPushNotification();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   await initializeDateFormatting('th_TH', null);
-  runApp(const MyApp());
+  runApp(MyApp(navigatorKey: navigatorKey));
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+  final GlobalKey<NavigatorState> navigatorKey;
+  const MyApp({super.key, required this.navigatorKey});
 
   @override
   State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
-  final _navigatorKey = GlobalKey<NavigatorState>();
   late AppLinks _appLinks;
   StreamSubscription<Uri>? _linkSubscription;
 
@@ -76,7 +82,7 @@ class _MyAppState extends State<MyApp> {
     debugPrint('Navigating to: $fragment');
 
     // Navigate to TrackingPage
-    _navigatorKey.currentState?.push(MaterialPageRoute(
+    widget.navigatorKey.currentState?.push(MaterialPageRoute(
       builder: (context) {
         return TrackingPage(
           petId: fragment,
@@ -91,7 +97,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      navigatorKey: _navigatorKey,
+      navigatorKey: widget.navigatorKey,
       title: 'Nonghai',
       theme: ThemeData(
         colorScheme: ThemeData().colorScheme.copyWith(
@@ -102,8 +108,7 @@ class _MyAppState extends State<MyApp> {
             onSurface: const Color(0xff2C3F50), //blue surface(box/button)
             secondaryContainer: const Color(0xffE8E8E8), //container
             secondaryFixed: const Color(0xff2C3F50), //container
-            surfaceBright:
-                const Color(0xff5DB671), // green container box(status)
+            surfaceBright: const Color(0xff5DB671), // green container box(status)
             onErrorContainer: Colors.red // red container box(status)
             ),
         useMaterial3: true,
@@ -166,7 +171,7 @@ class _MyAppState extends State<MyApp> {
           iconTheme: IconThemeData(color: Color(0xff2C3F50), size: 25),
         ),
       ),
-      initialRoute: '/nfc',
+      initialRoute: '/',
       routes: {
         '/': (context) => const AuthGate(),
         '/loginOrRegister': (context) => const LoginOrRegistoer(),
