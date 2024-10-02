@@ -2,19 +2,22 @@ import 'dart:async';
 import 'package:app_links/app_links.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 // import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:nonghai/pages/nfc_page.dart';
 // import 'package:flutter/painting.dart';
 // import 'package:flutter/rendering.dart';
 // import 'package:flutter/widgets.dart';
-import 'package:nonghai/pages/test_nfc_page.dart';
 import 'package:nonghai/pages/tracking_page.dart';
+import 'package:nonghai/services/auth/auth_service.dart';
 import 'package:nonghai/services/auth/login_or_registoer.dart';
 import 'package:nonghai/firebase_options.dart';
 import 'package:nonghai/pages/home_page.dart';
 import 'package:nonghai/services/auth/auth_gate.dart';
+import 'package:nonghai/services/caller.dart';
 import 'package:nonghai/services/noti/noti_service.dart';
 // import 'package:nonghai/services/auth/auth_service.dart';
 // import 'package:provider/provider.dart';
@@ -81,6 +84,8 @@ class _MyAppState extends State<MyApp> {
     // Print the full URI for debugging purposes
     debugPrint('Navigating to: $fragment');
 
+    createTracking(fragment);
+
     // Navigate to TrackingPage
     widget.navigatorKey.currentState?.push(MaterialPageRoute(
       builder: (context) {
@@ -91,6 +96,69 @@ class _MyAppState extends State<MyApp> {
         );
       },
     ));
+  }
+
+  void createTracking(String petId) async {
+    try {
+      final currentUserId = AuthService().getCurrentUser()!.uid;
+      double lat = 0.0000000;
+      double long = 0.0000000;
+
+      final position = await _getLocation();
+      if (position != null) {
+        lat = position.latitude;
+        long = position.longitude;
+      }
+
+      final resp = await Caller.dio.post(
+        '/tracking/createTracking',
+        data: {
+          'petId': petId,
+          "finder_id": currentUserId,
+          "lat": lat,
+          "long": long
+        },
+      );
+      if (resp.statusCode == 200) {
+        print('Tracking created');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Network error occurred: $e');
+      }
+    }
+  }
+
+  Future<Position?> _getLocation() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Test if location services are enabled.
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      // Location services are not enabled don't continue
+      // accessing the position and request users of the
+      // App to enable the location services.
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        if (kDebugMode) {
+          print('Location permission is denied');
+        }
+        return null;
+      }
+    }
+    if (permission == LocationPermission.deniedForever) {
+      if (kDebugMode) {
+        print('Location permission is denied forever');
+      }
+      return null;
+    }
+    return await Geolocator.getCurrentPosition();
   }
 
   // This widget is the root of your application.
@@ -108,7 +176,8 @@ class _MyAppState extends State<MyApp> {
             onSurface: const Color(0xff2C3F50), //blue surface(box/button)
             secondaryContainer: const Color(0xffE8E8E8), //container
             secondaryFixed: const Color(0xff2C3F50), //container
-            surfaceBright: const Color(0xff5DB671), // green container box(status)
+            surfaceBright:
+                const Color(0xff5DB671), // green container box(status)
             onErrorContainer: Colors.red // red container box(status)
             ),
         useMaterial3: true,
@@ -176,7 +245,6 @@ class _MyAppState extends State<MyApp> {
         '/': (context) => const AuthGate(),
         '/loginOrRegister': (context) => const LoginOrRegistoer(),
         '/home': (context) => const HomePage(),
-        '/testnfc': (context) => const TestNfcPage(),
         '/nfc': (context) => const NfcPage(
               petId: '550e8400-e29b-41d4-a716-446655440000',
             ),
