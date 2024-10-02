@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nonghai/pages/chat/chat_home_page.dart';
-<<<<<<< HEAD
 import 'package:nonghai/pages/auth/home_page.dart';
-=======
-import 'package:nonghai/pages/home_page.dart';
->>>>>>> Dev
 
 class BottomNavPage extends StatefulWidget {
   const BottomNavPage({super.key, required this.page});
@@ -79,7 +75,6 @@ class _BottomNavPageState extends State<BottomNavPage> {
                 height: 70,
                 child: FloatingActionButton(
                   elevation: 1,
-<<<<<<< HEAD
                   backgroundColor:
                       Theme.of(context).appBarTheme.backgroundColor,
                   shape: const CircleBorder(),
@@ -87,13 +82,6 @@ class _BottomNavPageState extends State<BottomNavPage> {
                     setState(() {
                       _selectedPageIndex =
                           1; // Set to the index of the Home page
-=======
-                  backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-                  shape: const CircleBorder(),
-                  onPressed: () {
-                    setState(() {
-                      _selectedPageIndex = 1; // Set to the index of the Home page
->>>>>>> Dev
                     });
                   },
                   child: const Icon(
