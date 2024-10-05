@@ -3,10 +3,10 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:nonghai/models/message.dart';
 import 'package:nonghai/models/notification.dart';
 import 'package:nonghai/services/caller.dart';
-import 'package:nonghai/services/noti/noti_service.dart';
 import 'package:nonghai/services/noti/send_noti_service.dart';
 
 class ChatService {
@@ -57,18 +57,14 @@ class ChatService {
           .collection('messages')
           .add(newMessage.toMap());
     } finally {
-      print('chatRoomID: $chatRoomID');
-      print('senderID: $currentUserID');
-      final resp = await Caller.dio.post(
+      // Call the server to set unread status
+      await Caller.dio.post(
         '/chat/setUnread',
         data: {
           'chat_id': chatRoomID,
           'sender_id': currentUserID,
         },
       );
-      if (resp.statusCode == 200) {
-        print('Unread message set');
-      }
       sendChatNoti(currentUserID, receiverID, message);
     }
   }
@@ -86,15 +82,10 @@ class ChatService {
     try {
       // Upload image to Firebase Storage
       String fileName = 'chat_images/$chatRoomID/${timestamp.seconds}.png';
-      print('Setting image fileName to $fileName Done');
       final storageRef = FirebaseStorage.instance.ref().child(fileName);
-      print('StorageRef to $storageRef Done');
       final uploadTask = storageRef.putFile(File(imageFile.path));
-      print('Uploading image to $uploadTask Done');
       final snapshot = await uploadTask.whenComplete(() {});
-      print('Snapshot to $snapshot Done');
       final downloadUrl = await snapshot.ref.getDownloadURL();
-      print('DownloadUrl to $downloadUrl Done');
 
       // Create new message with image URL
       Message newMessage = Message(
@@ -113,18 +104,18 @@ class ChatService {
           .add(newMessage.toMap());
 
       // Call the server to set unread status
-      // final resp = await Caller.dio.post(
-      //   '/chat/setUnread',
-      //   data: {
-      //     'chat_id': chatRoomID,
-      //     'sender_id': currentUserID,
-      //   },
-      // );
-      // if (resp.statusCode == 200) {
-      //   print('Unread message set');
-      // }
+      await Caller.dio.post(
+        '/chat/setUnread',
+        data: {
+          'chat_id': chatRoomID,
+          'sender_id': currentUserID,
+        },
+      );
+      sendChatNoti(currentUserID, receiverID, "Image");
     } catch (e) {
-      print('Error sending image message: $e');
+      if (kDebugMode) {
+        print('Error sending image message: $e');
+      }
     }
   }
 

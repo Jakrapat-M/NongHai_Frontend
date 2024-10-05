@@ -5,8 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:nonghai/components/chat_bubble.dart';
 import 'package:nonghai/components/custom_appbar.dart';
 import 'package:nonghai/services/auth/auth_service.dart';
+import 'package:nonghai/services/caller.dart';
 import 'package:nonghai/services/chat/chat_service.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:nonghai/types/user_data.dart';
 
 class ChatRoomPage extends StatefulWidget {
   final String receiverID;
@@ -18,6 +20,7 @@ class ChatRoomPage extends StatefulWidget {
 }
 
 class _ChatRoomPageState extends State<ChatRoomPage> {
+  UserData? userData;
   // controller
   final _messageController = TextEditingController();
 
@@ -28,33 +31,21 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   final _focusNode = FocusNode();
 
   final ImagePicker _picker = ImagePicker();
-  
-  final String receiverName = 'Get receiver name';
 
-  @override
-  void initState() {
-    super.initState();
+  getuserName() async {
+    try {
+      final response = await Caller.dio.get(
+        "/user/${widget.receiverID}",
+      );
 
-    _focusNode.addListener(() {
-      if (_focusNode.hasFocus) {
-        Future.delayed(
-          const Duration(milliseconds: 1000),
-          () => scrollDown(),
-        );
+      if (response.statusCode == 200) {
+        setState(() {
+          userData = UserData.fromJson(response.data['data']);
+        });
       }
-    });
-
-    Future.delayed(
-      const Duration(milliseconds: 100),
-      () => scrollDown(),
-    );
-  }
-
-  @override
-  void dispose() {
-    _focusNode.dispose();
-    _messageController.dispose();
-    super.dispose();
+    } catch (e) {
+      return 'Error Fetching Name';
+    }
   }
 
   // scroll comtroller
@@ -104,7 +95,36 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _focusNode.addListener(() {
+      if (_focusNode.hasFocus) {
+        Future.delayed(
+          const Duration(milliseconds: 1000),
+          () => scrollDown(),
+        );
+      }
+    });
+
+    Future.delayed(
+      const Duration(milliseconds: 100),
+      () => scrollDown(),
+    );
+
+    // Fetch and set the username
+    getuserName();
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    _messageController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    String receiverName = userData?.name ?? 'Error Fetching Name';
     return Scaffold(
       appBar: CustomAppBar(title: receiverName),
       body: SafeArea(

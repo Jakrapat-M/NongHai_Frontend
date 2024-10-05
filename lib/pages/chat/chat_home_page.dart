@@ -127,7 +127,6 @@ class _ChatHomePageState extends State<ChatHomePage> {
 
     if (userData["email"] != authService.getCurrentUser()!.email) {
       return UserTile(
-        userLabel: userData["email"],
         receiverID: userData["uid"],
         onTap: () {
           MaterialPageRoute materialPageRoute = MaterialPageRoute(
