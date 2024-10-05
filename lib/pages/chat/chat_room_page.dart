@@ -12,8 +12,8 @@ import 'package:nonghai/types/user_data.dart';
 
 class ChatRoomPage extends StatefulWidget {
   final String receiverID;
-
-  const ChatRoomPage({super.key, required this.receiverID});
+  final String? receiverName;
+  const ChatRoomPage({super.key, required this.receiverID, this.receiverName});
 
   @override
   State<ChatRoomPage> createState() => _ChatRoomPageState();
@@ -112,7 +112,9 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     );
 
     // Fetch and set the username
-    getuserName();
+    if (widget.receiverName == null) {
+      getuserName();
+    }
   }
 
   @override
@@ -124,7 +126,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
 
   @override
   Widget build(BuildContext context) {
-    String receiverName = userData?.name ?? 'Error Fetching Name';
+    String receiverName = userData?.name ?? '';
     return Scaffold(
       appBar: CustomAppBar(title: receiverName),
       body: SafeArea(
