@@ -36,7 +36,11 @@ void main() async {
 
   await notificationService.initialize();
   await notificationService.initPushNotification();
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  FirebaseMessaging.onMessage.listen(notificationService.firebaseMessagingForegroundHandler);
+
+  FirebaseMessaging.onBackgroundMessage(notificationService.firebaseMessagingBackgroundHandler);
+  
   await initializeDateFormatting('th_TH', null);
   runApp(MyApp(navigatorKey: navigatorKey));
 }
@@ -187,9 +191,4 @@ class _MyAppState extends State<MyApp> {
       },
     );
   }
-}
-
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp();
-  print('Handling a background message ${message.messageId}');
 }

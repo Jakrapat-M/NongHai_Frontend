@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 
@@ -92,80 +93,23 @@ class NotificationService {
     FirebaseMessaging.instance.getInitialMessage().then(handleMessage);
     FirebaseMessaging.onMessageOpenedApp.listen(handleMessage);
   }
+
+  Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+    await Firebase.initializeApp();
+    print('Handling a background message ${message.messageId}');
+  }
+
+  void firebaseMessagingForegroundHandler(RemoteMessage message) {
+    if (message.notification != null) {
+
+      final snackbar = SnackBar(
+        content: Text("test"),
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
+        duration: const Duration(seconds: 5),
+      );
+
+      ScaffoldMessenger.of(_navigatorKey.currentContext!).showSnackBar(snackbar);
+    }
+  }
 }
-
-// class NotificationService {
-//   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
-
-//   // Initialize the Notification Service
-//   Future<void> initialize() async {
-//     // Request permissions
-//     NotificationSettings settings = await _messaging.requestPermission(
-//       provisional: true,
-//     );
-
-//     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-//       print('User granted permission');
-//     } else {
-//       print('User declined or has not accepted permission');
-//     }
-
-//     // Get the device token
-//     String? token = await _messaging.getToken();
-//     if (kDebugMode) {
-//       print('Device Token: $token');
-//     }
-//     final authService = AuthService();
-//     final currentUserID = authService.getCurrentUser()!.uid;
-
-//     try {
-//       // Create a user token in the backend
-//       final resp = await Caller.dio
-//           .post('/token/createUserToken', data: {"user_id": currentUserID, "token": token});
-//       if (resp.statusCode == 200 && resp.data['data'] == "Token already exist") {
-//         print('Token already exist');
-//       } else if (resp.statusCode == 200) {
-//         print('Token created successfully');
-//       }
-//     } catch (e) {
-//       if (kDebugMode) {
-//         print('Network error occurred: $e');
-//       }
-//     }
-
-//     // Handle foreground messages
-//     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-//       print('Received a message in the foreground: ${message.notification?.title}');
-//       _showNotification(message);
-//     });
-
-//     // Handle notifications when the app is opened by tapping on the notification
-//     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-//       print('User tapped on a notification: ${message.data}');
-
-//       // Determine navigation based on the notification type
-//       _handleMessageNavigation(message);
-//     });
-//   }
-
-//   // Show a notification (Placeholder)
-//   void _showNotification(RemoteMessage message) {
-//     // Implement a method like flutter_local_notifications to show a notification
-//     // handle notification when app is terminated and now opened
-//     FirebaseMessaging.instance.getInitialMessage();
-//   }
-
-//   // Handle navigation when a user taps on a notification
-//   void _handleMessageNavigation(RemoteMessage message) {
-//     print('Handling message navigation: ${message.data}');
-//     final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-//     // Check the 'type' field in the notification data payload to decide where to navigate
-//     if (message.data['type'] == 'chat') {
-//       // Navigate to Chat Page
-//       navigatorKey.currentState?.pushNamed('/chat', arguments: message);
-//     } else if (message.data['type'] == 'notification') {
-//       // Navigate to Notification Page
-//       navigatorKey.currentState?.pushNamed('/notification', arguments: message);
-//     }
-//   }
-// }
