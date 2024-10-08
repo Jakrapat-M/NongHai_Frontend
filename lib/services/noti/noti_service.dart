@@ -18,9 +18,6 @@ class NotificationService {
   }
 
   Future<void> initialize() async {
-    final authService = AuthService();
-    final currentUserID = authService.getCurrentUser()!.uid;
-
     final settings = await _firebaseMessaging.requestPermission(provisional: true);
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
       print('User granted permission');
@@ -28,24 +25,7 @@ class NotificationService {
       print('User declined or has not accepted permission');
     }
 
-    final token = await _firebaseMessaging.getToken();
-    if (kDebugMode) {
-      print('Device Token: $token');
-    }
-    try {
-      // Create a user token in the backend
-      final resp = await Caller.dio
-          .post('/token/createUserToken', data: {"user_id": currentUserID, "token": token});
-      if (resp.statusCode == 200 && resp.data['data'] == "Token already exist") {
-        print('Token already exist');
-      } else if (resp.statusCode == 200) {
-        print('Token created successfully');
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('Network error occurred: $e');
-      }
-    }
+    
   }
 
   // handle message
@@ -101,12 +81,34 @@ class NotificationService {
 
   void firebaseMessagingForegroundHandler(RemoteMessage message) {
     if (message.notification != null) {
-
       final snackbar = SnackBar(
-        content: Text("test"),
+        backgroundColor: Colors.black.withOpacity(0.6),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+        ),
+        content: TextButton(
+          onPressed: () {
+            handleMessage(message);
+          },
+          child: Row(
+            children: [
+              Text(
+                message.notification!.title! + ': ',
+                style: TextStyle(
+                    color: Colors.white), // Optional: Change text color for better visibility
+              ),
+              const SizedBox(width: 8),
+              Text(
+                message.notification!.body!,
+                style: TextStyle(
+                    color: Colors.white), // Optional: Change text color for better visibility
+              ),
+            ],
+          ),
+        ),
         behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
-        duration: const Duration(seconds: 5),
+        margin: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0, bottom: 20),
+        duration: const Duration(seconds: 3),
       );
 
       ScaffoldMessenger.of(_navigatorKey.currentContext!).showSnackBar(snackbar);

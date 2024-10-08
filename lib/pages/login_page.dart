@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nonghai/components/custom_button.dart';
 import 'package:nonghai/components/custom_text_field.dart';
 import 'package:nonghai/services/auth/auth_service.dart';
+import 'package:nonghai/services/noti/noti_service.dart';
 // import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
@@ -23,6 +24,7 @@ class _LoginPageState extends State<LoginPage> {
     try {
       authService.signInWithEmailandPassword(
           emailController.text, passwordController.text);
+      
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(e.toString()),
