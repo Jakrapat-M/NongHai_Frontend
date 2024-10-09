@@ -20,6 +20,7 @@ class TrackingPage extends StatefulWidget {
 }
 
 class _TrackingPageState extends State<TrackingPage> {
+  bool isLoading = true;
   List<TrackingInfo> trackingInfo = [];
   void getTracking() async {
     try {
@@ -32,6 +33,7 @@ class _TrackingPageState extends State<TrackingPage> {
               .map<TrackingInfo>((e) => TrackingInfo.fromJson(e))
               .toList();
         });
+        isLoading = false;
       }
     } catch (e) {
       if (kDebugMode) {
@@ -73,29 +75,32 @@ class _TrackingPageState extends State<TrackingPage> {
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
               const SizedBox(height: 20),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: trackingInfo.length,
-                  itemBuilder: (context, index) {
-                    return Center(
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 330),
-                        child: TrackingObject(
-                          key: Key(trackingInfo[index].trackingId),
-                          username: trackingInfo[index].finderName,
-                          phone: trackingInfo[index].finderPhone,
-                          address: trackingInfo[index].address,
-                          lat: trackingInfo[index].lat,
-                          long: trackingInfo[index].long,
-                          chat: trackingInfo[index].finderChat,
-                          image: trackingInfo[index].finderImage,
-                          dateTime: trackingInfo[index].createdAt,
-                        ),
+              isLoading
+                  ? const CircularProgressIndicator()
+                  : Expanded(
+                      child: ListView.builder(
+                        itemCount: trackingInfo.length,
+                        itemBuilder: (context, index) {
+                          return Center(
+                            child: ConstrainedBox(
+                              constraints: const BoxConstraints(maxWidth: 330),
+                              child: TrackingObject(
+                                key: Key(trackingInfo[index].trackingId),
+                                username: trackingInfo[index].finderName,
+                                phone: trackingInfo[index].finderPhone,
+                                address: trackingInfo[index].address,
+                                lat: trackingInfo[index].lat,
+                                long: trackingInfo[index].long,
+                                chat: trackingInfo[index].finderChat,
+                                image: trackingInfo[index].finderImage,
+                                dateTime: trackingInfo[index].createdAt,
+                              ),
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
-              ),
+                    ),
+              const SizedBox(height: 20),
             ],
           ),
         ),
