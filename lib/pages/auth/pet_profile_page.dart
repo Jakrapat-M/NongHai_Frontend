@@ -109,17 +109,17 @@ class _PetProfilePageState extends State<PetProfilePage> {
               //       petDetails['status'] == 'Safe' ? Colors.green : Colors.red,
               //   size: 30,
               // ),
-              isOwner == true
-                  ? Image.asset(
-                      'assets/images/location_track.png',
-                      width: 10, // Adjust width as needed
-                      height: 10, // Adjust height as needed
-                      color: petDetails['status'] == 'Safe'
-                          ? Colors.green
-                          : Colors.red,
-                    )
-                  : const SizedBox
-                      .shrink(), // This will show nothing if isOwner is false
+              // isOwner == true
+              //     ? Image.asset(
+              //         'assets/images/location_track.png',
+              //         width: 10, // Adjust width as needed
+              //         height: 10, // Adjust height as needed
+              //         color: petDetails['status'] == 'Safe'
+              //             ? Colors.green
+              //             : Colors.red,
+              //       )
+              //     : const SizedBox
+              //         .shrink(), // This will show nothing if isOwner is false
             ],
           ),
         ),
