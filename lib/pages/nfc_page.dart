@@ -21,7 +21,7 @@ class _NfcPageState extends State<NfcPage> {
     super.initState();
     message = NdefMessage([
       NdefRecord.createUri(
-          Uri.parse('https://nonghai.ryyyyyy.com/tracking#${widget.petId}')),
+          Uri.parse('https://webnonghai.ryyyyyy.com/tracking#${widget.petId}')),
     ]);
   }
 

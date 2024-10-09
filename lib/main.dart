@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:app_links/app_links.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 // import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -11,6 +12,8 @@ import 'package:nonghai/pages/nfc_page.dart';
 // import 'package:flutter/widgets.dart';
 import 'package:nonghai/pages/test_nfc_page.dart';
 import 'package:nonghai/pages/tracking_page.dart';
+import 'package:nonghai/services/auth/auth_service.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:nonghai/services/auth/login_or_registoer.dart';
 import 'package:nonghai/firebase_options.dart';
 import 'package:nonghai/pages/home_page.dart';
@@ -19,6 +22,7 @@ import 'package:nonghai/services/noti/noti_service.dart';
 // import 'package:nonghai/services/auth/auth_service.dart';
 // import 'package:provider/provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:nonghai/services/caller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -69,11 +73,85 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
+  void createTracking(String petId) async {
+    try {
+      print("createTracking id: $petId");
+      final currentUser = AuthService().getCurrentUser();
+      if (currentUser == null) {
+        print('No user is currently signed in.');
+        return; // Handle this case appropriately, maybe show an error message
+      }
+      final currentUserId = currentUser.uid;
+
+      double lat = 0.0000000;
+      double long = 0.0000000;
+
+      print("currentUserId: $currentUserId");
+      final position = await _getLocation();
+      if (position != null) {
+        lat = position.latitude;
+        long = position.longitude;
+      }
+
+      final resp = await Caller.dio.post(
+        '/tracking/createTracking',
+        data: {
+          'pet_id': petId,
+          'finder_id': currentUserId,
+          'lat': lat,
+          'long': long
+        },
+      );
+      if (resp.statusCode == 200) {
+        print('Tracking created');
+      } else {
+        // Log the error response
+        print('Failed to create tracking: ${resp.statusCode} - ${resp.data}');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Network error occurred: $e');
+      }
+    }
+  }
+
+  Future<Position?> _getLocation() async {
+    print("test getLocaion");
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    print('Checking location');
+    // Test if location services are enabled.
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      print("Location services are disabled.");
+      return null;
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        print("Location permissions are denied");
+        return null;
+      }
+    }
+    if (permission == LocationPermission.deniedForever) {
+      print(
+          'Location permissions are permanently denied, we cannot request permissions.');
+      return null;
+    }
+    print("get location success");
+
+    return await Geolocator.getCurrentPosition();
+  }
+
   void openAppLink(Uri uri) {
     final fragment = uri.fragment;
 
     // Print the full URI for debugging purposes
     debugPrint('Navigating to: $fragment');
+    createTracking(fragment);
 
     // Navigate to TrackingPage
     _navigatorKey.currentState?.push(MaterialPageRoute(
