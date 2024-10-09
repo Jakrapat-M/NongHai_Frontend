@@ -37,7 +37,9 @@ dependencies:
   firebase_core: ^3.3.0
   firebase_auth: ^5.1.4
   firebase_messaging: ^15.1.2
+  firebase_messaging: ^15.1.2
   provider:
+  cloud_firestore: ^5.4.2
   cloud_firestore: ^5.4.2
   nfc_manager: ^3.5.0
   dio: ^5.6.0
@@ -46,6 +48,8 @@ dependencies:
   json_annotation: ^4.9.0
   http: ^1.2.2
   timeago: ^3.0.2
+  firebase_storage: ^12.3.1
+  image_picker: ^1.0.0
   firebase_storage: ^12.3.1
   image_picker: ^1.0.0
   url_launcher: ^6.3.0

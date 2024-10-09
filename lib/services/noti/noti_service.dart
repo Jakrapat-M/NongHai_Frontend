@@ -1,73 +1,120 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
-
-// class NotiService {
-//   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-//   final _firebaseMessaging = FirebaseMessaging.instance;
-
-//   Future<void> init() async {
-//     final notificationSetion = await _firebaseMessaging.requestPermission(provisional: true);
-
-//     final apnsToken = await _firebaseMessaging.getAPNSToken();
-//     if (apnsToken != null) {
-//       print('APNS Token: $apnsToken');
-//       // make FCM plugin API request
-//     }
-
-//     final fCMToken = await _firebaseMessaging.getToken();
-
-//     if (kDebugMode) {
-//       print('FCM Token: $fCMToken');
-//     }
-//   }
-
-//   // handle message
-//   void handleMessage(RemoteMessage? message) {
-//     if (message == null) return;
-// // navigate to page
-//     navigatorKey.currentState?.pushNamed('/notification', arguments: message);
-//   }
-
-//   Future initPushNotification() async {
-//     // handle notification when app is terminated and now opened
-//     FirebaseMessaging.instance.getInitialMessage().then(handleMessage);
-
-//     FirebaseMessaging.onMessageOpenedApp.listen(handleMessage);
-//   }
-// }
+import 'package:nonghai/models/notification.dart';
+import 'package:nonghai/pages/chat/chat_room_page.dart';
+import 'package:nonghai/pages/tracking_page.dart';
+import 'package:nonghai/services/auth/auth_service.dart';
+import 'package:nonghai/services/caller.dart';
 
 class NotificationService {
-  final FirebaseMessaging _messaging = FirebaseMessaging.instance;
+  final _firebaseMessaging = FirebaseMessaging.instance;
+  late GlobalKey<NavigatorState> _navigatorKey;
+
+  NotificationService({required GlobalKey<NavigatorState> navigatorKey}) {
+    _navigatorKey = navigatorKey;
+  }
 
   Future<void> initialize() async {
-    // Request permissions for iOS
-    NotificationSettings settings = await _messaging.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
-
+    final settings =
+        await _firebaseMessaging.requestPermission(provisional: true);
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
       print('User granted permission');
     } else {
       print('User declined or has not accepted permission');
     }
-
-    // Get the device token
-    String? token = await _messaging.getToken();
-    print("Device Token: $token");
-
-    // Handle foreground messages
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print('Received a message in the foreground: ${message.notification?.title}');
-      _showNotification(message);
-    });
   }
 
-  // Show a notification
-  void _showNotification(RemoteMessage message) {
-    // Use a package like flutter_local_notifications to show a notification
+  // handle message
+  void handleMessage(RemoteMessage? message) {
+    print('noti data: ${message?.data}');
+
+    if (message == null) return;
+
+    switch (message.data['navigate_to']) {
+      case 'tracking':
+        _navigatorKey.currentState?.push(MaterialPageRoute(
+          builder: (context) {
+            return const TrackingPage(
+              petId: "111",
+              petName: 'Ella',
+              petImage: 'petImage',
+            );
+          },
+        ));
+        break;
+      case 'chat':
+        // Navigate to Chat Page
+        MaterialPageRoute materialPageRoute = MaterialPageRoute(
+          builder: (context) => ChatRoomPage(
+            receiverID: message.data['chat_with'],
+          ),
+        );
+
+// Use the global navigator key to push the route
+
+        _navigatorKey.currentState?.push(materialPageRoute);
+        break;
+      default:
+        break;
+    }
+
+    // navigate to page
+
+    // navigatorKey.currentState?.pushNamed('/notification', arguments: message);
+  }
+
+  // Background message handler
+  Future initPushNotification() async {
+    // handle notification when app is terminated and now opened
+    FirebaseMessaging.instance.getInitialMessage().then(handleMessage);
+    FirebaseMessaging.onMessageOpenedApp.listen(handleMessage);
+  }
+
+  Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+    await Firebase.initializeApp();
+    print('Handling a background message ${message.messageId}');
+  }
+
+  void firebaseMessagingForegroundHandler(RemoteMessage message) {
+    if (message.notification != null) {
+      final snackbar = SnackBar(
+        backgroundColor: Colors.black.withOpacity(0.6),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+        ),
+        content: TextButton(
+          onPressed: () {
+            handleMessage(message);
+          },
+          child: Row(
+            children: [
+              Text(
+                '${message.notification!.title!}: ',
+                style: const TextStyle(
+                    color: Colors
+                        .white), // Optional: Change text color for better visibility
+              ),
+              const SizedBox(width: 8),
+              Text(
+                message.notification!.body!,
+                style: const TextStyle(
+                    color: Colors
+                        .white), // Optional: Change text color for better visibility
+              ),
+            ],
+          ),
+        ),
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.only(
+            top: 16.0, left: 16.0, right: 16.0, bottom: 20),
+        duration: const Duration(seconds: 3),
+      );
+
+      ScaffoldMessenger.of(_navigatorKey.currentContext!)
+          .showSnackBar(snackbar);
+    }
   }
 }

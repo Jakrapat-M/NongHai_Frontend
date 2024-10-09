@@ -1,21 +1,26 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:nonghai/components/chat_bubble.dart';
 import 'package:nonghai/components/custom_appbar.dart';
 import 'package:nonghai/services/auth/auth_service.dart';
+import 'package:nonghai/services/caller.dart';
 import 'package:nonghai/services/chat/chat_service.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:nonghai/types/user_data.dart';
 
 class ChatRoomPage extends StatefulWidget {
-  final String receiverEmail;
   final String receiverID;
-
-  ChatRoomPage({super.key, required this.receiverEmail, required this.receiverID});
+  final String? receiverName;
+  const ChatRoomPage({super.key, required this.receiverID, this.receiverName});
 
   @override
   State<ChatRoomPage> createState() => _ChatRoomPageState();
 }
 
 class _ChatRoomPageState extends State<ChatRoomPage> {
+  UserData? userData;
   // controller
   final _messageController = TextEditingController();
 
@@ -25,30 +30,22 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
 
   final _focusNode = FocusNode();
 
-  @override
-  void initState() {
-    super.initState();
+  final ImagePicker _picker = ImagePicker();
 
-    _focusNode.addListener(() {
-      if (_focusNode.hasFocus) {
-        Future.delayed(
-          const Duration(milliseconds: 1000),
-          () => scrollDown(),
-        );
+  getuserName() async {
+    try {
+      final response = await Caller.dio.get(
+        "/user/${widget.receiverID}",
+      );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          userData = UserData.fromJson(response.data['data']);
+        });
       }
-    });
-
-    Future.delayed(
-      const Duration(milliseconds: 100),
-      () => scrollDown(),
-    );
-  }
-
-  @override
-  void dispose() {
-    _focusNode.dispose();
-    _messageController.dispose();
-    super.dispose();
+    } catch (e) {
+      return 'Error Fetching Name';
+    }
   }
 
   // scroll comtroller
@@ -71,10 +68,67 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     }
   }
 
+  Future<void> _pickAndSendImage() async {
+    try {
+      final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+
+      if (pickedFile != null) {
+        File imageFile = File(pickedFile.path);
+        // Upload image to Firebase Storage and send message
+        await _chatService.sendImageMessage(widget.receiverID, imageFile);
+        scrollDown();
+      }
+    } catch (e) {
+      print('Error picking image: $e');
+    }
+  }
+
+  Future<void> _captureAndSendImage() async {
+    final XFile? capturedFile = await _picker.pickImage(source: ImageSource.camera);
+
+    if (capturedFile != null) {
+      File imageFile = File(capturedFile.path);
+      // Upload image to Firebase Storage and send message
+      await _chatService.sendImageMessage(widget.receiverID, imageFile);
+      scrollDown();
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.addListener(() {
+      if (_focusNode.hasFocus) {
+        Future.delayed(
+          const Duration(milliseconds: 1000),
+          () => scrollDown(),
+        );
+      }
+    });
+
+    Future.delayed(
+      const Duration(milliseconds: 100),
+      () => scrollDown(),
+    );
+
+    // Fetch and set the username
+    if (widget.receiverName == null) {
+      getuserName();
+    }
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    _messageController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    String receiverName = userData?.name ?? '';
     return Scaffold(
-      appBar: CustomAppBar(title: widget.receiverEmail),
+      appBar: CustomAppBar(title: receiverName),
       body: SafeArea(
         child: Column(
           children: [
@@ -120,26 +174,39 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   Widget _buildMessageItem(DocumentSnapshot doc) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
 
-    // is current user
+    // Check if the message belongs to the current user
     bool isCurrentUser = data["senderID"] == _authService.getCurrentUser()!.uid;
 
-    // align message to right
+    // Align message to the right if it's from the current user
     var alignment = isCurrentUser ? Alignment.centerRight : Alignment.centerLeft;
 
     return Container(
-        alignment: alignment,
-        child: ChatBubble(
-          message: data["message"],
-          isSender: isCurrentUser,
-          timestamp: data["timestamp"],
-        ));
+      alignment: alignment,
+      child: data["imageUrl"] != null
+          ? Padding(
+              padding: const EdgeInsets.symmetric(vertical: 5.0),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Image.network(
+                  data["imageUrl"],
+                  height: MediaQuery.of(context).size.width * 0.50,
+                  fit: BoxFit.fitHeight,
+                ),
+              ),
+            )
+          : ChatBubble(
+              message: data["message"],
+              isSender: isCurrentUser,
+              timestamp: data["timestamp"],
+            ),
+    );
   }
 
   // build message input
   Widget _buildMessageInput(BuildContext context) {
     return Container(
       constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.width * 0.30, // Set max width to 75% of screen width
+        maxHeight: MediaQuery.of(context).size.width * 0.30,
       ),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(45),
@@ -147,6 +214,10 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
       ),
       child: Row(
         children: [
+          IconButton(
+            icon: Icon(Icons.camera_alt, color: Theme.of(context).colorScheme.primary),
+            onPressed: _captureAndSendImage, // Call the method to capture an image using the camera
+          ),
           Expanded(
             child: TextField(
               keyboardType: TextInputType.multiline,
@@ -166,6 +237,10 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
               ),
               obscureText: false,
             ),
+          ),
+          IconButton(
+            icon: Icon(Icons.image, color: Theme.of(context).colorScheme.primary),
+            onPressed: _pickAndSendImage, // Call the method to pick an image from the gallery
           ),
           IconButton(
             icon: Icon(Icons.send, color: Theme.of(context).colorScheme.primary),
