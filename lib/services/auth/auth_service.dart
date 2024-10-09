@@ -25,8 +25,9 @@ class AuthService {
           .doc(userCredential.user!.uid)
           .set({'uid': userCredential.user!.uid, 'email': email}, SetOptions(merge: true));
 
-
+      //create a device token for the user
       TokenService().createUserToken();
+
       return userCredential;
     }
     // catch any errors
