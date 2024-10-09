@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:nonghai/pages/auth/additional_note_page.dart';
+import 'package:nonghai/pages/nfc_page.dart';
 
 import '../../components/custom_button.dart';
 import '../../components/custom_text_field.dart';
@@ -50,21 +51,11 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
     //     nameController.text != null &&
     //     surnameController.text != null &&
     //     addrController.text != null) {
-    if (breedController.text != null) {
-      petData!['breed'] = breedController.text;
-    }
-    if (nameController.text != null) {
-      petData!['name'] = nameController.text;
-    }
-    if (weightController.text != null) {
-      petData!['weight'] = int.tryParse(weightController.text);
-    }
-    if (hairColorController.text != null) {
-      petData!['hair_color'] = hairColorController.text;
-    }
-    if (bloodController.text != null) {
-      petData!['blood_type'] = bloodController.text;
-    }
+    petData!['breed'] = breedController.text;
+    petData!['name'] = nameController.text;
+    petData!['weight'] = int.tryParse(weightController.text);
+    petData!['hair_color'] = hairColorController.text;
+    petData!['blood_type'] = bloodController.text;
     print(petData);
     //call api here to create user then go to next page
 
@@ -76,12 +67,11 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
     // Check if API call was successful
     if (response.statusCode == 201) {
       print('resp: ${response.data}');
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const BottomNavPage(page: 1)),
-        (Route<dynamic> route) =>
-            false, // This will remove all the previous routes
-      );
+      print('petId: ${response.data['data']}');
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => NfcPage(petId: response.data['data'])));
     } else {
       // Handle error from API
       if (mounted) {
@@ -222,11 +212,11 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
                   fillColor: Colors.white,
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(50),
-                    borderSide: BorderSide(color: Colors.transparent),
+                    borderSide: const BorderSide(color: Colors.transparent),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(50),
-                    borderSide: BorderSide(color: Colors.transparent),
+                    borderSide: const BorderSide(color: Colors.transparent),
                   ),
                   contentPadding:
                       const EdgeInsets.symmetric(vertical: 15, horizontal: 20),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nfc_manager/nfc_manager.dart';
-import 'package:nonghai/components/custom_appbar.dart';
+import 'package:nonghai/components/custom_appbar_to_home.dart';
 import 'package:nonghai/components/custom_button.dart';
 
 class NfcPage extends StatefulWidget {
@@ -28,7 +28,7 @@ class _NfcPageState extends State<NfcPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppBar(title: 'Scan NFC'),
+      appBar: const CustomAppBarToHome(title: 'Scan NFC'),
       body: SafeArea(
         child: FutureBuilder(
           future: NfcManager.instance.isAvailable(),
