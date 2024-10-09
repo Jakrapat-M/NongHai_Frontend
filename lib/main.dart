@@ -179,7 +179,8 @@ class _MyAppState extends State<MyApp> {
               fontSize: 16,
               fontWeight: FontWeight.w600,
               color: Color(0xff333333),
-              fontFamily: 'Fredoka'),
+              fontFamily: 'Fredoka',
+              overflow: TextOverflow.ellipsis),
         ),
         bannerTheme: const MaterialBannerThemeData(
           contentTextStyle: TextStyle(
