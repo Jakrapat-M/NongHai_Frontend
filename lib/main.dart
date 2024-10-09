@@ -24,7 +24,6 @@ import 'pages/auth/add_pet_info_page.dart';
 import 'pages/auth/add_pet_profile_page.dart';
 import 'pages/auth/add_profile_page.dart';
 import 'pages/auth/additional_note_page.dart';
-import 'pages/auth/pet_profile_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -160,26 +159,6 @@ class _MyAppState extends State<MyApp> {
               fontSize: 16,
               fontWeight: FontWeight.w500,
               color: Color(0xff57687C)),
-          headlineLarge: TextStyle(
-              fontSize: 36,
-              fontWeight: FontWeight.w600,
-              color: Color(0xff2C3F50),
-              fontFamily: 'Fredoka'),
-          headlineSmall: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w400,
-              color: Color(0xff333333),
-              fontFamily: 'Fredoka'),
-          titleSmall: TextStyle(
-              fontFamily: 'Fredoka',
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: Color(0xff5C5C5C)),
-          titleMedium: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Color(0xff333333),
-              fontFamily: 'Fredoka'),
         ),
         bannerTheme: const MaterialBannerThemeData(
           contentTextStyle: TextStyle(
@@ -216,10 +195,6 @@ class _MyAppState extends State<MyApp> {
         '/additionalNote': (context) => const AdditionalNotePage(
               petData: {},
             ),
-        '/petProfile': (context) {
-          final dynamic petID = ModalRoute.of(context)?.settings.arguments;
-          return PetProfilePage(petID: petID);
-        },
         '/nfc': (context) => const NfcPage(
               petId: '550e8400-e29b-41d4-a716-446655440000',
             ),
