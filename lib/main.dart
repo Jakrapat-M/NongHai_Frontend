@@ -38,7 +38,6 @@ void main() async {
   await notificationService.initPushNotification();
 
   FirebaseMessaging.onMessage.listen(notificationService.firebaseMessagingForegroundHandler);
-
   FirebaseMessaging.onBackgroundMessage(notificationService.firebaseMessagingBackgroundHandler);
   
   await initializeDateFormatting('th_TH', null);
