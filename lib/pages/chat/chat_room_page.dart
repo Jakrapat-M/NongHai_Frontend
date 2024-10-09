@@ -40,6 +40,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   final ImagePicker _picker = ImagePicker();
 
   getuserName() async {
+    print('Fetching Name');
     try {
       final response = await Caller.dio.get(
         "/user/${widget.receiverID}",

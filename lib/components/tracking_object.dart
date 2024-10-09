@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:nonghai/pages/chat/chat_room_page.dart';
+import 'package:nonghai/services/chat/chat_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
 
@@ -25,8 +27,7 @@ class TrackingObject extends StatelessWidget {
 
   Future<void> _launchMap() async {
     if (lat != null && long != null) {
-      Uri url = Uri.parse(
-          'https://www.google.com/maps/search/?api=1&query=$lat,$long');
+      Uri url = Uri.parse('https://www.google.com/maps/search/?api=1&query=$lat,$long');
       if (!await launchUrl(
         url,
         mode: LaunchMode.externalApplication,
@@ -46,8 +47,7 @@ class TrackingObject extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String dateTime =
-        DateFormat('hh:mm:ss a, dd MMMM yyyy').format(this.dateTime);
+    String dateTime = DateFormat('hh:mm:ss a, dd MMMM yyyy').format(this.dateTime);
     return Column(
       children: [
         // date Time
@@ -58,8 +58,7 @@ class TrackingObject extends StatelessWidget {
               width: 10,
               height: 10,
               decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary,
-                  shape: BoxShape.circle),
+                  color: Theme.of(context).colorScheme.primary, shape: BoxShape.circle),
             ),
             Text(dateTime, style: Theme.of(context).textTheme.bodyLarge),
           ],
@@ -84,21 +83,16 @@ class TrackingObject extends StatelessWidget {
                           padding: const EdgeInsets.all(5),
                           width: 200,
                           decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(20)),
+                              color: Colors.white, borderRadius: BorderRadius.circular(20)),
                           child: Row(
                             children: [
                               CircleAvatar(
                                 radius: 12.5,
-                                backgroundColor: Theme.of(context)
-                                    .colorScheme
-                                    .secondaryContainer,
-                                foregroundImage: AssetImage(
-                                    image ?? 'assets/images/test.jpg'),
+                                backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+                                foregroundImage: AssetImage(image ?? 'assets/images/test.jpg'),
                               ),
                               Padding(
-                                padding:
-                                    const EdgeInsets.only(left: 10, right: 10),
+                                padding: const EdgeInsets.only(left: 10, right: 10),
                                 child: Text(
                                   username,
                                   style: Theme.of(context).textTheme.bodyMedium,
@@ -114,11 +108,24 @@ class TrackingObject extends StatelessWidget {
                             radius: 17,
                             backgroundColor: Colors.white,
                             child: IconButton(
-                              icon:
-                                  const Icon(Icons.chat_bubble_outline_rounded),
-                              onPressed: () {},
-                              color:
-                                  Theme.of(context).colorScheme.secondaryFixed,
+                              icon: const Icon(Icons.chat_bubble_outline_rounded),
+                              onPressed: () {
+                                print('Chatwith $chat');
+                                MaterialPageRoute materialPageRoute = MaterialPageRoute(
+                                  builder: (context) => ChatRoomPage(
+                                    receiverID: chat,
+                                  ),
+                                );
+                                // navigate to chat room
+                                Navigator.of(context)
+                                    .push(
+                                  materialPageRoute,
+                                )
+                                    .then((e) {
+                                  ChatService().setRead(chat);
+                                });
+                              },
+                              color: Theme.of(context).colorScheme.secondaryFixed,
                               iconSize: 18,
                             ),
                           ),
@@ -131,8 +138,7 @@ class TrackingObject extends StatelessWidget {
                             child: IconButton(
                               icon: const Icon(Icons.phone_rounded),
                               onPressed: _makePhoneCall,
-                              color:
-                                  Theme.of(context).colorScheme.secondaryFixed,
+                              color: Theme.of(context).colorScheme.secondaryFixed,
                               iconSize: 18,
                             ),
                           ),
@@ -143,8 +149,7 @@ class TrackingObject extends StatelessWidget {
                   Row(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(
-                            top: 8, left: 8, right: 16, bottom: 8),
+                        padding: const EdgeInsets.only(top: 8, left: 8, right: 16, bottom: 8),
                         child: CircleAvatar(
                           radius: 17,
                           backgroundColor: Colors.white,

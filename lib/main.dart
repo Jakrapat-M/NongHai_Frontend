@@ -39,7 +39,7 @@ void main() async {
 
   FirebaseMessaging.onMessage.listen(notificationService.firebaseMessagingForegroundHandler);
   FirebaseMessaging.onBackgroundMessage(notificationService.firebaseMessagingBackgroundHandler);
-  
+
   await initializeDateFormatting('th_TH', null);
   runApp(MyApp(navigatorKey: navigatorKey));
 }
@@ -174,7 +174,7 @@ class _MyAppState extends State<MyApp> {
           iconTheme: IconThemeData(color: Color(0xff2C3F50), size: 25),
         ),
       ),
-      initialRoute: '/',
+      initialRoute: '/tracking',
       routes: {
         '/': (context) => const AuthGate(),
         '/loginOrRegister': (context) => const LoginOrRegistoer(),

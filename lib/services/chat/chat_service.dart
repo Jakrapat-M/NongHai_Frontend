@@ -196,4 +196,21 @@ class ChatService {
       ),
     );
   }
+
+  void setRead(String chatWith) async {
+    final currentUserID = _auth.currentUser!.uid;
+
+    // Construct chat room id
+    List<String> ids = [currentUserID, chatWith];
+    ids.sort();
+    String chatRoomID = ids.join('_');
+
+    await Caller.dio.post(
+      '/chat/setRead',
+      data: {
+        'chat_id': chatRoomID,
+        'sender_id': currentUserID,
+      },
+    );
+  }
 }
