@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:nonghai/pages/tracking_page.dart';
 import 'dart:convert';
 
 import '../../services/caller.dart';
@@ -63,7 +64,7 @@ class _PetProfilePageState extends State<PetProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    var _image = petDetails['image'];
+    var image = petDetails['image'];
     print(petDetails);
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -111,7 +112,20 @@ class _PetProfilePageState extends State<PetProfilePage> {
               // ),
               const Spacer(),
               isOwner == true
-                  ? ElevatedButton(onPressed: () {}, child: Text('track'))
+                  ? ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TrackingPage(
+                              petId: widget.petID,
+                              petName: petDetails['name'],
+                              petImage: petDetails['image'],
+                            ),
+                          ),
+                        );
+                      },
+                      child: const Text('track'))
                   // ? AssetImage(
                   //     'assets/images/location_track.png',
                   //     width: 10, // Adjust width as needed
@@ -138,8 +152,8 @@ class _PetProfilePageState extends State<PetProfilePage> {
                   padding: const EdgeInsets.fromLTRB(0, 30, 0, 15),
                   child: CircleAvatar(
                     radius: 125,
-                    backgroundImage: (_image != null && _image != '')
-                        ? NetworkImage(_image) // Load image from URL
+                    backgroundImage: (image != null && image != '')
+                        ? NetworkImage(image) // Load image from URL
                         : const AssetImage('assets/images/meme1.jpg')
                             as ImageProvider, // Fallback to a placeholder if _image is empty
                     // backgroundImage: AssetImage('assets/images/meme1.jpg'),
@@ -202,7 +216,7 @@ class _PetProfilePageState extends State<PetProfilePage> {
                                   ),
                                   Text(
                                     petDetails['age'],
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                         color: Color(0xff333333),
                                         fontSize: 20,
                                         fontFamily: 'Fredoka',
@@ -231,7 +245,7 @@ class _PetProfilePageState extends State<PetProfilePage> {
                                   ),
                                   Text(
                                     '${petDetails['weight']} kg',
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                         color: Color(0xff333333),
                                         fontSize: 20,
                                         fontFamily: 'Fredoka',
