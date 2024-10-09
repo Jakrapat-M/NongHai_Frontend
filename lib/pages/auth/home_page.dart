@@ -77,6 +77,7 @@ class _HomePageState extends State<HomePage> {
           // Map pet details
           _petDetails = _pets.map((pet) {
             return {
+              'id': pet['id'],
               'name': pet['name'] ?? 'No name',
               'sex': pet['sex'] ?? 'Unknown',
               'age': pet['age'] != null ? pet['age'].toString() : 'Unknown age',
@@ -347,99 +348,109 @@ class _HomePageState extends State<HomePage> {
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
                                   ),
-                                  child: Column(
-                                    children: [
-                                      SizedBox(
-                                        width: double.infinity,
-                                        height: 155,
-                                        child: ClipRRect(
-                                          borderRadius:
-                                              const BorderRadius.vertical(
-                                            top: Radius.circular(8),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      // Navigate to pet detail page with the pet ID
+                                      String petId = pet['id'];
+                                      Navigator.pushNamed(
+                                          context, '/petProfile',
+                                          arguments: petId);
+                                    },
+                                    child: Column(
+                                      children: [
+                                        SizedBox(
+                                          width: double.infinity,
+                                          height: 155,
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                const BorderRadius.vertical(
+                                              top: Radius.circular(8),
+                                            ),
+                                            child: pet['img'] != '' &&
+                                                    pet['img'] != null
+                                                ? Image.network(
+                                                    pet['img'],
+                                                    fit: BoxFit.cover,
+                                                    errorBuilder: (context,
+                                                        error, stackTrace) {
+                                                      return Image.asset(
+                                                        'assets/images/meme2.jpg', // Default image
+                                                        fit: BoxFit.cover,
+                                                      );
+                                                    },
+                                                  )
+                                                : Image.asset(
+                                                    'assets/images/meme2.jpg', // Default image
+                                                    fit: BoxFit.cover,
+                                                  ),
                                           ),
-                                          child: pet['img'] != '' &&
-                                                  pet['img'] != null
-                                              ? Image.network(
-                                                  pet['img'],
-                                                  fit: BoxFit.cover,
-                                                  errorBuilder: (context, error,
-                                                      stackTrace) {
-                                                    return Image.asset(
-                                                      'assets/images/meme2.jpg', // Default image
-                                                      fit: BoxFit.cover,
-                                                    );
-                                                  },
-                                                )
-                                              : Image.asset(
-                                                  'assets/images/meme2.jpg', // Default image
-                                                  fit: BoxFit.cover,
-                                                ),
                                         ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            8, 5, 8, 5),
-                                        child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.end,
-                                            children: [
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    pet['name'],
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .labelLarge,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  ),
-                                                ],
-                                              ),
-                                              // ค่อยมาเปลี่ยนเป็น data1-data2 (sex-year)
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    pet['sex'] +
-                                                        ' - ' +
-                                                        pet['age'],
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .displayMedium,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  ),
-                                                  const Spacer(),
-                                                  //add logic if status=safe then green
-                                                  Container(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: 11,
-                                                        vertical: 1.5),
-                                                    decoration: BoxDecoration(
-                                                        color: Theme.of(context)
-                                                            .colorScheme
-                                                            .surfaceBright,
-                                                        shape:
-                                                            BoxShape.rectangle,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(8)),
-                                                    child: Text(
-                                                      'Safe',
+                                        Padding(
+                                          padding: const EdgeInsets.fromLTRB(
+                                              8, 5, 8, 5),
+                                          child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.end,
+                                              children: [
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      pet['name'],
                                                       style: Theme.of(context)
                                                           .textTheme
-                                                          .displaySmall,
+                                                          .labelLarge,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
                                                     ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ]),
-                                      ),
-                                    ],
+                                                  ],
+                                                ),
+                                                // ค่อยมาเปลี่ยนเป็น data1-data2 (sex-year)
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      pet['sex'] +
+                                                          ' - ' +
+                                                          pet['age'],
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .displayMedium,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                    const Spacer(),
+                                                    //add logic if status=safe then green
+                                                    Container(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal: 11,
+                                                          vertical: 1.5),
+                                                      decoration: BoxDecoration(
+                                                          color: Theme.of(
+                                                                  context)
+                                                              .colorScheme
+                                                              .surfaceBright,
+                                                          shape: BoxShape
+                                                              .rectangle,
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(8)),
+                                                      child: Text(
+                                                        'Safe',
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .displaySmall,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ]),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 );
                               }
@@ -457,21 +468,5 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
-    //   ),
-    // );
-
-    // appBar: AppBar(
-    //   title: const Text("Home"),
-    //   actions: [
-    //     Padding(
-    //       padding: const EdgeInsets.symmetric(horizontal: 16.0),
-    //       child: IconButton(
-    //         // sign out button
-    //         onPressed: signOut,
-    //         icon: const Icon(Icons.logout),
-    //       ),
-    //     ),
-    //   ],
-    // ),
   }
 }
