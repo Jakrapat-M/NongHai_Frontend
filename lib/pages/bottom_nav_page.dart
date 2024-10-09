@@ -18,7 +18,9 @@ class _BottomNavPageState extends State<BottomNavPage> {
   void initState() {
     super.initState();
     _selectedPageIndex = widget.page;
+    
   }
+  
 
   static final List<Widget> _widgetOptions = <Widget>[
     const ChatHomePage(),

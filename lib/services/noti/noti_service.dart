@@ -1,13 +1,11 @@
+import 'dart:math';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
-import 'package:nonghai/models/notification.dart';
 import 'package:nonghai/pages/chat/chat_room_page.dart';
 import 'package:nonghai/pages/tracking_page.dart';
-import 'package:nonghai/services/auth/auth_service.dart';
-import 'package:nonghai/services/caller.dart';
 
 class NotificationService {
   final _firebaseMessaging = FirebaseMessaging.instance;
@@ -24,8 +22,6 @@ class NotificationService {
     } else {
       print('User declined or has not accepted permission');
     }
-
-    
   }
 
   // handle message
@@ -82,7 +78,7 @@ class NotificationService {
   void firebaseMessagingForegroundHandler(RemoteMessage message) {
     if (message.notification != null) {
       final snackbar = SnackBar(
-        backgroundColor: Colors.black.withOpacity(0.6),
+        backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24),
         ),
@@ -93,21 +89,30 @@ class NotificationService {
           child: Row(
             children: [
               Text(
-                message.notification!.title! + ': ',
-                style: TextStyle(
-                    color: Colors.white), // Optional: Change text color for better visibility
+                '${message.notification!.title!}: ',
+                style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.black), // Optional: Change text color for better visibility
               ),
               const SizedBox(width: 8),
               Text(
+                overflow: TextOverflow.clip,
+                maxLines: 1,
                 message.notification!.body!,
-                style: TextStyle(
-                    color: Colors.white), // Optional: Change text color for better visibility
+                style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.black), // Optional: Change text color for better visibility
               ),
             ],
           ),
         ),
         behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0, bottom: 20),
+        margin: EdgeInsets.only(
+          top: 16.0,
+          left: 16.0,
+          right: 16.0,
+          bottom: MediaQuery.of(_navigatorKey.currentContext!).size.height - 100,
+        ),
         duration: const Duration(seconds: 3),
       );
 
