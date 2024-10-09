@@ -13,7 +13,14 @@ import 'package:nonghai/types/user_data.dart';
 class ChatRoomPage extends StatefulWidget {
   final String receiverID;
   final String? receiverName;
-  const ChatRoomPage({super.key, required this.receiverID, this.receiverName});
+  final bool? isNew;
+
+  const ChatRoomPage({
+    super.key,
+    required this.receiverID,
+    this.receiverName,
+    bool? isNew,
+  }) : isNew = isNew ?? false;
 
   @override
   State<ChatRoomPage> createState() => _ChatRoomPageState();
@@ -114,6 +121,10 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     // Fetch and set the username
     if (widget.receiverName == null) {
       getuserName();
+    }
+
+    if (widget.isNew!) {
+      _chatService.createChatRoom(widget.receiverID);
     }
   }
 
