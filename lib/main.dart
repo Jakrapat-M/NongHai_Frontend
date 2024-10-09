@@ -16,13 +16,20 @@ import 'package:nonghai/services/auth/auth_service.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:nonghai/services/auth/login_or_registoer.dart';
 import 'package:nonghai/firebase_options.dart';
-import 'package:nonghai/pages/home_page.dart';
+import 'package:nonghai/pages/auth/home_page.dart';
 import 'package:nonghai/services/auth/auth_gate.dart';
 import 'package:nonghai/services/noti/noti_service.dart';
 // import 'package:nonghai/services/auth/auth_service.dart';
 // import 'package:provider/provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:nonghai/services/caller.dart';
+
+import 'pages/auth/add_contact_page.dart';
+import 'pages/auth/add_pet_info_page.dart';
+import 'pages/auth/add_pet_profile_page.dart';
+import 'pages/auth/add_profile_page.dart';
+import 'pages/auth/additional_note_page.dart';
+import 'pages/auth/pet_profile_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -221,16 +228,51 @@ class _MyAppState extends State<MyApp> {
               fontSize: 11,
               fontWeight: FontWeight.w600,
               color: Color(0xff1E1E1E)),
-          // labelMedium: TextStyle(
-          //     fontFamily: 'Fredoka',
-          //     fontSize: 9,
-          //     fontWeight: FontWeight.w500,
-          //     color: Color(0xff5C5C5C)),
-          // labelSmall: TextStyle(
-          //     fontFamily: 'Fredoka',
-          //     fontSize: 8,
-          //     fontWeight: FontWeight.w600,
-          //     color: Color(0xffffffff)),
+          displayMedium: TextStyle(
+              fontFamily: 'Fredoka',
+              fontSize: 9,
+              fontWeight: FontWeight.w500,
+              color: Color(0xff5C5C5C)),
+          displaySmall: TextStyle(
+              fontFamily: 'Fredoka',
+              fontSize: 8,
+              fontWeight: FontWeight.w600,
+              color: Color(0xffffffff)),
+          displayLarge: TextStyle(
+              fontFamily: 'Fredoka',
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: Color(0xff57687C)),
+          headlineLarge: TextStyle(
+              fontSize: 36,
+              fontWeight: FontWeight.w600,
+              color: Color(0xff2C3F50),
+              fontFamily: 'Fredoka'),
+          headlineSmall: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w400,
+              color: Color(0xff333333),
+              fontFamily: 'Fredoka'),
+          titleSmall: TextStyle(
+              fontFamily: 'Fredoka',
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: Color(0xff5C5C5C)),
+          titleMedium: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Color(0xff333333),
+              fontFamily: 'Fredoka'),
+        ),
+        bannerTheme: const MaterialBannerThemeData(
+          contentTextStyle: TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.w500,
+              color: Color(0xff2C3F50),
+              fontFamily: 'Fredoka'),
+          backgroundColor: Color(0xfff2f2f2),
+          elevation: 0,
+          // iconTheme: IconThemeData(color: Color(0xff2C3F50), size: 25),
         ),
         appBarTheme: const AppBarTheme(
           titleTextStyle: TextStyle(
@@ -244,12 +286,23 @@ class _MyAppState extends State<MyApp> {
           iconTheme: IconThemeData(color: Color(0xff2C3F50), size: 25),
         ),
       ),
-      initialRoute: '/nfc',
+      initialRoute: '/',
       routes: {
         '/': (context) => const AuthGate(),
         '/loginOrRegister': (context) => const LoginOrRegistoer(),
         '/home': (context) => const HomePage(),
         '/testnfc': (context) => const TestNfcPage(),
+        '/addProfileImage': (context) => const AddProfilePage(),
+        '/addContact': (context) => const AddContactPage(),
+        '/addPetProfileImage': (context) => const AddPetProfilePage(),
+        '/addPetInfo': (context) => const AddPetInfoPage(),
+        '/additionalNote': (context) => const AdditionalNotePage(
+              petData: {},
+            ),
+        '/petProfile': (context) {
+          final dynamic petID = ModalRoute.of(context)?.settings.arguments;
+          return PetProfilePage(petID: petID);
+        },
         '/nfc': (context) => const NfcPage(
               petId: '550e8400-e29b-41d4-a716-446655440000',
             ),
