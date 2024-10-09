@@ -20,7 +20,7 @@ class _BottomNavPageState extends State<BottomNavPage> {
   }
 
   static final List<Widget> _widgetOptions = <Widget>[
-    ChatHomePage(),
+    const ChatHomePage(),
     const HomePage(),
     const Placeholder(),
   ];

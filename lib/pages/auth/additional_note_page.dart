@@ -1,3 +1,5 @@
+// ignore_for_file: unused_field, unused_import
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
@@ -56,7 +58,7 @@ class _AdditionalNotePageState extends State<AdditionalNotePage> {
             children: [
               TextField(
                 controller: noteController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: 'Note',
                   border: OutlineInputBorder(),
                 ),
