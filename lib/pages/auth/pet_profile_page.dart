@@ -50,6 +50,7 @@ class _PetProfilePageState extends State<PetProfilePage> {
           // Check if the current logged-in user is the owner
           final currentUserId = FirebaseAuth.instance.currentUser!.uid;
           isOwner = currentUserId == petDetails['user_id'];
+          isSafe = petDetails['status'] == 'Safe';
 
           // If the current user is not the owner, fetch the owner's data
           if (!isOwner) {
@@ -81,7 +82,9 @@ class _PetProfilePageState extends State<PetProfilePage> {
       final response = await Caller.dio.get("/user/$ownerId");
 
       if (response.statusCode == 200) {
-        setState(() {});
+        setState(() {
+          ownerData = response.data['data'];
+        });
         print(ownerData);
       } else {
         setState(() {
@@ -93,6 +96,23 @@ class _PetProfilePageState extends State<PetProfilePage> {
       setState(() {
         _errorMessage = 'Error occurred while fetching owner details: $e';
       });
+    }
+  }
+
+  Future<void> _updatePetStatus(String petId, bool isSafe) async {
+    String status = "";
+    isSafe ? status = "Safe" : status = "Lost";
+    final response = await Caller.dio.put(
+      "/pet/$petId",
+      data: {
+        'status': status,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      print('Pet updated with image URL successfully.');
+    } else {
+      print('Failed to update pet image URL: ${response.data}');
     }
   }
 
@@ -191,7 +211,7 @@ class _PetProfilePageState extends State<PetProfilePage> {
                     radius: 125,
                     backgroundImage: (image != null && image != '')
                         ? NetworkImage(image) // Load image from URL
-                        : const AssetImage('assets/images/meme1.jpg')
+                        : const AssetImage('assets/images/meme2.jpg')
                             as ImageProvider, // Fallback to a placeholder if _image is empty
                     // backgroundImage: AssetImage('assets/images/meme1.jpg'),
                   ),
@@ -439,6 +459,8 @@ class _PetProfilePageState extends State<PetProfilePage> {
                                         setState(() {
                                           isSafe = value;
                                         });
+                                        _updatePetStatus(
+                                            petDetails['id'], isSafe);
                                         // You might want to send this updated status to your backend here.
                                       },
                                       activeColor: Colors.green,
@@ -501,7 +523,7 @@ class _PetProfilePageState extends State<PetProfilePage> {
                   ],
                 ),
               ),
-              if (!isOwner)
+              if (isOwner)
                 Padding(
                     padding: const EdgeInsets.fromLTRB(5, 0, 5, 10),
                     child: Column(children: [
@@ -535,7 +557,8 @@ class _PetProfilePageState extends State<PetProfilePage> {
                                       ownerData['image'] != '')
                                   ? NetworkImage(
                                       ownerData['image']) // Load image from URL
-                                  : const AssetImage('assets/images/meme1.jpg')
+                                  : const AssetImage(
+                                          'assets/images/default_profile.png')
                                       as ImageProvider, // Fallback to a placeholder if _image is empty
                               // backgroundImage: AssetImage('assets/images/meme1.jpg'),
                             ),

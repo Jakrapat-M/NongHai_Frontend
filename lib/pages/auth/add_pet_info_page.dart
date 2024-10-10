@@ -1,4 +1,6 @@
-// ignore_for_file: avoid_print, use_build_context_synchronously, unused_element, unused_import, unnecessary_null_comparison
+// ignore_for_file: avoid_print, use_build_context_synchronously, unused_element, unused_import, unnecessary_null_comparison, non_constant_identifier_names
+
+import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +11,7 @@ import 'package:nonghai/pages/nfc_page.dart';
 
 import '../../components/custom_button.dart';
 import '../../components/custom_text_field.dart';
+import '../../services/auth/add_profile.dart';
 import '../../services/auth/auth_service.dart';
 import '../../services/caller.dart';
 import '../bottom_nav_page.dart';
@@ -49,51 +52,58 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
   }
 
   Future<void> _createPet(BuildContext context) async {
-    // if (_phoneNumber != null &&
-    //     nameController.text != null &&
-    //     surnameController.text != null &&
-    //     addrController.text != null) {
-    petData!['breed'] = breedController.text;
-    petData!['name'] = nameController.text;
-    petData!['weight'] = int.tryParse(weightController.text);
-    petData!['hair_color'] = hairColorController.text;
-    petData!['blood_type'] = bloodController.text;
+    if (breedController.text.isNotEmpty) {
+      petData!['breed'] = breedController.text;
+    }
+    if (nameController.text.isNotEmpty) {
+      petData!['name'] = nameController.text;
+    }
+    if (weightController.text.isNotEmpty) {
+      petData!['weight'] = int.tryParse(weightController.text);
+    }
+    if (hairColorController.text.isNotEmpty) {
+      petData!['hair_color'] = hairColorController.text;
+    }
+    if (bloodController.text.isNotEmpty) {
+      petData!['blood_type'] = bloodController.text;
+    }
+
     print(petData);
-    //call api here to create user then go to next page
 
     final response = await Caller.dio.post(
       "/pet/createPet",
       data: petData,
     );
 
-    // Check if API call was successful
     if (response.statusCode == 201) {
-      print('resp: ${response.data}');
-      print('petId: ${response.data['data']}');
+      final petId =
+          response.data['data']; // Extract the petId from the response
+
+      // Use the petId in SaveProfile function
+      petData!['id'] = petId;
+      await SaveProfile();
+
       Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) => NfcPage(petId: response.data['data'])));
     } else {
-      // Handle error from API
       if (mounted) {
         showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-                  title: const Text('API Error'),
-                  content: Text(response.data.toString()),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('OK'),
-                    ),
-                  ],
-                ));
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('API Error'),
+            content: Text(response.data.toString()),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
       }
     }
-    // } else {
-    //   _showAlertDialog();
-    // }
   }
 
   void _showAlertDialog() {
@@ -114,6 +124,44 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
         );
       },
     );
+  }
+
+// ต้อง create(no image) ให้ได้ไอดีมาแล้วค่อยเอาไอดีไปsave in fb-> update iamge
+  Future<Map<String, dynamic>> SaveProfile() async {
+    if (petData?['image'] != null) {
+      String imagePath = petData!['image'];
+      String petId = petData!['id']; // Use the petId for the file name
+
+      Uint8List imageFile = await File(imagePath).readAsBytes();
+      String folderPath = 'petProfileImage/$petId.jpg'; // Save as petId.jpg
+
+      String imgUrl = await StoreProfile()
+          .saveData(userId: petId, file: imageFile, folderPath: folderPath);
+
+      petData!['image'] = imgUrl;
+      await _updatePetWithImage(petId, imgUrl);
+
+      print('Uploaded image URL: $imgUrl');
+      return petData!;
+    } else {
+      _showAlertDialog();
+      return {};
+    }
+  }
+
+  Future<void> _updatePetWithImage(String petId, String imageUrl) async {
+    final response = await Caller.dio.put(
+      "/pet/$petId",
+      data: {
+        'image': imageUrl,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      print('Pet updated with image URL successfully.');
+    } else {
+      print('Failed to update pet image URL: ${response.data}');
+    }
   }
 
   @override

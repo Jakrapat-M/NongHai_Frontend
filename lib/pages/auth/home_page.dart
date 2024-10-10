@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously, avoid_print, prefer_typing_uninitialized_variables, unnecessary_null_comparison
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:nonghai/services/auth/auth_service.dart';
@@ -20,9 +21,20 @@ class _HomePageState extends State<HomePage> {
   bool _isLoading = true;
   String _errorMessage = '';
   String uid = "";
+  var profileImageUrl;
 
   Future<void> fetchUserData() async {
     uid = FirebaseAuth.instance.currentUser!.uid;
+    DocumentSnapshot doc = await FirebaseFirestore.instance
+        .collection('userProfile')
+        .doc(uid)
+        .get();
+
+    if (doc.exists) {
+      setState(() {
+        profileImageUrl = doc['image'];
+      });
+    }
 
     if (uid == null) {
       setState(() {
@@ -66,7 +78,7 @@ class _HomePageState extends State<HomePage> {
           }
 
           // Log the user data to check what was retrieved
-          print('Username: $_username, Address: $_address, Phone: $_phone');
+          // print('Username: $_username, Address: $_address, Phone: $_phone');
 
           // Pets data can be null, provide fallback
           _pets = userData['data']['pets'] ?? [];
@@ -80,6 +92,7 @@ class _HomePageState extends State<HomePage> {
               'sex': pet['sex'] ?? 'Unknown',
               'age': pet['age'] != null ? pet['age'].toString() : 'Unknown age',
               'img': pet['image'] ?? '',
+              'status': pet['status'] != null ? pet['status'].toString() : ''
             };
           }).toList();
 
@@ -89,6 +102,8 @@ class _HomePageState extends State<HomePage> {
           // Set image, fallback to empty string if null
           _image = userData['data']['image'] ?? '';
           _isLoading = false;
+          print(_image);
+          print(profileImageUrl);
         });
       } else {
         setState(() {
@@ -178,7 +193,8 @@ class _HomePageState extends State<HomePage> {
                       radius: 47,
                       backgroundImage: (_image != null && _image != '')
                           ? NetworkImage(_image) // Load image from URL
-                          : const AssetImage('assets/images/meme1.jpg')
+                          : const AssetImage(
+                                  'assets/images/default_profile.png')
                               as ImageProvider, // Fallback to a placeholder if _image is empty
                       // backgroundImage: AssetImage('assets/images/meme1.jpg'),
                     ),
@@ -348,12 +364,19 @@ class _HomePageState extends State<HomePage> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: GestureDetector(
-                                    onTap: () {
+                                    onTap: () async {
                                       // Navigate to pet detail page with the pet ID
                                       String petId = pet['id'];
-                                      Navigator.pushNamed(
+                                      await Navigator.pushNamed(
                                           context, '/petProfile',
                                           arguments: petId);
+                                      // fetchUserData();
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const HomePage()),
+                                      );
                                     },
                                     child: Column(
                                       children: [
@@ -422,28 +445,35 @@ class _HomePageState extends State<HomePage> {
                                                     ),
                                                     const Spacer(),
                                                     //add logic if status=safe then green
-                                                    Container(
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                          horizontal: 11,
-                                                          vertical: 1.5),
-                                                      decoration: BoxDecoration(
-                                                          color: Theme.of(
-                                                                  context)
-                                                              .colorScheme
-                                                              .surfaceBright,
-                                                          shape: BoxShape
-                                                              .rectangle,
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(8)),
-                                                      child: Text(
-                                                        'Safe',
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .displaySmall,
+                                                    if (pet['status'] != null &&
+                                                        pet['status'] != "")
+                                                      Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                horizontal: 11,
+                                                                vertical: 1.5),
+                                                        decoration: BoxDecoration(
+                                                            color:
+                                                                pet['status'] ==
+                                                                        'Lost'
+                                                                    ? Colors.red
+                                                                    : Colors
+                                                                        .green,
+                                                            shape: BoxShape
+                                                                .rectangle,
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        8)),
+                                                        child: Text(
+                                                          pet['status'],
+                                                          style:
+                                                              Theme.of(context)
+                                                                  .textTheme
+                                                                  .displaySmall,
+                                                        ),
                                                       ),
-                                                    ),
                                                   ],
                                                 ),
                                               ]),
