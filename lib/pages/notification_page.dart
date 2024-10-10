@@ -4,6 +4,7 @@ import 'package:nonghai/components/custom_appbar.dart';
 import 'package:nonghai/components/notification_tile.dart';
 import 'package:nonghai/services/auth/auth_service.dart';
 import 'package:nonghai/services/caller.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class NotificationPage extends StatefulWidget {
   const NotificationPage({super.key});
@@ -51,7 +52,7 @@ class _NotificationPageState extends State<NotificationPage> {
 
   Widget _buildNotificationList() {
     if (notifications == null) {
-      return const Center(child: CircularProgressIndicator());
+      return Center(child: SpinKitFadingCube(color: Theme.of(context).colorScheme.primary));
     }
 
     if (notifications!.isEmpty) {
