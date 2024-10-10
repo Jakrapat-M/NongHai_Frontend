@@ -10,7 +10,6 @@ import 'package:nonghai/pages/nfc_page.dart';
 // import 'package:flutter/painting.dart';
 // import 'package:flutter/rendering.dart';
 // import 'package:flutter/widgets.dart';
-import 'package:nonghai/pages/test_nfc_page.dart';
 import 'package:nonghai/pages/tracking_page.dart';
 import 'package:nonghai/services/auth/auth_service.dart';
 import 'package:geolocator/geolocator.dart';
@@ -291,7 +290,6 @@ class _MyAppState extends State<MyApp> {
         '/': (context) => const AuthGate(),
         '/loginOrRegister': (context) => const LoginOrRegistoer(),
         '/home': (context) => const HomePage(),
-        '/testnfc': (context) => const TestNfcPage(),
         '/addProfileImage': (context) => const AddProfilePage(),
         '/addContact': (context) => const AddContactPage(),
         '/addPetProfileImage': (context) => const AddPetProfilePage(),
