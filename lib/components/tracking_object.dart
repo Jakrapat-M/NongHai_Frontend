@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nonghai/pages/chat/chat_room_page.dart';
+import 'package:nonghai/services/auth/auth_service.dart';
 import 'package:nonghai/services/chat/chat_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
@@ -50,6 +51,8 @@ class TrackingObject extends StatelessWidget {
   Widget build(BuildContext context) {
     String dateTime =
         DateFormat('hh:mm:ss a, dd MMMM yyyy').format(this.dateTime);
+    final currentUserId = AuthService().getCurrentUser()!.uid;
+    bool isCurrentUser = currentUserId == chat;
     return Column(
       children: [
         // date Time
@@ -115,30 +118,40 @@ class TrackingObject extends StatelessWidget {
                           child: CircleAvatar(
                             radius: 17,
                             backgroundColor: Colors.white,
-                            child: IconButton(
-                              icon:
-                                  const Icon(Icons.chat_bubble_outline_rounded),
-                              onPressed: () {
-                                print('Chatwith $chat');
-                                MaterialPageRoute materialPageRoute =
-                                    MaterialPageRoute(
-                                  builder: (context) => ChatRoomPage(
-                                    receiverID: chat,
+                            child: isCurrentUser
+                                ? IconButton(
+                                    icon: const Icon(
+                                        Icons.chat_bubble_outline_rounded),
+                                    onPressed: () {},
+                                    color:
+                                        Theme.of(context).colorScheme.secondary,
+                                    iconSize: 18,
+                                  )
+                                : IconButton(
+                                    icon: const Icon(
+                                        Icons.chat_bubble_outline_rounded),
+                                    onPressed: () {
+                                      print('Chatwith $chat');
+                                      MaterialPageRoute materialPageRoute =
+                                          MaterialPageRoute(
+                                        builder: (context) => ChatRoomPage(
+                                          receiverID: chat,
+                                        ),
+                                      );
+                                      // navigate to chat room
+                                      Navigator.of(context)
+                                          .push(
+                                        materialPageRoute,
+                                      )
+                                          .then((e) {
+                                        ChatService().setRead(chat);
+                                      });
+                                    },
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .secondaryFixed,
+                                    iconSize: 18,
                                   ),
-                                );
-                                // navigate to chat room
-                                Navigator.of(context)
-                                    .push(
-                                  materialPageRoute,
-                                )
-                                    .then((e) {
-                                  ChatService().setRead(chat);
-                                });
-                              },
-                              color:
-                                  Theme.of(context).colorScheme.secondaryFixed,
-                              iconSize: 18,
-                            ),
                           ),
                         ),
                         Padding(
@@ -146,13 +159,22 @@ class TrackingObject extends StatelessWidget {
                           child: CircleAvatar(
                             radius: 17,
                             backgroundColor: Colors.white,
-                            child: IconButton(
-                              icon: const Icon(Icons.phone_rounded),
-                              onPressed: _makePhoneCall,
-                              color:
-                                  Theme.of(context).colorScheme.secondaryFixed,
-                              iconSize: 18,
-                            ),
+                            child: isCurrentUser
+                                ? IconButton(
+                                    icon: const Icon(Icons.phone_rounded),
+                                    onPressed: () {},
+                                    color:
+                                        Theme.of(context).colorScheme.secondary,
+                                    iconSize: 18,
+                                  )
+                                : IconButton(
+                                    icon: const Icon(Icons.phone_rounded),
+                                    onPressed: _makePhoneCall,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .secondaryFixed,
+                                    iconSize: 18,
+                                  ),
                           ),
                         ),
                       ],
