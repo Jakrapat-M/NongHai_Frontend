@@ -12,7 +12,7 @@ import 'package:nonghai/pages/nfc_page.dart';
 // import 'package:flutter/widgets.dart';
 import 'package:nonghai/pages/tracking_page.dart';
 import 'package:nonghai/services/auth/auth_service.dart';
-import 'package:geolocator/geolocator.dart';
+// import 'package:geolocator/geolocator.dart';
 import 'package:nonghai/services/auth/login_or_registoer.dart';
 import 'package:nonghai/firebase_options.dart';
 import 'package:nonghai/pages/auth/home_page.dart';
@@ -45,10 +45,8 @@ void main() async {
   await notificationService.initialize();
   await notificationService.initPushNotification();
 
-  FirebaseMessaging.onMessage
-      .listen(notificationService.firebaseMessagingForegroundHandler);
-  FirebaseMessaging.onBackgroundMessage(
-      notificationService.firebaseMessagingBackgroundHandler);
+  FirebaseMessaging.onMessage.listen(notificationService.firebaseMessagingForegroundHandler);
+  FirebaseMessaging.onBackgroundMessage(notificationService.firebaseMessagingBackgroundHandler);
 
   await initializeDateFormatting('th_TH', null);
   runApp(MyApp(navigatorKey: navigatorKey));
@@ -110,12 +108,7 @@ class _MyAppState extends State<MyApp> {
 
       final resp = await Caller.dio.post(
         '/tracking/createTracking',
-        data: {
-          'pet_id': petId,
-          'finder_id': currentUserId,
-          'lat': lat,
-          'long': long
-        },
+        data: {'pet_id': petId, 'finder_id': currentUserId, 'lat': lat, 'long': long},
       );
       if (resp.statusCode == 200) {
         print('Tracking created');
@@ -131,36 +124,40 @@ class _MyAppState extends State<MyApp> {
     return true;
   }
 
-  Future<Position?> _getLocation() async {
-    print("test getLocaion");
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    print('Checking location');
-    // Test if location services are enabled.
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      print("Location services are disabled.");
-      return null;
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        print("Location permissions are denied");
-        return null;
-      }
-    }
-    if (permission == LocationPermission.deniedForever) {
-      print(
-          'Location permissions are permanently denied, we cannot request permissions.');
-      return null;
-    }
-    print("get location success");
-
-    return await Geolocator.getCurrentPosition();
+  Future<dynamic> _getLocation() async {
+    return null;
   }
+
+  // Future<Position?> _getLocation() async {
+  //   print("test getLocaion");
+  //   bool serviceEnabled;
+  //   LocationPermission permission;
+
+  //   print('Checking location');
+  //   // Test if location services are enabled.
+  //   serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  //   if (!serviceEnabled) {
+  //     print("Location services are disabled.");
+  //     return null;
+  //   }
+
+  //   permission = await Geolocator.checkPermission();
+  //   if (permission == LocationPermission.denied) {
+  //     permission = await Geolocator.requestPermission();
+  //     if (permission == LocationPermission.denied) {
+  //       print("Location permissions are denied");
+  //       return null;
+  //     }
+  //   }
+  //   if (permission == LocationPermission.deniedForever) {
+  //     print(
+  //         'Location permissions are permanently denied, we cannot request permissions.');
+  //     return null;
+  //   }
+  //   print("get location success");
+
+  //   return await Geolocator.getCurrentPosition();
+  // }
 
   void openAppLink(Uri uri) {
     final fragment = uri.fragment;
@@ -193,8 +190,7 @@ class _MyAppState extends State<MyApp> {
             onSurface: const Color(0xff2C3F50), //blue surface(box/button)
             secondaryContainer: const Color(0xffE8E8E8), //container
             secondaryFixed: const Color(0xff2C3F50), //container
-            surfaceBright:
-                const Color(0xff5DB671), // green container box(status)
+            surfaceBright: const Color(0xff5DB671), // green container box(status)
             onErrorContainer: Colors.red // red container box(status)
             ),
         useMaterial3: true,
