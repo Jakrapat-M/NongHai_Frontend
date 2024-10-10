@@ -161,11 +161,7 @@ class _MyAppState extends State<MyApp> {
     createTracking(fragment).then((value) {
       _navigatorKey.currentState?.push(MaterialPageRoute(
         builder: (context) {
-          return TrackingPage(
-            petId: fragment,
-            petName: 'Ella',
-            petImage: 'petImage',
-          );
+          return PetProfilePage(petID: fragment);
         },
       ));
     });
