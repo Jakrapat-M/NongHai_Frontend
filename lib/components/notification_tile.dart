@@ -1,21 +1,18 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:nonghai/pages/tracking_page.dart';
 import 'package:nonghai/services/caller.dart';
+import 'package:nonghai/services/noti/send_noti_service.dart';
 import 'package:nonghai/types/noti_info.dart';
+import 'package:nonghai/types/noti_object_data.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class NotificationTile extends StatefulWidget {
-  final String userId;
-  final String petId;
-  final String trackingId;
-  final bool isRead;
+  final String notiId;
 
   const NotificationTile({
     super.key,
-    required this.userId,
-    required this.petId,
-    required this.trackingId,
-    required this.isRead,
+    required this.notiId,
   });
 
   @override
@@ -24,40 +21,93 @@ class NotificationTile extends StatefulWidget {
 
 class _NotificationTileState extends State<NotificationTile> {
   TrackingNotiInfo? trackerNotiInfo;
-  bool isLoading = true;
+  NotificationObject? notiObject;
+  bool isLoading1 = true;
+  bool isLoading2 = true;
 
-  getTrackingData() async {
+  getNotiData() async {
+    print('getNotiData for notiId: ${widget.notiId}');
     try {
-      final resp = await Caller.dio.get(
-        '/tracking/getTrackingById',
-        data: {"tracking_id": widget.trackingId},
+      final response = await Caller.dio.get(
+        '/notification/getNotification',
+        data: {"noti_id": widget.notiId},
       );
 
-      if (resp.statusCode == 200) {
+      if (response.statusCode == 200) {
         setState(() {
-          trackerNotiInfo = TrackingNotiInfo.fromJson(resp.data['data']);
+          notiObject = NotificationObject.fromJson(response.data['data']);
+          isLoading1 = false;
         });
       }
     } catch (e) {
       if (kDebugMode) {
         print('Network error occurred: $e');
       }
-    } finally {
-      setState(() {
-        isLoading = false;
-      });
     }
+  }
+
+  getNotificationData() async {
+    print('getNotificationData for notiId: ${widget.notiId}');
+    try {
+      final resp = await Caller.dio.get(
+        '/tracking/getTrackingById',
+        data: {"tracking_id": notiObject?.trackingId},
+      );
+
+      if (resp.statusCode == 200) {
+        setState(() {
+          trackerNotiInfo = TrackingNotiInfo.fromJson(resp.data['data']);
+          isLoading2 = false;
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Network error occurred on get noti data: $e');
+      }
+    }
+  }
+
+  handleTap() async {
+    SendNotiService().readNotification(widget.notiId);
+
+    MaterialPageRoute materialPageRoute = MaterialPageRoute(
+      builder: (context) => TrackingPage(
+        petId: notiObject?.petId ?? 'Unknown Pet',
+        petName: trackerNotiInfo?.petName ?? 'Unknown Pet',
+        petImage: trackerNotiInfo?.petImage ?? '',
+      ),
+    );
+    Navigator.of(context).push(materialPageRoute).then((value) {
+      // Refresh data when returning from TrackingPage
+      setState(() {
+        isLoading1 = true; // Reset loading states
+        isLoading2 = true;
+      });
+      getNotiData().then((_) {
+        getNotificationData();
+      });
+    });
   }
 
   @override
   void initState() {
     super.initState();
-    getTrackingData();
+
+    Future.delayed(Duration.zero, () {
+      getNotiData().then((value) {
+        getNotificationData();
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
+    if (isLoading1 || isLoading2) {
       return Center(
         child: SizedBox(
           height: 50,
@@ -75,6 +125,7 @@ class _NotificationTileState extends State<NotificationTile> {
     return GestureDetector(
       onTap: () {
         // Navigate to tracking page
+        handleTap();
       },
       child: Container(
         decoration: BoxDecoration(
@@ -122,7 +173,7 @@ class _NotificationTileState extends State<NotificationTile> {
             const SizedBox(width: 8.0),
             Icon(
               Icons.circle,
-              color: widget.isRead ? Colors.grey[200] : Colors.pink[200],
+              color: notiObject!.isRead ? Colors.grey[200] : Colors.pink[200],
               size: 11,
             ),
           ],

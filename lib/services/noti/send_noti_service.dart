@@ -16,4 +16,18 @@ class SendNotiService {
       }
     }
   }
+
+  Future<void> readNotification(String notiId) async {
+    try {
+      print('setNotificationRead for notiId: $notiId');
+      await Caller.dio.post(
+        '/notification/setNotificationRead',
+        data: {"noti_id": notiId},
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        print('Network error occurred: $e');
+      }
+    }
+  }
 }

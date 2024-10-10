@@ -44,7 +44,7 @@ class _NotificationPageState extends State<NotificationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(title: 'Notification', noBackButton: true),
+      appBar: const CustomAppBar(title: 'Notification', noBackButton: true),
       body: SafeArea(child: _buildNotificationList()),
     );
   }
@@ -63,10 +63,8 @@ class _NotificationPageState extends State<NotificationPage> {
       itemBuilder: (context, index) {
         final notification = notifications![index];
         return NotificationTile(
-          userId: notification['user_id'],
-          petId: notification['pet_id'],
-          trackingId: notification['tracking_id'],
-          isRead: notification['is_read'],
+          notiId: notification['id'],
+
         );
       },
     );
