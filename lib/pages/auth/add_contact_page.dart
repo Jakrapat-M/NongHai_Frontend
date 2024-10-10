@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print, unnecessary_null_comparison, use_build_context_synchronously
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
@@ -104,11 +106,11 @@ class _AddContactPageState extends State<AddContactPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Invalid Input'),
-          content: Text('The field cannot be empty.'),
+          title: const Text('Invalid Input'),
+          content: const Text('The field cannot be empty.'),
           actions: [
             TextButton(
-              child: Text('OK'),
+              child: const Text('OK'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -163,7 +165,7 @@ class _AddContactPageState extends State<AddContactPage> {
               padding: const EdgeInsets.only(bottom: 12),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Color(0xffffffff),
+                  color: const Color(0xffffffff),
                   borderRadius: BorderRadius.circular(50),
                 ),
                 child: IntlPhoneField(
@@ -177,12 +179,12 @@ class _AddContactPageState extends State<AddContactPage> {
                     // ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide:
-                          BorderSide(color: Colors.transparent), // No underline
+                      borderSide: const BorderSide(
+                          color: Colors.transparent), // No underline
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(
+                      borderSide: const BorderSide(
                           color:
                               Colors.transparent), // No underline when focused
                     ),
