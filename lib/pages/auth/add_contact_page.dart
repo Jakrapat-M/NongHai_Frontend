@@ -3,13 +3,13 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:nonghai/services/auth/add_profile.dart';
 import '../../components/custom_button.dart';
 import '../../components/custom_text_field.dart';
-import '../../services/auth/auth_service.dart';
+// import '../../services/auth/auth_service.dart';
 import '../../services/caller.dart';
 
 class AddContactPage extends StatefulWidget {
@@ -40,29 +40,17 @@ class _AddContactPageState extends State<AddContactPage> {
         nameController.text.isNotEmpty &&
         surnameController.text.isNotEmpty &&
         addrController.text.isNotEmpty) {
-      userData!['phone'] = _phoneNumber!.toString();
+      userData!['phone'] = _phoneNumber!;
       userData!['name'] = nameController.text;
       userData!['surname'] = surnameController.text;
       userData!['address'] = addrController.text;
 
-      print(userData);
-
-      final authService = AuthService();
+      // final authService = AuthService();
       try {
-        // Sign up with Firebase
-        UserCredential userCredential =
-            await authService.signUpWithEmailandPassword(
-                userData!['email'], userData!['password']);
-
-        // Get the Firebase User's UID
-        String uid = userCredential.user!.uid;
-
-        // Update userData to include the UID and remove the password
-        userData!['id'] = uid;
-        userData!.remove('password');
-
-        // Call SaveProfile and wait for the updated userData
-        userData = await SaveProfile(); // Update userData with image URL
+        // Call SaveProfile to upload the profile image and get the updated user data
+        if (userData?['image'] != null && userData!['image'].isNotEmpty) {
+          userData = await SaveProfile();
+        }
 
         // Call the createUser API with updated userData
         final response = await Caller.dio.post(
@@ -70,30 +58,41 @@ class _AddContactPageState extends State<AddContactPage> {
           data: userData,
         );
 
-        // Check if API call was successful
+        // Handle the API response
         if (response.statusCode == 201) {
-          print('resp: ${response.data}');
-          Navigator.pushNamed(context, '/addPetProfileImage', arguments: uid);
+          Navigator.pushNamed(context, '/addPetProfileImage',
+              arguments: userData!['id']);
         } else {
           // Handle error from API
-          if (mounted) {
-            showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                      title: const Text('API Error'),
-                      content: Text(response.data.toString()),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text('OK'),
-                        ),
-                      ],
-                    ));
-          }
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('API Error'),
+              content: Text(response.data.toString()),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+          );
         }
       } catch (e) {
-        // Handle Firebase sign-up error
-        print('Error occurred: ${e.toString()}');
+        // Handle errors during the API call or image upload
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Error'),
+            content: Text('Error occurred: ${e.toString()}'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
       }
     } else {
       _showAlertDialog();

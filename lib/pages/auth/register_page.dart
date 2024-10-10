@@ -1,3 +1,6 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:nonghai/components/custom_button.dart';
 import 'package:nonghai/components/custom_text_field.dart';
@@ -25,41 +28,80 @@ class _RegisterPageState extends State<RegisterPage> {
   //   print(apiUrl);
   // }
 
-  void createAccount(BuildContext context) {
+  void createAccount(BuildContext context) async {
     if (passwordController.text == confirmPasswordController.text &&
         passwordController.text.length >= 6) {
-      final userData = {
-        "id": "",
-        "username": usernameController.text,
-        "name": "-",
-        "surname": "-",
-        "email": emailController.text,
-        "password": passwordController.text,
-        "phone": "-",
-        "address": "-",
-        "latitude": 13.7540,
-        "longitude": 100.5014, // latitude / longitude of TH
-        "image": ""
-      };
-      // Navigate to Add Profile Image page and pass userData
-      Navigator.pushNamed(context, '/addProfileImage', arguments: userData);
-    } else {
-      // Handle password mismatch
-      if (mounted) {
+      final email = emailController.text;
+      final FirebaseAuth auth = FirebaseAuth.instance;
+
+      try {
+        // Sign up with Firebase Authentication
+        UserCredential userCredential =
+            await auth.createUserWithEmailAndPassword(
+          email: email,
+          password: passwordController.text,
+        );
+
+        // Get the Firebase User's UID
+        String uid = userCredential.user?.uid ?? "";
+
+        // Prepare user data for the next step
+        final userData = {
+          "id": uid,
+          "username": usernameController.text,
+          "name": "-",
+          "surname": "-",
+          "email": email,
+          "password": passwordController.text,
+          "phone": "-",
+          "address": "-",
+          "latitude": 13.7540,
+          "longitude": 100.5014, // latitude / longitude of TH
+          "image": ""
+        };
+
+        // Navigate to Add Profile Image page and pass userData
+        Navigator.pushNamed(context, '/addProfileImage', arguments: userData);
+      } on FirebaseAuthException catch (e) {
+        // Handle errors like email already in use
+        String errorMessage;
+        if (e.code == 'email-already-in-use') {
+          errorMessage =
+              'The provided email is already registered. Please use a different email.';
+        } else {
+          errorMessage = e.message ?? 'An error occurred. Please try again.';
+        }
+        // Show the error dialog
         showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-                  title: const Text('Invalid Password'),
-                  content: const Text(
-                      'Please ensure your password has at least 6 characters and matched.'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('OK'),
-                    ),
-                  ],
-                ));
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Error'),
+            content: Text(errorMessage),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
       }
+    } else {
+      // Handle password mismatch or length issues
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Invalid Password'),
+          content: const Text(
+              'Please ensure your password has at least 6 characters and matches.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
     }
   }
 
