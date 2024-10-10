@@ -5,6 +5,7 @@ import 'package:nonghai/pages/chat/chat_room_page.dart';
 import 'package:nonghai/services/auth/auth_service.dart';
 import 'package:nonghai/services/caller.dart';
 import 'package:nonghai/services/chat/chat_service.dart';
+import 'package:nonghai/services/noti/show_or_hide_noti.dart';
 import 'package:nonghai/types/chat_room_data.dart';
 import 'package:nonghai/types/user_data.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -169,16 +170,11 @@ class _UserTileState extends State<UserTile> {
           materialPageRoute,
         )
             .then((value) {
+          ShowOrHideNoti().resetChatting();
+          // mark chat as read where navigate back from chat room
+          chatService.setRead(widget.receiverID);
           // Refresh the chat room list
           setState(() {
-            // mark chat as read where navigate back from chat room
-            Caller.dio.post(
-              '/chat/setRead',
-              data: {
-                'chat_id': chatRoomID,
-                'sender_id': currentUserId,
-              },
-            );
             //refresh chat room list
           });
         });

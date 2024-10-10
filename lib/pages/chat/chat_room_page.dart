@@ -1,13 +1,16 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:nonghai/components/chat_bubble.dart';
 import 'package:nonghai/components/custom_appbar.dart';
+import 'package:nonghai/main.dart';
 import 'package:nonghai/services/auth/auth_service.dart';
 import 'package:nonghai/services/caller.dart';
 import 'package:nonghai/services/chat/chat_service.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:nonghai/services/noti/show_or_hide_noti.dart';
 import 'package:nonghai/types/user_data.dart';
 
 class ChatRoomPage extends StatefulWidget {
@@ -39,7 +42,12 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
 
   final ImagePicker _picker = ImagePicker();
 
-  getuserName() async {
+  checkChatRoom() {
+    // Check if the chat room exists
+    ShowOrHideNoti().setChatingWith(widget.receiverID);
+  }
+
+  getuserData() async {
     print('Fetching Name');
     try {
       final response = await Caller.dio.get(
@@ -50,7 +58,9 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
         setState(() {
           userData = UserData.fromJson(response.data['data']);
         });
+        return UserData.fromJson(response.data['data']);
       }
+      return 'Error Fetching Name';
     } catch (e) {
       return 'Error Fetching Name';
     }
@@ -105,6 +115,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   @override
   void initState() {
     super.initState();
+    checkChatRoom();
     _focusNode.addListener(() {
       if (_focusNode.hasFocus) {
         Future.delayed(
@@ -121,7 +132,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
 
     // Fetch and set the username
     if (widget.receiverName == null) {
-      getuserName();
+      getuserData();
     }
 
     if (widget.isNew!) {

@@ -1,11 +1,11 @@
-import 'dart:math';
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'package:flutter/material.dart';
+import 'package:nonghai/main.dart';
 import 'package:nonghai/pages/chat/chat_room_page.dart';
 import 'package:nonghai/pages/tracking_page.dart';
+import 'package:nonghai/services/noti/show_or_hide_noti.dart';
 
 class NotificationService {
   final _firebaseMessaging = FirebaseMessaging.instance;
@@ -76,7 +76,8 @@ class NotificationService {
   }
 
   void firebaseMessagingForegroundHandler(RemoteMessage message) {
-    if (message.notification != null) {
+    final hideNoti = ShowOrHideNoti().showOrHideNoti(message.data['chat_with']);
+    if (message.notification != null && !hideNoti) {
       final snackbar = SnackBar(
         backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(

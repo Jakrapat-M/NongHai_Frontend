@@ -174,7 +174,7 @@ class _MyAppState extends State<MyApp> {
           iconTheme: IconThemeData(color: Color(0xff2C3F50), size: 25),
         ),
       ),
-      initialRoute: '/tracking',
+      initialRoute: '/',
       routes: {
         '/': (context) => const AuthGate(),
         '/loginOrRegister': (context) => const LoginOrRegistoer(),
