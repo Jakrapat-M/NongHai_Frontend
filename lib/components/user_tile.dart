@@ -51,18 +51,20 @@ class _UserTileState extends State<UserTile> {
 
   void getuserData() async {
     try {
+      print('Fetching user data for ${widget.receiverID}');
       final response = await Caller.dio.get(
         "/user/${widget.receiverID}",
       );
 
       if (response.statusCode == 200) {
+        print('User data: ${response.data['data']}');
         setState(() {
           userData = UserData.fromJson(response.data['data']);
         });
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Network error occurred: $e');
+        print('Network error occurred on getuserData: $e');
       }
       return null;
     }

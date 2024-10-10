@@ -5,54 +5,58 @@ part 'user_data.g.dart';
 @JsonSerializable()
 class UserData {
   @JsonKey(name: 'id')
-  String id;
+  String? id;
 
   @JsonKey(name: 'created_at')
-  DateTime createdAt;
+  DateTime? createdAt;
 
   @JsonKey(name: 'updated_at')
-  DateTime updatedAt;
+  DateTime? updatedAt;
 
   @JsonKey(name: 'username')
-  String username;
+  String? username;
 
   @JsonKey(name: 'name')
-  String name;
+  String? name;
 
   @JsonKey(name: 'surname')
-  String surname;
+  String? surname;
 
   @JsonKey(name: 'email')
-  String email;
+  String? email;
 
   @JsonKey(name: 'phone')
-  String phone;
+  String? phone;
 
   @JsonKey(name: 'address')
-  String address;
+  String? address;
 
   @JsonKey(name: 'latitude')
-  double latitude;
+  double? latitude;
 
   @JsonKey(name: 'longitude')
-  double longitude;
+  double? longitude;
 
   @JsonKey(name: 'image')
-  String image;
+  String? image;
+
+  @JsonKey(name: 'pets')
+  List<dynamic>? pets;
 
   UserData({
-    required this.id,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.username,
-    required this.name,
-    required this.surname,
-    required this.email,
-    required this.phone,
-    required this.address,
-    required this.latitude,
-    required this.longitude,
-    required this.image,
+    this.id,
+    this.createdAt,
+     this.updatedAt,
+    this.username,
+     this.name,
+     this.surname,
+     this.email,
+     this.phone,
+     this.address,
+    this.latitude,
+    this.longitude,
+    this.image,
+    this.pets,
   });
 
   // Factory method to create a `User` instance from a JSON map.
