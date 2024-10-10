@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print, unnecessary_null_comparison, prefer_const_constructors
+// ignore_for_file: avoid_print, unnecessary_null_comparison, prefer_const_constructors, use_build_context_synchronously
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +26,8 @@ class _AddPetProfilePageState extends State<AddPetProfilePage> {
     "weight": 0,
     "hair_color": "N/A",
     "blood_type": "N/A",
+    "eyes": "Blue",
+    "status": "Safe", // ค่อยมาเปลี่ยน
     "note": "",
     "image": ""
   };
@@ -56,19 +58,72 @@ class _AddPetProfilePageState extends State<AddPetProfilePage> {
     var status = await Permission.storage.request();
 
     if (status.isGranted) {
-      final ImagePicker picker = ImagePicker();
-      final XFile? selectedImage =
-          await picker.pickImage(source: ImageSource.gallery);
-
-      if (selectedImage != null) {
-        setState(() {
-          _image = selectedImage;
-        });
-      }
+      // Show dialog to choose image source
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text(
+              'Select Image Source',
+              textAlign: TextAlign.center,
+            ),
+            content: SizedBox(
+              // Set a fixed height if needed
+              height: 100,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment
+                        .center, // Center the buttons horizontally
+                    children: <Widget>[
+                      TextButton(
+                        child: const Text('Camera'),
+                        onPressed: () async {
+                          Navigator.of(context).pop(); // Close the dialog
+                          final ImagePicker picker = ImagePicker();
+                          final XFile? selectedImage = await picker.pickImage(
+                              source: ImageSource.camera);
+                          if (selectedImage != null) {
+                            setState(() {
+                              _image = selectedImage;
+                            });
+                          }
+                        },
+                      ),
+                      const SizedBox(width: 20), // Add space between buttons
+                      TextButton(
+                        child: const Text('Gallery'),
+                        onPressed: () async {
+                          Navigator.of(context).pop(); // Close the dialog
+                          final ImagePicker picker = ImagePicker();
+                          final XFile? selectedImage = await picker.pickImage(
+                              source: ImageSource.gallery);
+                          if (selectedImage != null) {
+                            setState(() {
+                              _image = selectedImage;
+                            });
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
     } else {
-      // Handle the case when permission is denied
-      print('Storage permission denied');
+      _showMessage('Storage permission denied');
     }
+  }
+
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      // No casting needed
+      SnackBar(content: Text(message)),
+    );
   }
 
   void _next() {
@@ -110,7 +165,7 @@ class _AddPetProfilePageState extends State<AddPetProfilePage> {
     print(petData);
     return Scaffold(
       appBar: AppBar(
-        title: Text("Your Profile",
+        title: Text("Pet Profile",
             style: Theme.of(context).bannerTheme.contentTextStyle),
       ),
       backgroundColor: Theme.of(context).colorScheme.surface,

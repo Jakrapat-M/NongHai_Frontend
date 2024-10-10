@@ -1,9 +1,12 @@
-// ignore_for_file: avoid_print, unnecessary_null_comparison, use_build_context_synchronously
+// ignore_for_file: avoid_print, unnecessary_null_comparison, use_build_context_synchronously, non_constant_identifier_names
+
+import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
-
+import 'package:nonghai/services/auth/add_profile.dart';
 import '../../components/custom_button.dart';
 import '../../components/custom_text_field.dart';
 import '../../services/auth/auth_service.dart';
@@ -34,23 +37,16 @@ class _AddContactPageState extends State<AddContactPage> {
 
   Future<void> _createUser(BuildContext context) async {
     if (_phoneNumber != null &&
-        nameController.text != null &&
-        surnameController.text != null &&
-        addrController.text != null) {
-      if (_phoneNumber != null) {
-        userData!['phone'] = _phoneNumber!.toString();
-      }
-      if (nameController.text != null) {
-        userData!['name'] = nameController.text;
-      }
-      if (surnameController.text != null) {
-        userData!['surname'] = surnameController.text;
-      }
-      if (addrController.text != null) {
-        userData!['address'] = addrController.text;
-      }
+        nameController.text.isNotEmpty &&
+        surnameController.text.isNotEmpty &&
+        addrController.text.isNotEmpty) {
+      userData!['phone'] = _phoneNumber!.toString();
+      userData!['name'] = nameController.text;
+      userData!['surname'] = surnameController.text;
+      userData!['address'] = addrController.text;
+
       print(userData);
-      //call api here to create user then go to next page
+
       final authService = AuthService();
       try {
         // Sign up with Firebase
@@ -65,7 +61,10 @@ class _AddContactPageState extends State<AddContactPage> {
         userData!['id'] = uid;
         userData!.remove('password');
 
-        // Call the createUser API
+        // Call SaveProfile and wait for the updated userData
+        userData = await SaveProfile(); // Update userData with image URL
+
+        // Call the createUser API with updated userData
         final response = await Caller.dio.post(
           "/user/createUser",
           data: userData,
@@ -119,6 +118,35 @@ class _AddContactPageState extends State<AddContactPage> {
         );
       },
     );
+  }
+
+  Future<Map<String, dynamic>> SaveProfile() async {
+    if (userData?['image'] != null) {
+      // Get the image file path
+      String imagePath = userData!['image'];
+      String userId = userData!['id'];
+
+      // Convert the image file to Uint8List for uploading
+      Uint8List imageFile = await File(imagePath).readAsBytes();
+
+      // Define the path for the image upload
+      String folderPath = 'profileImage/$userId.jpg'; // Save as userId.jpg
+
+      // Save the profile image and pass the userId and folderPath
+      String imgUrl = await StoreProfile()
+          .saveData(userId: userId, file: imageFile, folderPath: folderPath);
+
+      // Set userData['image'] with the URL
+      userData!['image'] = imgUrl;
+
+      // Handle the response as needed
+      print('Uploaded image URL: $imgUrl');
+      print(userData!['image']);
+      return userData!; // Return the updated userData
+    } else {
+      _showAlertDialog(); // Handle case when no image is provided
+      return {}; // Return empty map or handle it accordingly
+    }
   }
 
   @override
