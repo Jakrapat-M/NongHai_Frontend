@@ -32,7 +32,7 @@ class _UserTileState extends State<UserTile> {
   final authService = AuthService();
 
   Future<ChatRoomData?> getChatRoomDataWithDelay(String chatID) async {
-    await Future.delayed(const Duration(milliseconds: 300)); // Adjust this delay if necessary
+    await Future.delayed(const Duration(milliseconds: 300));
     return getChatRoomData(chatID);
   }
 
@@ -67,7 +67,6 @@ class _UserTileState extends State<UserTile> {
       if (kDebugMode) {
         print('Network error occurred on getuserData: $e');
       }
-      return null;
     }
   }
 
@@ -191,6 +190,7 @@ class _UserTileState extends State<UserTile> {
             CircleAvatar(
               backgroundColor: Theme.of(context).colorScheme.secondary,
               radius: 30,
+              // TODO: change to user image
               backgroundImage: const AssetImage("assets/images/default_profile.png"),
             ),
             const SizedBox(width: 16.0),
@@ -200,7 +200,11 @@ class _UserTileState extends State<UserTile> {
                 children: [
                   Text(
                     userLabel,
-                    style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 16),
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.primary,
+                        overflow: TextOverflow.ellipsis,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 4.0),
                   Text(
@@ -220,7 +224,7 @@ class _UserTileState extends State<UserTile> {
             Icon(
               Icons.circle,
               color: isRead ? Colors.grey[200] : Colors.pink[200],
-              size: 10,
+              size: 11,
             ),
           ],
         ),

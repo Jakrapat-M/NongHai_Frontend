@@ -1,6 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:nonghai/services/caller.dart';
+import 'package:nonghai/types/noti_info.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
-class NotificationTile extends StatelessWidget {
+class NotificationTile extends StatefulWidget {
   final String userId;
   final String petId;
   final String trackingId;
@@ -15,30 +19,62 @@ class NotificationTile extends StatelessWidget {
   });
 
   @override
+  State<NotificationTile> createState() => _NotificationTileState();
+}
+
+class _NotificationTileState extends State<NotificationTile> {
+  TrackingNotiInfo? trackerNotiInfo;
+  bool isLoading = true;
+
+  getTrackingData() async {
+    try {
+      final resp = await Caller.dio.get(
+        '/tracking/getTrackingById',
+        data: {"tracking_id": widget.trackingId},
+      );
+
+      if (resp.statusCode == 200) {
+        setState(() {
+          trackerNotiInfo = TrackingNotiInfo.fromJson(resp.data['data']);
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Network error occurred: $e');
+      }
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getTrackingData();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // return ListTile(
-    //   leading: Icon(
-    //     isRead ? Icons.notifications : Icons.notifications_active,
-    //     color: isRead ? Colors.grey : Colors.blue,
-    //   ),
-    //   title: Text('Pet ID: $petId'),
-    //   subtitle: Text('Tracking ID: $trackingId'),
-    //   trailing: isRead
-    //       ? const Icon(Icons.check_circle, color: Colors.green)
-    //       : const Icon(Icons.circle, color: Colors.red),
-    // );
+    if (isLoading) {
+      return Center(
+        child: SizedBox(
+          height: 50,
+          width: 50,
+          child: CircularProgressIndicator(
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        ),
+      );
+    }
+
+    final address = trackerNotiInfo?.address ?? 'Unknown';
+    String timeAgo = timeago.format(trackerNotiInfo!.createdAt);
+
     return GestureDetector(
       onTap: () {
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) => TrackingPage(
-        //       petId: petId,
-        //       petName: 'Pet Name',
-        //       petImage: 'Pet Image',
-        //     ),
-        //   ),
-        // );
+        // Navigate to tracking page
       },
       child: Container(
         decoration: BoxDecoration(
@@ -52,6 +88,7 @@ class NotificationTile extends StatelessWidget {
             CircleAvatar(
               backgroundColor: Theme.of(context).colorScheme.secondary,
               radius: 30,
+              // TODO: Change to pet image
               backgroundImage: const AssetImage("assets/images/default_profile.png"),
             ),
             const SizedBox(width: 16.0),
@@ -60,12 +97,17 @@ class NotificationTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Pet ID: $petId",
-                    style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 16),
+                    "Nong ${trackerNotiInfo?.petName ?? 'Unknown Pet'} Found",
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                      overflow: TextOverflow.ellipsis,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   const SizedBox(height: 4.0),
                   Text(
-                    "Tracking ID: $trackingId",
+                    "Near $address",
                     style: const TextStyle(fontSize: 12),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -74,14 +116,14 @@ class NotificationTile extends StatelessWidget {
             ),
             const SizedBox(width: 8.0),
             Text(
-              "time ago", // from timestamp in tracking info
+              timeAgo,
               style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 12),
             ),
             const SizedBox(width: 8.0),
             Icon(
               Icons.circle,
-              color: isRead ? Colors.grey[200] : Colors.pink[200],
-              size: 10,
+              color: widget.isRead ? Colors.grey[200] : Colors.pink[200],
+              size: 11,
             ),
           ],
         ),
