@@ -84,9 +84,8 @@ class _BottomNavPageState extends State<BottomNavPage> {
                           1; // Set to the index of the Home page
                     });
                   },
-                  child: const Icon(
-                    Icons.home,
-                    size: 30,
+                  child: const Image(
+                    image: AssetImage('assets/images/Logo.png'),
                   ),
                 ),
               ),
