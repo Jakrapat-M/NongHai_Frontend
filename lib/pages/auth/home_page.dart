@@ -15,61 +15,93 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-// เหลือเอาข้อมูลสัตว์เลี้ยงมาโชว์
 class _HomePageState extends State<HomePage> {
   var _username, _address, _phone, _image;
   int _petCount = 0;
   List<dynamic> _pets = [], _petDetails = [];
+  bool _isLoading = true;
+  String _errorMessage = '';
+  String uid = "";
 
   Future<void> fetchUserData() async {
-    // Get the UID of the current user
-    final uid = FirebaseAuth.instance.currentUser?.uid;
+    uid = FirebaseAuth.instance.currentUser!.uid;
 
     if (uid == null) {
-      print('No user is currently signed in.');
+      setState(() {
+        _errorMessage = 'No user is currently signed in.';
+        _isLoading = false;
+      });
       return;
     }
 
     try {
-      if (kDebugMode) {
-        print('id=$uid');
-      }
       final response = await Caller.dio.get(
-        "/user/$uid", // Replace with your server's IP address
+        "/user/$uid",
       );
 
+      // Log the entire API response for debugging
+      print('API response data: ${response.data}');
+
       if (response.statusCode == 200) {
-        try {
-          final userData = response.data;
-          setState(() {
-            _username = userData['data']['username'];
-            _address = userData['data']['address'];
-            _phone = userData['data']['phone'];
-            _pets = userData['data']['pets'] ?? []; // Get pets, default to empty list if null
-            _petCount = _pets != [] ? _pets.length : 0; // Count number of pets, 0 if _pets is null
-            // Prepare pet details for display
-            _petDetails = _pets.map((pet) {
-              return {
-                'name': pet['name'],
-                'sex': pet['sex'],
-                'age': pet['age'],
-                'img': pet['image'],
-              };
-            }).toList();
-            _image = userData['data']['image'] ?? '';
-          });
-          print('User data retrieved successfully: $userData');
-          print(_petCount);
-          print(_petDetails);
-        } catch (e) {
-          print('Error occurred: $e');
+        final userData = response.data;
+
+        // Check if username, phone, and address are null or missing
+        if (userData['data'] == null ||
+            userData['data']['username'] == null ||
+            userData['data']['phone'] == null ||
+            userData['data']['address'] == null) {
+          throw Exception(
+              "Required user data (username, phone, or address) is missing.");
         }
+
+        setState(() {
+          _username = userData['data']['username'];
+          _address = userData['data']['address'];
+          // _phone = userData['data']['phone'];
+
+          // Check if phone contains '/' and extract the number after it
+          String fetchedPhone = userData['data']['phone'];
+          if (fetchedPhone.contains('/')) {
+            _phone = fetchedPhone.split('/').last; // Get the part after '/'
+          } else {
+            _phone = fetchedPhone; // No '/' present, use the full phone number
+          }
+
+          // Log the user data to check what was retrieved
+          print('Username: $_username, Address: $_address, Phone: $_phone');
+
+          // Pets data can be null, provide fallback
+          _pets = userData['data']['pets'] ?? [];
+          _petCount = _pets.length;
+
+          // Map pet details
+          _petDetails = _pets.map((pet) {
+            return {
+              'name': pet['name'] ?? 'No name',
+              'sex': pet['sex'] ?? 'Unknown',
+              'age': pet['age'] != null ? pet['age'].toString() : 'Unknown age',
+              'img': pet['image'] ?? '',
+            };
+          }).toList();
+
+          // Log the pet details to see if they're correctly parsed
+          print('Pet details: $_petDetails');
+
+          // Set image, fallback to empty string if null
+          _image = userData['data']['image'] ?? '';
+          _isLoading = false;
+        });
       } else {
-        print('Failed to fetch user data: ${response.statusCode}');
-        print('Response body: ${response.data}');
+        setState(() {
+          _errorMessage = 'Failed to fetch user data: ${response.statusCode}';
+          _isLoading = false;
+        });
       }
     } catch (e) {
-      print('Error occurred: $e');
+      setState(() {
+        _errorMessage = 'Error occurred: $e';
+        _isLoading = false;
+      });
     }
   }
 
@@ -81,7 +113,26 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    print(uid);
     // const cards = 2;
+    if (_isLoading) {
+      // Show a loading spinner while fetching data
+      return Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+    if (_errorMessage.isNotEmpty) {
+      return Scaffold(
+        body: Center(
+          child: Text(
+            _errorMessage,
+            style: const TextStyle(color: Colors.red, fontSize: 18),
+          ),
+        ),
+      );
+    }
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: Stack(
@@ -94,13 +145,25 @@ class _HomePageState extends State<HomePage> {
               height: 45, // Adjust the size as needed
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Theme.of(context).colorScheme.secondary, // Background color of the circle
+                color: Theme.of(context)
+                    .colorScheme
+                    .secondary, // Background color of the circle
               ),
-              child: const Center(
-                child: Icon(
-                  Icons.edit,
-                  size: 28,
-                  color: Color(0xff333333),
+              child: GestureDetector(
+                onTap: () async {
+                  final authService = AuthService();
+                  await authService.signOut();
+                  // Navigate to login or handle post-signout logic
+                  if (mounted) {
+                    Navigator.pushReplacementNamed(context, '/');
+                  }
+                },
+                child: const Center(
+                  child: Icon(
+                    Icons.edit,
+                    size: 28,
+                    color: Color(0xff333333),
+                  ),
                 ),
               ),
             ),
@@ -201,7 +264,10 @@ class _HomePageState extends State<HomePage> {
                         const Padding(
                           padding: EdgeInsets.fromLTRB(0, 15, 0, 12),
                           child: Row(
-                            children: [Text('Your Family', style: TextStyle(fontSize: 16))],
+                            children: [
+                              Text('Your Family',
+                                  style: TextStyle(fontSize: 16))
+                            ],
                           ),
                         ),
                         SizedBox(
@@ -211,64 +277,66 @@ class _HomePageState extends State<HomePage> {
                             padding: EdgeInsets.zero,
                             itemCount: _petCount +
                                 1, // Total number of items (n regular cards + 1 button card)
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 2, // 2 cards per row
                               mainAxisSpacing: 15.0, // Spacing between rows
                               crossAxisSpacing: 12.0, // Spacing between columns
-                              childAspectRatio: 2.05 / 2.6, // Aspect ratio of the cards
+                              childAspectRatio:
+                                  2.05 / 2.6, // Aspect ratio of the cards
                             ),
                             itemBuilder: (context, index) {
                               // Check if it's the last index (index n) to place the button card
                               if (index >= _petCount) {
                                 return Card(
-                                  color: Colors.transparent,
-                                  margin: const EdgeInsets.all(8.0),
-                                  elevation: 0,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: InkWell(
-                                    onTap: () {
-                                      // Define your add button action here
-                                    },
-                                    borderRadius: BorderRadius.circular(8),
-                                    splashColor: Colors.transparent, // Remove ripple effect
-                                    highlightColor: Colors.transparent, // Remove highlight effect
-                                    child: GestureDetector(
-                                      onTap: () async {
-                                        final authService = AuthService();
-                                        await authService.signOut();
-                                        // Navigate to login or handle post-signout logic
-                                        if (mounted) {
-                                          Navigator.pushReplacementNamed(context, '/');
-                                        }
+                                    color: Colors.transparent,
+                                    margin: const EdgeInsets.all(8.0),
+                                    elevation: 0,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: InkWell(
+                                      onTap: () {
+                                        // Define your add button action here
                                       },
-                                      child: Center(
-                                        child: Container(
-                                          width: 55,
-                                          height: 55,
-                                          decoration: const BoxDecoration(
-                                            color: Colors.white,
-                                            shape: BoxShape.circle,
-                                            // boxShadow: [
-                                            //   BoxShadow(
-                                            //     color: Colors.black.withOpacity(0.2), // Shadow color with opacity
-                                            //     spreadRadius: 2, // How much the shadow spreads
-                                            //     blurRadius: 5, // How soft the shadow is
-                                            //     offset: Offset(0, 3), // The position of the shadow (x, y)
-                                            //   ),
-                                            // ],
-                                          ),
-                                          child: Icon(
-                                            Icons.add,
-                                            size: 23,
-                                            color: Theme.of(context).colorScheme.onSurface,
+                                      borderRadius: BorderRadius.circular(8),
+                                      splashColor: Colors
+                                          .transparent, // Remove ripple effect
+                                      highlightColor: const Color.fromRGBO(0, 0,
+                                          0, 0), // Remove highlight effect
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          Navigator.pushNamed(
+                                              context, '/addPetProfileImage');
+                                        },
+                                        child: Center(
+                                          child: Container(
+                                            width: 55,
+                                            height: 55,
+                                            decoration: const BoxDecoration(
+                                              color: Colors.white,
+                                              shape: BoxShape.circle,
+                                              // boxShadow: [
+                                              //   BoxShadow(
+                                              //     color: Colors.black.withOpacity(0.2), // Shadow color with opacity
+                                              //     spreadRadius: 2, // How much the shadow spreads
+                                              //     blurRadius: 5, // How soft the shadow is
+                                              //     offset: Offset(0, 3), // The position of the shadow (x, y)
+                                              //   ),
+                                              // ],
+                                            ),
+                                            child: Icon(
+                                              Icons.add,
+                                              size: 23,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurface,
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  ),
-                                );
+                                      // ),
+                                    ));
                               } else {
                                 final pet = _petDetails[index];
                                 // Regular cards for indices 0 to n-1
@@ -285,14 +353,17 @@ class _HomePageState extends State<HomePage> {
                                         width: double.infinity,
                                         height: 155,
                                         child: ClipRRect(
-                                          borderRadius: const BorderRadius.vertical(
+                                          borderRadius:
+                                              const BorderRadius.vertical(
                                             top: Radius.circular(8),
                                           ),
-                                          child: pet['img'] != '' && pet['img'] != null
+                                          child: pet['img'] != '' &&
+                                                  pet['img'] != null
                                               ? Image.network(
                                                   pet['img'],
                                                   fit: BoxFit.cover,
-                                                  errorBuilder: (context, error, stackTrace) {
+                                                  errorBuilder: (context, error,
+                                                      stackTrace) {
                                                     return Image.asset(
                                                       'assets/images/meme2.jpg', // Default image
                                                       fit: BoxFit.cover,
@@ -306,43 +377,62 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                       ),
                                       Padding(
-                                        padding: const EdgeInsets.fromLTRB(8, 5, 8, 5),
+                                        padding: const EdgeInsets.fromLTRB(
+                                            8, 5, 8, 5),
                                         child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.end,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
                                             children: [
                                               Row(
-                                                mainAxisAlignment: MainAxisAlignment.start,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
                                                 children: [
                                                   Text(
                                                     pet['name'],
-                                                    style: Theme.of(context).textTheme.labelLarge,
-                                                    overflow: TextOverflow.ellipsis,
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .labelLarge,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
                                                   ),
                                                 ],
                                               ),
                                               // ค่อยมาเปลี่ยนเป็น data1-data2 (sex-year)
                                               Row(
-                                                mainAxisAlignment: MainAxisAlignment.start,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
                                                 children: [
                                                   Text(
-                                                    pet['sex'] + ' - ' + pet['age'],
-                                                    style: Theme.of(context).textTheme.labelMedium,
-                                                    overflow: TextOverflow.ellipsis,
+                                                    pet['sex'] +
+                                                        ' - ' +
+                                                        pet['age'],
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .displayMedium,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
                                                   ),
                                                   const Spacer(),
                                                   //add logic if status=safe then green
                                                   Container(
-                                                    padding: const EdgeInsets.symmetric(
-                                                        horizontal: 11, vertical: 1.5),
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 11,
+                                                        vertical: 1.5),
                                                     decoration: BoxDecoration(
                                                         color: Theme.of(context)
                                                             .colorScheme
                                                             .surfaceBright,
-                                                        shape: BoxShape.rectangle,
-                                                        borderRadius: BorderRadius.circular(8)),
+                                                        shape:
+                                                            BoxShape.rectangle,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(8)),
                                                     child: Text(
                                                       'Safe',
-                                                      style: Theme.of(context).textTheme.labelSmall,
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .displaySmall,
                                                     ),
                                                   ),
                                                 ],

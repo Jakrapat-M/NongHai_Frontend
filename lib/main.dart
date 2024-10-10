@@ -13,12 +13,18 @@ import 'package:nonghai/pages/test_nfc_page.dart';
 import 'package:nonghai/pages/tracking_page.dart';
 import 'package:nonghai/services/auth/login_or_registoer.dart';
 import 'package:nonghai/firebase_options.dart';
-import 'package:nonghai/pages/home_page.dart';
+import 'package:nonghai/pages/auth/home_page.dart';
 import 'package:nonghai/services/auth/auth_gate.dart';
 import 'package:nonghai/services/noti/noti_service.dart';
 // import 'package:nonghai/services/auth/auth_service.dart';
 // import 'package:provider/provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
+
+import 'pages/auth/add_contact_page.dart';
+import 'pages/auth/add_pet_info_page.dart';
+import 'pages/auth/add_pet_profile_page.dart';
+import 'pages/auth/add_profile_page.dart';
+import 'pages/auth/additional_note_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -151,16 +157,31 @@ class _MyAppState extends State<MyApp> {
               fontSize: 11,
               fontWeight: FontWeight.w600,
               color: Color(0xff1E1E1E)),
-          // labelMedium: TextStyle(
-          //     fontFamily: 'Fredoka',
-          //     fontSize: 9,
-          //     fontWeight: FontWeight.w500,
-          //     color: Color(0xff5C5C5C)),
-          // labelSmall: TextStyle(
-          //     fontFamily: 'Fredoka',
-          //     fontSize: 8,
-          //     fontWeight: FontWeight.w600,
-          //     color: Color(0xffffffff)),
+          displayMedium: TextStyle(
+              fontFamily: 'Fredoka',
+              fontSize: 9,
+              fontWeight: FontWeight.w500,
+              color: Color(0xff5C5C5C)),
+          displaySmall: TextStyle(
+              fontFamily: 'Fredoka',
+              fontSize: 8,
+              fontWeight: FontWeight.w600,
+              color: Color(0xffffffff)),
+          displayLarge: TextStyle(
+              fontFamily: 'Fredoka',
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: Color(0xff57687C)),
+        ),
+        bannerTheme: const MaterialBannerThemeData(
+          contentTextStyle: TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.w500,
+              color: Color(0xff2C3F50),
+              fontFamily: 'Fredoka'),
+          backgroundColor: Color(0xfff2f2f2),
+          elevation: 0,
+          // iconTheme: IconThemeData(color: Color(0xff2C3F50), size: 25),
         ),
         appBarTheme: const AppBarTheme(
           titleTextStyle: TextStyle(
@@ -180,6 +201,13 @@ class _MyAppState extends State<MyApp> {
         '/loginOrRegister': (context) => const LoginOrRegistoer(),
         '/home': (context) => const HomePage(),
         '/testnfc': (context) => const TestNfcPage(),
+        '/addProfileImage': (context) => const AddProfilePage(),
+        '/addContact': (context) => const AddContactPage(),
+        '/addPetProfileImage': (context) => const AddPetProfilePage(),
+        '/addPetInfo': (context) => const AddPetInfoPage(),
+        '/additionalNote': (context) => const AdditionalNotePage(
+              petData: {},
+            ),
         '/nfc': (context) => const NfcPage(
               petId: '550e8400-e29b-41d4-a716-446655440000',
             ),

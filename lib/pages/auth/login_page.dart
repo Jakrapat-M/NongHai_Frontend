@@ -50,18 +50,22 @@ class _LoginPageState extends State<LoginPage> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: CustomTextField(
-                      controller: emailController,
-                      hintText: "Email",
-                      obscureText: false),
+                    controller: emailController,
+                    hintText: "Email",
+                    obscureText: false,
+                    hintStyle: Theme.of(context).textTheme.displayLarge,
+                  ),
                 ),
 
                 // Password
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: CustomTextField(
-                      controller: passwordController,
-                      hintText: "Password",
-                      obscureText: true),
+                    controller: passwordController,
+                    hintText: "Password",
+                    obscureText: true,
+                    hintStyle: Theme.of(context).textTheme.displayLarge,
+                  ),
                 ),
 
                 //sign in button

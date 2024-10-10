@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSCameraUsageDescription</key>
+	<string>This app requires camera access to take photos.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app requires photo library access to select photos.</string>
     <key>CFBundleDevelopmentRegion</key>
     <string>$(DEVELOPMENT_LANGUAGE)</string>
     <key>CFBundleDisplayName</key>
@@ -46,10 +50,6 @@
     <key>UIApplicationSupportsIndirectInputEvents</key>
     <true/>
     <!-- Permissions for Camera and Photo Library -->
-    <key>NSCameraUsageDescription</key>
-    <string>We need access to the camera to take photos for chat.</string>
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>We need access to your photo library to select images for chat.</string>
     <key>NSPhotoLibraryAddUsageDescription</key>
     <string>We need access to save photos to your photo library.</string>
 </dict>
