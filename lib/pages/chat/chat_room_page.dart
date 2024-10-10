@@ -148,7 +148,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   @override
   Widget build(BuildContext context) {
     final currentUserId = _authService.getCurrentUser()!.uid;
-    if (widget.receiverName == currentUserId) {
+    if (widget.receiverID == currentUserId) {
       return const Scaffold(
         appBar: CustomAppBar(title: 'THIS IS YOU'),
         body: Center(
