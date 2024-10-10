@@ -1,15 +1,6 @@
-import 'dart:math';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:nonghai/components/custom_button.dart';
 import 'package:nonghai/components/custom_text_field.dart';
-import 'package:nonghai/services/auth/auth_service.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:nonghai/services/caller.dart';
-import 'package:nonghai/services/caller.dart';
 // import 'package:provider/provider.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -147,11 +138,13 @@ class _RegisterPageState extends State<RegisterPage> {
                   children: [
                     const Text("Already have an account?"),
                     TextButton(
-                      onPressed: () => {
-                        (Navigator.canPop(context))
-                            ? Navigator.pop(context)
-                            : Navigator.pushNamed(context, '/login'),
-                      },
+                      onPressed: widget.onTap,
+                      // onPressed: () => {
+                      //   Navigator.pop(context)
+                      // (Navigator.canPop(context))
+                      //     ? Navigator.pop(context)
+                      //     : Navigator.pushNamed(context, '/loginOrRegister'),
+                      // },
                       child: const Text("Sign In",
                           style: TextStyle(
                               color: Colors.deepPurple,

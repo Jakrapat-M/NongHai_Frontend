@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -55,11 +57,12 @@ class _AddProfilePageState extends State<AddProfilePage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('No Image Selected'),
-            content: Text('Please select a profile image before proceeding.'),
+            title: const Text('No Image Selected'),
+            content:
+                const Text('Please select a profile image before proceeding.'),
             actions: [
               TextButton(
-                child: Text('OK'),
+                child: const Text('OK'),
                 onPressed: () {
                   Navigator.of(context).pop(); // Close the dialog
                 },
@@ -93,24 +96,26 @@ class _AddProfilePageState extends State<AddProfilePage> {
               radius: 60,
               backgroundImage:
                   _image != null ? FileImage(File(_image!.path)) : null,
-              child: _image == null ? Icon(Icons.add_a_photo, size: 40) : null,
+              child: _image == null
+                  ? const Icon(Icons.add_a_photo, size: 40)
+                  : null,
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             GestureDetector(
               onTap: _pickImage,
               child: Text(
                 _image == null ? 'Add profile' : 'Change profile',
-                style: TextStyle(color: Colors.blue, fontSize: 16),
+                style: const TextStyle(color: Colors.blue, fontSize: 16),
               ),
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
             ElevatedButton(
               onPressed: _next,
-              child: Text('Next'),
+              child: const Text('Next'),
             ),
             ElevatedButton(
               onPressed: _skip,
-              child: Text('Skip'),
+              child: const Text('Skip'),
             ),
           ],
         ),
