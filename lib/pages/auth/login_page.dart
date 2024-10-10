@@ -40,11 +40,30 @@ class _LoginPageState extends State<LoginPage> {
             padding: const EdgeInsets.all(20),
             child: Column(
               children: [
-                const Icon(Icons.chat, size: 100),
-                const Text('NongHai', style: TextStyle(fontSize: 30)),
+                //image
+                const SizedBox(height: 50),
+                Image.asset(
+                  'assets/images/Logo.png',
+                  width: 200,
+                ),
+                const Text('Welcome!', style: TextStyle(fontSize: 40)),
+                const Text('NonghHai', style: TextStyle(fontSize: 24)),
+
+                const SizedBox(height: 10),
+                const Padding(
+                  padding: EdgeInsets.all(15.0),
+                  child: Text(
+                    "Keeping your pets safe with our innovative NFC technology. Let's ensure every wagging tail finds its way home.",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Color(0xff5C5C5C),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
 
                 // Email
-                const SizedBox(height: 50),
+                const SizedBox(height: 10),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: CustomTextField(
@@ -67,7 +86,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
 
                 //sign in button
-                const SizedBox(height: 50),
+                const SizedBox(height: 5),
                 CustomButton1(
                   text: "Sign In",
                   onTap: signIn,
