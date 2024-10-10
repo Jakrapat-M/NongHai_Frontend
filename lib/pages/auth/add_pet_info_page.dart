@@ -81,7 +81,7 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
 
       // Use the petId in SaveProfile function
       petData!['id'] = petId;
-      await SaveProfile();
+      //await SaveProfile();
 
       Navigator.push(
           context,
@@ -409,7 +409,7 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
               text: "Next",
               onTap: () => _createPet(context),
             ),
-            // const SizedBox(height: 5),
+            const SizedBox(height: 10),
             CustomButton1(
               text: "Skip",
               onTap: () => _skip(),
