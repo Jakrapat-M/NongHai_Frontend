@@ -79,13 +79,13 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  void createTracking(String petId) async {
+  Future<bool> createTracking(String petId) async {
     try {
       print("createTracking id: $petId");
       final currentUser = AuthService().getCurrentUser();
       if (currentUser == null) {
         print('No user is currently signed in.');
-        return; // Handle this case appropriately, maybe show an error message
+        return true; // Handle this case appropriately, maybe show an error message
       }
       final currentUserId = currentUser.uid;
 
@@ -119,6 +119,7 @@ class _MyAppState extends State<MyApp> {
         print('Network error occurred: $e');
       }
     }
+    return true;
   }
 
   Future<Position?> _getLocation() async {
@@ -157,18 +158,19 @@ class _MyAppState extends State<MyApp> {
 
     // Print the full URI for debugging purposes
     debugPrint('Navigating to: $fragment');
-    createTracking(fragment);
+    createTracking(fragment).then((value) {
+      _navigatorKey.currentState?.push(MaterialPageRoute(
+        builder: (context) {
+          return TrackingPage(
+            petId: fragment,
+            petName: 'Ella',
+            petImage: 'petImage',
+          );
+        },
+      ));
+    });
 
     // Navigate to TrackingPage
-    _navigatorKey.currentState?.push(MaterialPageRoute(
-      builder: (context) {
-        return TrackingPage(
-          petId: fragment,
-          petName: 'Ella',
-          petImage: 'petImage',
-        );
-      },
-    ));
   }
 
   // This widget is the root of your application.

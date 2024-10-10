@@ -23,7 +23,7 @@ class Caller {
       return 'ANDROID_API_URL';
     } else {
       // Fallback for other platforms if needed
-      return 'IOS_API_URL';
+      return 'ANDROID_API_URL';
     }
   }
 
