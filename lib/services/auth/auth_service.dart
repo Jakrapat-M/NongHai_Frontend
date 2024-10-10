@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:nonghai/services/noti/token_service.dart';
 
 class AuthService {
   // instance of auth
@@ -24,6 +25,9 @@ class AuthService {
           .doc(userCredential.user!.uid)
           .set({'uid': userCredential.user!.uid, 'email': email}, SetOptions(merge: true));
 
+      //create a device token for the user
+      TokenService().createUserToken();
+
       return userCredential;
     }
     // catch any errors
@@ -44,6 +48,7 @@ class AuthService {
           .doc(userCredential.user!.uid)
           .set({'uid': userCredential.user!.uid, 'email': email});
 
+      TokenService().createUserToken();
       return userCredential;
     } on FirebaseAuthException catch (e) {
       throw Exception(e.code);

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:nonghai/pages/chat/chat_room_page.dart';
+import 'package:nonghai/services/chat/chat_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
 
@@ -116,7 +118,23 @@ class TrackingObject extends StatelessWidget {
                             child: IconButton(
                               icon:
                                   const Icon(Icons.chat_bubble_outline_rounded),
-                              onPressed: () {},
+                              onPressed: () {
+                                print('Chatwith $chat');
+                                MaterialPageRoute materialPageRoute =
+                                    MaterialPageRoute(
+                                  builder: (context) => ChatRoomPage(
+                                    receiverID: chat,
+                                  ),
+                                );
+                                // navigate to chat room
+                                Navigator.of(context)
+                                    .push(
+                                  materialPageRoute,
+                                )
+                                    .then((e) {
+                                  ChatService().setRead(chat);
+                                });
+                              },
                               color:
                                   Theme.of(context).colorScheme.secondaryFixed,
                               iconSize: 18,

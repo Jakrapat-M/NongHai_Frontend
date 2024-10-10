@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:nonghai/components/custom_appbar.dart';
 import 'package:nonghai/components/user_tile.dart';
-import 'package:nonghai/pages/chat/chat_room_page.dart';
 import 'package:nonghai/services/auth/auth_service.dart';
 import 'package:nonghai/services/caller.dart';
 import 'package:nonghai/services/chat/chat_service.dart';
@@ -23,6 +23,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
 
   final currentUserId = AuthService().getCurrentUser()!.uid;
   final currentEmail = AuthService().getCurrentUser()!.email;
+
   getChatRoom() async {
     try {
       final resp = await Caller.dio
@@ -61,7 +62,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
         }
 
         if (chatRoomSnapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return Center(child: SpinKitFadingCube(color: Theme.of(context).colorScheme.primary));
         }
 
         if (chatRoomSnapshot.data == null) {
@@ -89,7 +90,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
             }
 
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
+              return Center(child: SpinKitFadingCube(color: Theme.of(context).colorScheme.primary));
             }
 
             // Filter the list of users
@@ -127,38 +128,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
 
     if (userData["email"] != authService.getCurrentUser()!.email) {
       return UserTile(
-        userLabel: userData["email"],
         receiverID: userData["uid"],
-        onTap: () {
-          MaterialPageRoute materialPageRoute = MaterialPageRoute(
-            builder: (context) => ChatRoomPage(
-              receiverEmail: userData["email"],
-              receiverID: userData["uid"],
-            ),
-          );
-          // navigate to chat room
-          Navigator.of(context)
-              .push(
-            materialPageRoute,
-          )
-              .then((value) {
-            // Refresh the chat room list
-            List<String> ids = [currentUserId, userData["uid"]];
-            ids.sort();
-            String chatRoomID = ids.join('_');
-            setState(() {
-              // mark chat as read where navigate back from chat room
-              Caller.dio.post(
-                '/chat/setRead',
-                data: {
-                  'chat_id': chatRoomID,
-                  'sender_id': currentUserId,
-                },
-              );
-              //refresh chat room list
-            });
-          });
-        },
       );
     } else {
       return const SizedBox();
