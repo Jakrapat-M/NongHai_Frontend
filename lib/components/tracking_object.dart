@@ -94,7 +94,7 @@ class TrackingObject extends StatelessWidget {
                                     .colorScheme
                                     .secondaryContainer,
                                 foregroundImage: AssetImage(
-                                    image ?? 'assets/images/test.jpg'),
+                                    image ?? 'assets/images/Logo.png'),
                               ),
                               Padding(
                                 padding:

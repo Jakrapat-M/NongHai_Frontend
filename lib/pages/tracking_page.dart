@@ -8,12 +8,9 @@ import 'package:nonghai/types/tracking_info.dart';
 class TrackingPage extends StatefulWidget {
   final String petId;
   final String petName;
-  final String petImage;
+  final String? petImage;
   const TrackingPage(
-      {super.key,
-      required this.petId,
-      required this.petName,
-      required this.petImage});
+      {super.key, required this.petId, required this.petName, this.petImage});
 
   @override
   State<TrackingPage> createState() => _TrackingPageState();
@@ -67,7 +64,8 @@ class _TrackingPageState extends State<TrackingPage> {
                 radius: 50,
                 backgroundColor:
                     Theme.of(context).colorScheme.secondaryContainer,
-                foregroundImage: AssetImage(widget.petImage),
+                foregroundImage:
+                    AssetImage(widget.petImage ?? "/assets/images/Logo.png"),
               ),
               const SizedBox(height: 15),
               Text(
