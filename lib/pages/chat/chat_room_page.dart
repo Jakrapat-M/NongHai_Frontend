@@ -150,6 +150,16 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
 
   @override
   Widget build(BuildContext context) {
+    final currentUserId = _authService.getCurrentUser()!.uid;
+    if (widget.receiverName == currentUserId) {
+      return const Scaffold(
+        appBar: CustomAppBar(title: 'THIS IS YOU'),
+        body: Center(
+          child: Text('You cannot chat with yourself'),
+        ),
+      );
+    }
+
     String receiverName = userData?.name ?? '';
     return Scaffold(
       appBar: CustomAppBar(title: receiverName),
