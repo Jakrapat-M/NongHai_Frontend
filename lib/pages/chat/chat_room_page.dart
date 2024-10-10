@@ -1,11 +1,9 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:nonghai/components/chat_bubble.dart';
 import 'package:nonghai/components/custom_appbar.dart';
-import 'package:nonghai/main.dart';
 import 'package:nonghai/services/auth/auth_service.dart';
 import 'package:nonghai/services/caller.dart';
 import 'package:nonghai/services/chat/chat_service.dart';
@@ -149,6 +147,16 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
 
   @override
   Widget build(BuildContext context) {
+    final currentUserId = _authService.getCurrentUser()!.uid;
+    if (widget.receiverName == currentUserId) {
+      return const Scaffold(
+        appBar: CustomAppBar(title: 'THIS IS YOU'),
+        body: Center(
+          child: Text('You cannot chat with yourself'),
+        ),
+      );
+    }
+
     String receiverName = userData?.name ?? '';
     return Scaffold(
       appBar: CustomAppBar(title: receiverName),
