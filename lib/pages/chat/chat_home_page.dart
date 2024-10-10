@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:nonghai/components/custom_appbar.dart';
 import 'package:nonghai/components/user_tile.dart';
 import 'package:nonghai/pages/chat/chat_room_page.dart';
@@ -62,7 +63,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
         }
 
         if (chatRoomSnapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return Center(child: SpinKitFadingCube(color: Theme.of(context).colorScheme.primary));
         }
 
         if (chatRoomSnapshot.data == null) {
@@ -90,7 +91,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
             }
 
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
+              return Center(child: SpinKitFadingCube(color: Theme.of(context).colorScheme.primary));
             }
 
             // Filter the list of users
@@ -129,7 +130,6 @@ class _ChatHomePageState extends State<ChatHomePage> {
     if (userData["email"] != authService.getCurrentUser()!.email) {
       return UserTile(
         receiverID: userData["uid"],
-        
       );
     } else {
       return const SizedBox();

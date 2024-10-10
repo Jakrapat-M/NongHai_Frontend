@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:nonghai/services/caller.dart';
 import 'package:nonghai/types/noti_info.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class NotificationTile extends StatefulWidget {
@@ -60,10 +61,11 @@ class _NotificationTileState extends State<NotificationTile> {
     if (isLoading) {
       return Center(
         child: SizedBox(
-          height: 50,
+          height: MediaQuery.of(context).size.height * 0.1,
           width: 50,
-          child: CircularProgressIndicator(
+          child: SpinKitPulse(
             color: Theme.of(context).colorScheme.primary,
+            size: 50.0,
           ),
         ),
       );
