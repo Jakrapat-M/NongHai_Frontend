@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:nonghai/services/auth/auth_service.dart';
 import 'package:nonghai/services/caller.dart';
+import 'package:nonghai/pages/bottom_nav_page.dart';
 // import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -375,7 +376,9 @@ class _HomePageState extends State<HomePage> {
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                const HomePage()),
+                                                const BottomNavPage(
+                                                  page: 1,
+                                                )),
                                       );
                                     },
                                     child: Column(

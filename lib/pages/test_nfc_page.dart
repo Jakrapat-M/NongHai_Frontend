@@ -52,14 +52,14 @@ class _TestNfcPageState extends State<TestNfcPage> {
                           mainAxisSpacing: 4,
                           children: [
                             ElevatedButton(
-                                child: const Text('Tag Read'),
-                                onPressed: _tagRead),
+                                onPressed: _tagRead,
+                                child: const Text('Tag Read')),
                             ElevatedButton(
-                                child: const Text('Ndef Write'),
-                                onPressed: _ndefWrite),
+                                onPressed: _ndefWrite,
+                                child: const Text('Ndef Write')),
                             ElevatedButton(
-                                child: const Text('Ndef Write Lock'),
-                                onPressed: _ndefWriteLock),
+                                onPressed: _ndefWriteLock,
+                                child: const Text('Ndef Write Lock')),
                           ],
                         ),
                       ),

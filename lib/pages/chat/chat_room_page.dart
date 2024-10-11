@@ -9,7 +9,8 @@ class ChatRoomPage extends StatefulWidget {
   final String receiverEmail;
   final String receiverID;
 
-  ChatRoomPage({super.key, required this.receiverEmail, required this.receiverID});
+  const ChatRoomPage(
+      {super.key, required this.receiverEmail, required this.receiverID});
 
   @override
   State<ChatRoomPage> createState() => _ChatRoomPageState();
@@ -65,7 +66,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   // send message
   void sendMessage() async {
     if (_messageController.text.isNotEmpty) {
-      await _chatService.sendMessage(widget.receiverID, _messageController.text);
+      await _chatService.sendMessage(
+          widget.receiverID, _messageController.text);
       _messageController.clear();
       scrollDown();
     }
@@ -110,8 +112,11 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
         return ListView(
           reverse: true,
           controller: _scrollController,
-          children:
-              snapshot.data!.docs.map((doc) => _buildMessageItem(doc)).toList().reversed.toList(),
+          children: snapshot.data!.docs
+              .map((doc) => _buildMessageItem(doc))
+              .toList()
+              .reversed
+              .toList(),
         );
       },
     );
@@ -124,7 +129,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     bool isCurrentUser = data["senderID"] == _authService.getCurrentUser()!.uid;
 
     // align message to right
-    var alignment = isCurrentUser ? Alignment.centerRight : Alignment.centerLeft;
+    var alignment =
+        isCurrentUser ? Alignment.centerRight : Alignment.centerLeft;
 
     return Container(
         alignment: alignment,
@@ -139,7 +145,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   Widget _buildMessageInput(BuildContext context) {
     return Container(
       constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.width * 0.30, // Set max width to 75% of screen width
+        maxHeight: MediaQuery.of(context).size.width *
+            0.30, // Set max width to 75% of screen width
       ),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(45),
@@ -168,7 +175,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
             ),
           ),
           IconButton(
-            icon: Icon(Icons.send, color: Theme.of(context).colorScheme.primary),
+            icon:
+                Icon(Icons.send, color: Theme.of(context).colorScheme.primary),
             onPressed: sendMessage,
           ),
         ],
