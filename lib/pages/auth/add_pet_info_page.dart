@@ -52,57 +52,76 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
   }
 
   Future<void> _createPet(BuildContext context) async {
-    if (breedController.text.isNotEmpty) {
-      petData!['breed'] = breedController.text;
-    }
-    if (nameController.text.isNotEmpty) {
-      petData!['name'] = nameController.text;
-    }
-    if (weightController.text.isNotEmpty) {
-      petData!['weight'] = int.tryParse(weightController.text);
-    }
-    if (hairColorController.text.isNotEmpty) {
-      petData!['hair_color'] = hairColorController.text;
-    }
-    if (bloodController.text.isNotEmpty) {
-      petData!['blood_type'] = bloodController.text;
-    }
-
-    print(petData);
-
-    final response = await Caller.dio.post(
-      "/pet/createPet",
-      data: petData,
-    );
-
-    if (response.statusCode == 201) {
-      final petId =
-          response.data['data']; // Extract the petId from the response
-
-      // Use the petId in SaveProfile function
-      petData!['id'] = petId;
-      await SaveProfile();
-
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => NfcPage(petId: response.data['data'])));
-    } else {
-      if (mounted) {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('API Error'),
-            content: Text(response.data.toString()),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('OK'),
-              ),
-            ],
-          ),
-        );
+    try {
+      if (breedController.text.isNotEmpty) {
+        petData!['breed'] = breedController.text;
       }
+      if (nameController.text.isNotEmpty) {
+        petData!['name'] = nameController.text;
+      }
+      if (weightController.text.isNotEmpty) {
+        petData!['weight'] = int.tryParse(weightController.text);
+      }
+      if (hairColorController.text.isNotEmpty) {
+        petData!['hair_color'] = hairColorController.text;
+      }
+      if (bloodController.text.isNotEmpty) {
+        petData!['blood_type'] = bloodController.text;
+      }
+
+      print(petData);
+
+      final response = await Caller.dio.post(
+        "/pet/createPet",
+        data: petData,
+      );
+
+      if (response.statusCode == 201) {
+        final petId =
+            response.data['data']; // Extract the petId from the response
+
+        // Use the petId in SaveProfile function
+        petData!['id'] = petId;
+        if (petData?['image'] != null && petData!['image'].isNotEmpty) {
+          await SaveProfile();
+        }
+
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => NfcPage(petId: response.data['data'])));
+      } else {
+        if (mounted) {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('API Error'),
+              content: Text(response.data.toString()),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      print('Error occurred: ${e.toString()}');
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Error'),
+          content: Text('Error occurred: ${e.toString()}'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
     }
   }
 
@@ -409,7 +428,7 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
               text: "Next",
               onTap: () => _createPet(context),
             ),
-            // const SizedBox(height: 5),
+            const SizedBox(height: 10),
             CustomButton1(
               text: "Skip",
               onTap: () => _skip(),
