@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:nonghai/services/auth/auth_service.dart';
 import 'package:nonghai/services/caller.dart';
 import 'package:nonghai/pages/bottom_nav_page.dart';
+// import 'package:nonghai/services/navigatorObserver.dart';
+import 'edit_home_page.dart';
 // import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -23,6 +25,9 @@ class _HomePageState extends State<HomePage> {
   String _errorMessage = '';
   String uid = "";
   var profileImageUrl;
+  bool _showOptions = false;
+  //  bool _isEditing = false;
+  final MyRouteObserver myRouteObserver = MyRouteObserver();
 
   Future<void> fetchUserData() async {
     uid = FirebaseAuth.instance.currentUser!.uid;
@@ -31,13 +36,13 @@ class _HomePageState extends State<HomePage> {
         .doc(uid)
         .get();
 
-    if (doc.exists) {
+    if (doc.exists && mounted) {
       setState(() {
         profileImageUrl = doc['image'];
       });
     }
 
-    if (uid == null) {
+    if (uid == null && mounted) {
       setState(() {
         _errorMessage = 'No user is currently signed in.';
         _isLoading = false;
@@ -46,17 +51,14 @@ class _HomePageState extends State<HomePage> {
     }
 
     try {
-      final response = await Caller.dio.get(
-        "/user/$uid",
-      );
+      final response = await Caller.dio.get("/user/$uid");
 
       // Log the entire API response for debugging
       print('API response data: ${response.data}');
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 && mounted) {
         final userData = response.data;
 
-        // Check if username, phone, and address are null or missing
         if (userData['data'] == null ||
             userData['data']['username'] == null ||
             userData['data']['phone'] == null ||
@@ -68,18 +70,12 @@ class _HomePageState extends State<HomePage> {
         setState(() {
           _username = userData['data']['username'];
           _address = userData['data']['address'];
-          // _phone = userData['data']['phone'];
 
           // Check if phone contains '/' and extract the number after it
           String fetchedPhone = userData['data']['phone'];
-          if (fetchedPhone.contains('/')) {
-            _phone = fetchedPhone.split('/').last; // Get the part after '/'
-          } else {
-            _phone = fetchedPhone; // No '/' present, use the full phone number
-          }
-
-          // Log the user data to check what was retrieved
-          // print('Username: $_username, Address: $_address, Phone: $_phone');
+          _phone = fetchedPhone.contains('/')
+              ? fetchedPhone.split('/').last
+              : fetchedPhone;
 
           // Pets data can be null, provide fallback
           _pets = userData['data']['pets'] ?? [];
@@ -97,26 +93,82 @@ class _HomePageState extends State<HomePage> {
             };
           }).toList();
 
-          // Log the pet details to see if they're correctly parsed
-          print('Pet details: $_petDetails');
-
           // Set image, fallback to empty string if null
           _image = userData['data']['image'] ?? '';
           _isLoading = false;
-          print(_image);
-          print(profileImageUrl);
         });
-      } else {
+      } else if (mounted) {
         setState(() {
           _errorMessage = 'Failed to fetch user data: ${response.statusCode}';
           _isLoading = false;
         });
+
+        // // Show a dialog with a sign-out option.
+        // if (mounted && _isCurrentPage) {
+        //   showDialog(
+        //     context: context,
+        //     builder: (context) {
+        //       return AlertDialog(
+        //         title: Text('An Error Occurred'),
+        //         content: Text(_errorMessage ?? 'Unknown error'),
+        //         actions: [
+        //           // TextButton(
+        //           //   onPressed: () {
+        //           //     Navigator.of(context).pop(); // Close the dialog
+        //           //   },
+        //           //   child: Text('Cancel'),
+        //           // ),
+        //           TextButton(
+        //             onPressed: () async {
+        //               Navigator.of(context).pop(); // Close the dialog
+        //               await FirebaseAuth.instance.signOut();
+        //               if (mounted) {
+        //                 Navigator.pushReplacementNamed(context, '/');
+        //               }
+        //             },
+        //             child: Text('Go back to login'),
+        //           ),
+        //         ],
+        //       );
+        //     },
+        //   );
+        // }
       }
     } catch (e) {
-      setState(() {
-        _errorMessage = 'Error occurred: $e';
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          print(e);
+          _errorMessage =
+              'Error occurred while logging in, Please try again later.';
+          _isLoading = false;
+        });
+      }
+
+      // Show a dialog with a sign-out option.
+      // print(_isTextVisible);
+      // if (mounted) {
+      //   showDialog(
+      //     context: context,
+      //     builder: (context) {
+      //       return AlertDialog(
+      //         title: Text('An Error Occurred'),
+      //         content: Text(_errorMessage ?? 'Unknown error'),
+      //         actions: [
+      //           TextButton(
+      //             onPressed: () async {
+      //               Navigator.of(context).pop(); // Close the dialog
+      //               await FirebaseAuth.instance.signOut();
+      //               if (mounted) {
+      //                 Navigator.pushReplacementNamed(context, '/');
+      //               }
+      //             },
+      //             child: Text('Go back to login'),
+      //           ),
+      //         ],
+      //       );
+      //     },
+      //   );
+      // }
     }
   }
 
@@ -150,355 +202,478 @@ class _HomePageState extends State<HomePage> {
     }
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      body: Stack(
-        children: [
-          Positioned(
-            top: 58,
-            right: 28,
-            child: Container(
-              width: 45, // Adjust the size as needed
-              height: 45, // Adjust the size as needed
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Theme.of(context)
-                    .colorScheme
-                    .secondary, // Background color of the circle
-              ),
+      body: SingleChildScrollView(
+        child: Stack(
+          children: [
+            Positioned(
+              top: 58,
+              right: 28,
               child: GestureDetector(
-                onTap: () async {
-                  final authService = AuthService();
-                  await authService.signOut();
-                  // Navigate to login or handle post-signout logic
-                  if (mounted) {
-                    Navigator.pushReplacementNamed(context, '/');
-                  }
+                onTap: () {
+                  setState(() {
+                    _showOptions = !_showOptions;
+                  });
                 },
-                child: const Center(
-                  child: Icon(
-                    Icons.edit,
-                    size: 28,
-                    color: Color(0xff333333),
+                child: Container(
+                  width: 45,
+                  height: 45,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Theme.of(context).colorScheme.secondary,
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.more_horiz_rounded,
+                      size: 28,
+                      color: Color(0xff333333),
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(0, 85, 0, 20),
-            child: Column(
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+            if (_showOptions)
+              Positioned(
+                top:
+                    110, // Adjust this to position the icons below the first button
+                right: 28,
+                child: Column(
                   children: [
-                    CircleAvatar(
-                      radius: 47,
-                      backgroundImage: (_image != null && _image != '')
-                          ? NetworkImage(_image) // Load image from URL
-                          : const AssetImage(
-                                  'assets/images/default_profile.png')
-                              as ImageProvider, // Fallback to a placeholder if _image is empty
-                      // backgroundImage: AssetImage('assets/images/meme1.jpg'),
+                    GestureDetector(
+                      onTap: () {
+                        // Navigate to edit page or perform edit action
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => EditHomePage(
+                              userData: {
+                                'id': uid,
+                                'username': _username,
+                                'address': _address,
+                                'phone': _phone,
+                                'image': _image,
+                                'pets': _petDetails,
+                                // 'profileImageUrl': profileImageUrl,
+                              },
+                            ),
+                          ),
+                        );
+                        setState(() {
+                          _showOptions = false;
+                        });
+                      },
+                      child: Container(
+                        width: 45,
+                        height: 45,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Theme.of(context).colorScheme.secondary,
+                        ),
+                        child: const Center(
+                          child: Icon(
+                            Icons.edit,
+                            size: 28,
+                            color: Color(0xff333333),
+                          ),
+                        ),
+                      ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 10, 0, 20),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            '$_username ',
-                            style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'Fredoka'),
+                    const SizedBox(height: 8), // Spacing between the buttons
+                    GestureDetector(
+                      onTap: () async {
+                        final authService = AuthService();
+                        await authService.signOut();
+                        if (mounted) {
+                          Navigator.pushReplacementNamed(context, '/');
+                        }
+                        setState(() {
+                          _showOptions = false;
+                        });
+                      },
+                      child: Container(
+                        width: 45,
+                        height: 45,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Theme.of(context).colorScheme.secondary,
+                        ),
+                        child: const Center(
+                          child: Icon(
+                            Icons.logout,
+                            size: 28,
+                            color: Color(0xff333333),
                           ),
-                          const Text(
-                            "'s family",
-                            style:
-                                TextStyle(fontSize: 20, fontFamily: 'Fredoka'),
-                          ),
-                        ],
+                        ),
                       ),
                     ),
                   ],
                 ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(65, 0, 65, 15),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.max,
+              ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 85, 0, 0),
+              child: Column(
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const Padding(
-                        padding: EdgeInsets.only(right: 20),
-                        child: Icon(
-                          Icons.home_outlined,
-                          size: 25,
-                          color: Color(0xff333333),
+                      CircleAvatar(
+                        radius: 47,
+                        backgroundImage: (_image != null && _image != '')
+                            ? NetworkImage(_image) // Load image from URL
+                            : const AssetImage(
+                                    'assets/images/default_profile.png')
+                                as ImageProvider, // Fallback to a placeholder if _image is empty
+                        // backgroundImage: AssetImage('assets/images/meme1.jpg'),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 10, 0, 20),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              '$_username ',
+                              style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'Fredoka'),
+                            ),
+                            const Text(
+                              "'s family",
+                              style: TextStyle(
+                                  fontSize: 20, fontFamily: 'Fredoka'),
+                            ),
+                          ],
                         ),
                       ),
-                      Expanded(
-                        child: Text(
-                          '$_address',
-                          style: const TextStyle(fontSize: 16),
-                          overflow: TextOverflow.clip,
-                        ),
-                      )
                     ],
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(65, 0, 65, 12),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.only(right: 20),
-                        child: Icon(
-                          Icons.phone_in_talk_outlined,
-                          size: 24,
-                          color: Color(0xff333333),
-                        ),
-                      ),
-                      Expanded(
-                        child: Text(
-                          '$_phone',
-                          style: const TextStyle(fontSize: 16),
-                          overflow: TextOverflow.clip,
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-                const Divider(
-                  color: Color.fromARGB(255, 199, 198, 198),
-                  thickness: 1.3,
-                  indent: 35,
-                  endIndent: 35,
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(35, 0, 35, 12),
-                  child: SingleChildScrollView(
-                    child: Column(
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(65, 0, 65, 15),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
                       children: [
                         const Padding(
-                          padding: EdgeInsets.fromLTRB(0, 15, 0, 12),
-                          child: Row(
-                            children: [
-                              Text('Your Family',
-                                  style: TextStyle(fontSize: 16))
-                            ],
+                          padding: EdgeInsets.only(right: 20),
+                          child: Icon(
+                            Icons.home_outlined,
+                            size: 25,
+                            color: Color(0xff333333),
                           ),
                         ),
-                        SizedBox(
-                          width: double.maxFinite,
-                          height: MediaQuery.of(context).size.height * 0.41,
-                          child: GridView.builder(
-                            padding: EdgeInsets.zero,
-                            itemCount: _petCount +
-                                1, // Total number of items (n regular cards + 1 button card)
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2, // 2 cards per row
-                              mainAxisSpacing: 15.0, // Spacing between rows
-                              crossAxisSpacing: 12.0, // Spacing between columns
-                              childAspectRatio:
-                                  2.05 / 2.6, // Aspect ratio of the cards
-                            ),
-                            itemBuilder: (context, index) {
-                              // Check if it's the last index (index n) to place the button card
-                              if (index >= _petCount) {
-                                return Card(
-                                    color: Colors.transparent,
-                                    margin: const EdgeInsets.all(8.0),
-                                    elevation: 0,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: InkWell(
-                                      onTap: () {
-                                        // Define your add button action here
-                                      },
-                                      borderRadius: BorderRadius.circular(8),
-                                      splashColor: Colors
-                                          .transparent, // Remove ripple effect
-                                      highlightColor: const Color.fromRGBO(0, 0,
-                                          0, 0), // Remove highlight effect
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          Navigator.pushNamed(
-                                              context, '/addPetProfileImage');
-                                        },
-                                        child: Center(
-                                          child: Container(
-                                            width: 55,
-                                            height: 55,
-                                            decoration: const BoxDecoration(
-                                              color: Colors.white,
-                                              shape: BoxShape.circle,
-                                              // boxShadow: [
-                                              //   BoxShadow(
-                                              //     color: Colors.black.withOpacity(0.2), // Shadow color with opacity
-                                              //     spreadRadius: 2, // How much the shadow spreads
-                                              //     blurRadius: 5, // How soft the shadow is
-                                              //     offset: Offset(0, 3), // The position of the shadow (x, y)
-                                              //   ),
-                                              // ],
-                                            ),
-                                            child: Icon(
-                                              Icons.add,
-                                              size: 23,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .onSurface,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      // ),
-                                    ));
-                              } else {
-                                final pet = _petDetails[index];
-                                // Regular cards for indices 0 to n-1
-                                return Card(
-                                  color: Theme.of(context).colorScheme.tertiary,
-                                  margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                  elevation: 1,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: GestureDetector(
-                                    onTap: () async {
-                                      // Navigate to pet detail page with the pet ID
-                                      String petId = pet['id'];
-                                      await Navigator.pushNamed(
-                                          context, '/petProfile',
-                                          arguments: petId);
-                                      // fetchUserData();
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const BottomNavPage(
-                                                  page: 1,
-                                                )),
-                                      );
-                                    },
-                                    child: Column(
-                                      children: [
-                                        SizedBox(
-                                          width: double.infinity,
-                                          height: 155,
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                const BorderRadius.vertical(
-                                              top: Radius.circular(8),
-                                            ),
-                                            child: pet['img'] != '' &&
-                                                    pet['img'] != null
-                                                ? Image.network(
-                                                    pet['img'],
-                                                    fit: BoxFit.cover,
-                                                    errorBuilder: (context,
-                                                        error, stackTrace) {
-                                                      return Image.asset(
-                                                        'assets/images/meme2.jpg', // Default image
-                                                        fit: BoxFit.cover,
-                                                      );
-                                                    },
-                                                  )
-                                                : Image.asset(
-                                                    'assets/images/meme2.jpg', // Default image
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.fromLTRB(
-                                              8, 5, 8, 5),
-                                          child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.end,
-                                              children: [
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      pet['name'],
-                                                      style: Theme.of(context)
-                                                          .textTheme
-                                                          .labelLarge,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    ),
-                                                  ],
-                                                ),
-                                                // ค่อยมาเปลี่ยนเป็น data1-data2 (sex-year)
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      pet['sex'] +
-                                                          ' - ' +
-                                                          pet['age'],
-                                                      style: Theme.of(context)
-                                                          .textTheme
-                                                          .displayMedium,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    ),
-                                                    const Spacer(),
-                                                    //add logic if status=safe then green
-                                                    if (pet['status'] != null &&
-                                                        pet['status'] != "")
-                                                      Container(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .symmetric(
-                                                                horizontal: 11,
-                                                                vertical: 1.5),
-                                                        decoration: BoxDecoration(
-                                                            color:
-                                                                pet['status'] ==
-                                                                        'Lost'
-                                                                    ? Colors.red
-                                                                    : Colors
-                                                                        .green,
-                                                            shape: BoxShape
-                                                                .rectangle,
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        8)),
-                                                        child: Text(
-                                                          pet['status'],
-                                                          style:
-                                                              Theme.of(context)
-                                                                  .textTheme
-                                                                  .displaySmall,
-                                                        ),
-                                                      ),
-                                                  ],
-                                                ),
-                                              ]),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              }
-                            },
+                        Expanded(
+                          child: Text(
+                            '$_address',
+                            style: const TextStyle(fontSize: 16),
+                            overflow: TextOverflow.clip,
                           ),
                         )
                       ],
                     ),
                   ),
-                )
-                // Add other Row widgets here as needed
-              ],
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(65, 0, 65, 12),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.only(right: 20),
+                          child: Icon(
+                            Icons.phone_in_talk_outlined,
+                            size: 24,
+                            color: Color(0xff333333),
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            '$_phone',
+                            style: const TextStyle(fontSize: 16),
+                            overflow: TextOverflow.clip,
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                  const Divider(
+                    color: Color.fromARGB(255, 199, 198, 198),
+                    thickness: 1.3,
+                    indent: 35,
+                    endIndent: 35,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(35, 0, 35, 12),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.fromLTRB(0, 15, 0, 12),
+                            child: Row(
+                              children: [
+                                Text('Your Family',
+                                    style: TextStyle(fontSize: 16))
+                              ],
+                            ),
+                          ),
+                          SizedBox(
+                            width: double.maxFinite,
+                            height: MediaQuery.of(context).size.height * 0.46,
+                            child: GridView.builder(
+                              padding: EdgeInsets.zero,
+                              itemCount: _petCount +
+                                  1, // Total number of items (n regular cards + 1 button card)
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2, // 2 cards per row
+                                mainAxisSpacing: 15.0, // Spacing between rows
+                                crossAxisSpacing:
+                                    12.0, // Spacing between columns
+                                childAspectRatio:
+                                    2.05 / 2.6, // Aspect ratio of the cards
+                              ),
+                              itemBuilder: (context, index) {
+                                // Check if it's the last index (index n) to place the button card
+                                if (index >= _petCount || _petCount == 0) {
+                                  return Card(
+                                      color: Colors.transparent,
+                                      margin: const EdgeInsets.all(8.0),
+                                      elevation: 0,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: InkWell(
+                                        onTap: () {
+                                          // Define your add button action here
+                                        },
+                                        borderRadius: BorderRadius.circular(8),
+                                        splashColor: Colors
+                                            .transparent, // Remove ripple effect
+                                        highlightColor: const Color.fromRGBO(0,
+                                            0, 0, 0), // Remove highlight effect
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            Navigator.pushNamed(
+                                                context, '/addPetProfileImage');
+                                          },
+                                          child: Center(
+                                            child: Container(
+                                              width: 55,
+                                              height: 55,
+                                              decoration: const BoxDecoration(
+                                                color: Colors.white,
+                                                shape: BoxShape.circle,
+                                                // boxShadow: [
+                                                //   BoxShadow(
+                                                //     color: Colors.black.withOpacity(0.2), // Shadow color with opacity
+                                                //     spreadRadius: 2, // How much the shadow spreads
+                                                //     blurRadius: 5, // How soft the shadow is
+                                                //     offset: Offset(0, 3), // The position of the shadow (x, y)
+                                                //   ),
+                                                // ],
+                                              ),
+                                              child: Icon(
+                                                Icons.add,
+                                                size: 23,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSurface,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        // ),
+                                      ));
+                                } else {
+                                  final pet = _petDetails[index];
+                                  // Regular cards for indices 0 to n-1
+                                  return Card(
+                                    color:
+                                        Theme.of(context).colorScheme.tertiary,
+                                    margin:
+                                        const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                    elevation: 1,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: GestureDetector(
+                                      onTap: () async {
+                                        // Navigate to pet detail page with the pet ID
+                                        String petId = pet['id'];
+
+                                        // Check if the widget is still mounted before navigation
+                                        if (mounted) {
+                                          await Navigator.pushNamed(
+                                              context, '/petProfile',
+                                              arguments: petId);
+
+                                          // Check if the widget is still mounted before navigating again
+                                          if (mounted) {
+                                            Navigator.pushReplacement(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const BottomNavPage(
+                                                  page: 1,
+                                                ),
+                                              ),
+                                            );
+                                          }
+                                        }
+                                      },
+                                      child: Column(
+                                        children: [
+                                          SizedBox(
+                                            width: double.infinity,
+                                            height: 155,
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  const BorderRadius.vertical(
+                                                top: Radius.circular(8),
+                                              ),
+                                              child: Container(
+                                                color: const Color.fromARGB(
+                                                    255, 227, 225, 225),
+                                                child: pet['img'] != '' &&
+                                                        pet['img'] != null
+                                                    ? Image.network(
+                                                        pet['img'],
+                                                        fit: BoxFit.cover,
+                                                        errorBuilder: (context,
+                                                            error, stackTrace) {
+                                                          return const Center(
+                                                            child: Text(
+                                                              'No preview image',
+                                                              style: TextStyle(
+                                                                fontSize: 16,
+                                                                color: Colors
+                                                                    .grey, // Customize text color if needed
+                                                              ),
+                                                            ),
+                                                          );
+                                                        },
+                                                      )
+                                                    : const Center(
+                                                        child: Text(
+                                                          'No preview image',
+                                                          style: TextStyle(
+                                                            fontSize: 16,
+                                                            color: Colors
+                                                                .grey, // Customize text color if needed
+                                                          ),
+                                                        ),
+                                                      ),
+                                              ),
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.fromLTRB(
+                                                8, 5, 8, 5),
+                                            child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.end,
+                                                children: [
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    children: [
+                                                      Text(
+                                                        pet['name'],
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .labelLarge,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  // ค่อยมาเปลี่ยนเป็น data1-data2 (sex-year)
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    children: [
+                                                      Text(
+                                                        pet['sex'] +
+                                                            ' - ' +
+                                                            pet['age'],
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .displayMedium,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                      ),
+                                                      const Spacer(),
+                                                      //add logic if status=safe then green
+                                                      if (pet['status'] !=
+                                                              null &&
+                                                          pet['status'] != "")
+                                                        Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  horizontal:
+                                                                      11,
+                                                                  vertical:
+                                                                      1.5),
+                                                          decoration: BoxDecoration(
+                                                              color:
+                                                                  pet['status'] ==
+                                                                          'Lost'
+                                                                      ? Colors
+                                                                          .red
+                                                                      : Colors
+                                                                          .green,
+                                                              shape: BoxShape
+                                                                  .rectangle,
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          8)),
+                                                          child: Text(
+                                                            pet['status'],
+                                                            style: Theme.of(
+                                                                    context)
+                                                                .textTheme
+                                                                .displaySmall,
+                                                          ),
+                                                        ),
+                                                    ],
+                                                  ),
+                                                ]),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                }
+                              },
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  )
+                  // Add other Row widgets here as needed
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
+  }
+}
+
+class MyRouteObserver extends NavigatorObserver {
+  String currentRoute = '';
+
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    super.didPush(route, previousRoute);
+    currentRoute = route.settings.name ?? '';
+    print('Current route: $currentRoute');
+  }
+
+  @override
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    super.didPop(route, previousRoute);
+    currentRoute = previousRoute?.settings.name ?? '';
+    print('Current route after pop: $currentRoute');
   }
 }

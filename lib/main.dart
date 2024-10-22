@@ -24,6 +24,8 @@ import 'pages/auth/add_pet_info_page.dart';
 import 'pages/auth/add_pet_profile_page.dart';
 import 'pages/auth/add_profile_page.dart';
 import 'pages/auth/additional_note_page.dart';
+import 'pages/auth/edit_home_page.dart';
+import 'pages/auth/edit_pet_page.dart';
 import 'pages/auth/pet_profile_page.dart';
 
 void main() async {
@@ -46,6 +48,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final _navigatorKey = GlobalKey<NavigatorState>();
+  // final MyRouteObserver myRouteObserver = MyRouteObserver();
   late AppLinks _appLinks;
   StreamSubscription<Uri>? _linkSubscription;
 
@@ -173,7 +176,7 @@ class _MyAppState extends State<MyApp> {
           titleSmall: TextStyle(
               fontFamily: 'Fredoka',
               fontSize: 16,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w400,
               color: Color(0xff5C5C5C)),
           titleMedium: TextStyle(
               fontSize: 16,
@@ -181,6 +184,12 @@ class _MyAppState extends State<MyApp> {
               color: Color(0xff333333),
               fontFamily: 'Fredoka',
               overflow: TextOverflow.ellipsis),
+          titleLarge: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w500,
+            color: Color(0xffbfbfbf),
+            fontFamily: 'Fredoka',
+          ),
         ),
         bannerTheme: const MaterialBannerThemeData(
           contentTextStyle: TextStyle(
@@ -209,18 +218,24 @@ class _MyAppState extends State<MyApp> {
         '/': (context) => const AuthGate(),
         '/loginOrRegister': (context) => const LoginOrRegistoer(),
         '/home': (context) => const HomePage(),
+        '/editHome': (context) => const EditHomePage(
+              userData: {},
+            ),
         '/testnfc': (context) => const TestNfcPage(),
         '/addProfileImage': (context) => const AddProfilePage(),
         '/addContact': (context) => const AddContactPage(),
         '/addPetProfileImage': (context) => const AddPetProfilePage(),
         '/addPetInfo': (context) => const AddPetInfoPage(),
         '/additionalNote': (context) => const AdditionalNotePage(
-              petData: {},
+              note: '',
             ),
         '/petProfile': (context) {
           final dynamic petID = ModalRoute.of(context)?.settings.arguments;
           return PetProfilePage(petID: petID);
         },
+        '/editPet': (context) => const EditPetPage(
+              petData: {},
+            ),
         '/nfc': (context) => const NfcPage(
               petId: '550e8400-e29b-41d4-a716-446655440000',
             ),
