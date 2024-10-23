@@ -6,6 +6,8 @@ import 'dart:typed_data';
 // import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+// import 'package:nonghai/pages/auth/add_pet_info_page.dart';
+import 'package:nonghai/pages/auth/add_pet_profile_page.dart';
 import 'package:nonghai/services/auth/add_profile.dart';
 import '../../components/custom_button.dart';
 import '../../components/custom_text_field.dart';
@@ -60,8 +62,16 @@ class _AddContactPageState extends State<AddContactPage> {
 
         // Handle the API response
         if (response.statusCode == 201) {
-          Navigator.pushNamed(context, '/addPetProfileImage',
-              arguments: userData!['id']);
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+              // ignore: prefer_const_constructors
+              builder: (context) => AddPetProfilePage(
+                  // userId: userData!['id'], // Pass your userData if needed
+                  ),
+            ),
+            (Route<dynamic> route) =>
+                false, // This ensures no previous routes remain
+          );
         } else {
           // Handle error from API
           showDialog(
@@ -153,7 +163,7 @@ class _AddContactPageState extends State<AddContactPage> {
     print(userData);
     return Scaffold(
       appBar: AppBar(
-        title: Text("Your Profile",
+        title: Text("Your Contact",
             style: Theme.of(context).bannerTheme.contentTextStyle),
       ),
       backgroundColor: Theme.of(context).colorScheme.surface,

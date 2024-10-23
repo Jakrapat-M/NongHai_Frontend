@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'package:app_links/app_links.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
 // import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -10,9 +8,8 @@ import 'package:nonghai/pages/nfc_page.dart';
 // import 'package:flutter/painting.dart';
 // import 'package:flutter/rendering.dart';
 // import 'package:flutter/widgets.dart';
+import 'package:nonghai/pages/test_nfc_page.dart';
 import 'package:nonghai/pages/tracking_page.dart';
-import 'package:nonghai/services/auth/auth_service.dart';
-// import 'package:geolocator/geolocator.dart';
 import 'package:nonghai/services/auth/login_or_registoer.dart';
 import 'package:nonghai/firebase_options.dart';
 import 'package:nonghai/pages/auth/home_page.dart';
@@ -21,46 +18,37 @@ import 'package:nonghai/services/noti/noti_service.dart';
 // import 'package:nonghai/services/auth/auth_service.dart';
 // import 'package:provider/provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:nonghai/services/caller.dart';
 
 import 'pages/auth/add_contact_page.dart';
 import 'pages/auth/add_pet_info_page.dart';
 import 'pages/auth/add_pet_profile_page.dart';
 import 'pages/auth/add_profile_page.dart';
 import 'pages/auth/additional_note_page.dart';
+import 'pages/auth/edit_home_page.dart';
+import 'pages/auth/edit_pet_page.dart';
 import 'pages/auth/pet_profile_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await dotenv.load(fileName: '.env');
-  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
-  final navigatorKey = GlobalKey<NavigatorState>();
-  final notificationService = NotificationService(navigatorKey: navigatorKey);
-
-  await notificationService.initialize();
-  await notificationService.initPushNotification();
-
-  FirebaseMessaging.onMessage.listen(notificationService.firebaseMessagingForegroundHandler);
-  FirebaseMessaging.onBackgroundMessage(notificationService.firebaseMessagingBackgroundHandler);
-
+  await NotiService().init();
   await initializeDateFormatting('th_TH', null);
-  runApp(MyApp(navigatorKey: navigatorKey));
+  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
-  final GlobalKey<NavigatorState> navigatorKey;
-  const MyApp({super.key, required this.navigatorKey});
+  const MyApp({super.key});
 
   @override
   State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
+  final _navigatorKey = GlobalKey<NavigatorState>();
+  // final MyRouteObserver myRouteObserver = MyRouteObserver();
   late AppLinks _appLinks;
   StreamSubscription<Uri>? _linkSubscription;
 
@@ -86,100 +74,29 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  Future<bool> createTracking(String petId) async {
-    try {
-      print("createTracking id: $petId");
-      final currentUser = AuthService().getCurrentUser();
-      if (currentUser == null) {
-        print('No user is currently signed in.');
-        return true; // Handle this case appropriately, maybe show an error message
-      }
-      final currentUserId = currentUser.uid;
-
-      double lat = 0.0000000;
-      double long = 0.0000000;
-
-      print("currentUserId: $currentUserId");
-      final position = await _getLocation();
-      if (position != null) {
-        lat = position.latitude;
-        long = position.longitude;
-      }
-
-      final resp = await Caller.dio.post(
-        '/tracking/createTracking',
-        data: {'pet_id': petId, 'finder_id': currentUserId, 'lat': lat, 'long': long},
-      );
-      if (resp.statusCode == 200) {
-        print('Tracking created');
-      } else {
-        // Log the error response
-        print('Failed to create tracking: ${resp.statusCode} - ${resp.data}');
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('Network error occurred: $e');
-      }
-    }
-    return true;
-  }
-
-  Future<dynamic> _getLocation() async {
-    return null;
-  }
-
-  // Future<Position?> _getLocation() async {
-  //   print("test getLocaion");
-  //   bool serviceEnabled;
-  //   LocationPermission permission;
-
-  //   print('Checking location');
-  //   // Test if location services are enabled.
-  //   serviceEnabled = await Geolocator.isLocationServiceEnabled();
-  //   if (!serviceEnabled) {
-  //     print("Location services are disabled.");
-  //     return null;
-  //   }
-
-  //   permission = await Geolocator.checkPermission();
-  //   if (permission == LocationPermission.denied) {
-  //     permission = await Geolocator.requestPermission();
-  //     if (permission == LocationPermission.denied) {
-  //       print("Location permissions are denied");
-  //       return null;
-  //     }
-  //   }
-  //   if (permission == LocationPermission.deniedForever) {
-  //     print(
-  //         'Location permissions are permanently denied, we cannot request permissions.');
-  //     return null;
-  //   }
-  //   print("get location success");
-
-  //   return await Geolocator.getCurrentPosition();
-  // }
-
   void openAppLink(Uri uri) {
     final fragment = uri.fragment;
 
     // Print the full URI for debugging purposes
     debugPrint('Navigating to: $fragment');
-    createTracking(fragment).then((value) {
-      widget.navigatorKey.currentState?.push(MaterialPageRoute(
-        builder: (context) {
-          return PetProfilePage(petID: fragment);
-        },
-      ));
-    });
 
     // Navigate to TrackingPage
+    _navigatorKey.currentState?.push(MaterialPageRoute(
+      builder: (context) {
+        return TrackingPage(
+          petId: fragment,
+          petName: 'Ella',
+          petImage: 'petImage',
+        );
+      },
+    ));
   }
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      navigatorKey: widget.navigatorKey,
+      navigatorKey: _navigatorKey,
       title: 'Nonghai',
       theme: ThemeData(
         colorScheme: ThemeData().colorScheme.copyWith(
@@ -190,7 +107,8 @@ class _MyAppState extends State<MyApp> {
             onSurface: const Color(0xff2C3F50), //blue surface(box/button)
             secondaryContainer: const Color(0xffE8E8E8), //container
             secondaryFixed: const Color(0xff2C3F50), //container
-            surfaceBright: const Color(0xff5DB671), // green container box(status)
+            surfaceBright:
+                const Color(0xff5DB671), // green container box(status)
             onErrorContainer: Colors.red // red container box(status)
             ),
         useMaterial3: true,
@@ -258,7 +176,7 @@ class _MyAppState extends State<MyApp> {
           titleSmall: TextStyle(
               fontFamily: 'Fredoka',
               fontSize: 16,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w400,
               color: Color(0xff5C5C5C)),
           titleMedium: TextStyle(
               fontSize: 16,
@@ -266,6 +184,12 @@ class _MyAppState extends State<MyApp> {
               color: Color(0xff333333),
               fontFamily: 'Fredoka',
               overflow: TextOverflow.ellipsis),
+          titleLarge: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w500,
+            color: Color(0xffbfbfbf),
+            fontFamily: 'Fredoka',
+          ),
         ),
         bannerTheme: const MaterialBannerThemeData(
           contentTextStyle: TextStyle(
@@ -294,17 +218,24 @@ class _MyAppState extends State<MyApp> {
         '/': (context) => const AuthGate(),
         '/loginOrRegister': (context) => const LoginOrRegistoer(),
         '/home': (context) => const HomePage(),
+        '/editHome': (context) => const EditHomePage(
+              userData: {},
+            ),
+        '/testnfc': (context) => const TestNfcPage(),
         '/addProfileImage': (context) => const AddProfilePage(),
         '/addContact': (context) => const AddContactPage(),
         '/addPetProfileImage': (context) => const AddPetProfilePage(),
         '/addPetInfo': (context) => const AddPetInfoPage(),
         '/additionalNote': (context) => const AdditionalNotePage(
-              petData: {},
+              note: '',
             ),
         '/petProfile': (context) {
           final dynamic petID = ModalRoute.of(context)?.settings.arguments;
           return PetProfilePage(petID: petID);
         },
+        '/editPet': (context) => const EditPetPage(
+              petData: {},
+            ),
         '/nfc': (context) => const NfcPage(
               petId: '550e8400-e29b-41d4-a716-446655440000',
             ),
@@ -315,9 +246,4 @@ class _MyAppState extends State<MyApp> {
       },
     );
   }
-}
-
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp();
-  print('Handling a background message ${message.messageId}');
 }

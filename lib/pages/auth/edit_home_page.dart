@@ -1,0 +1,900 @@
+// ignore_for_file: prefer_interpolation_to_compose_strings, avoid_print, unnecessary_null_comparison, use_build_context_synchronously, non_constant_identifier_names
+
+// import 'dart:io';
+// import 'dart:typed_data'; //unnecessary
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:nonghai/pages/bottom_nav_page.dart';
+import 'package:nonghai/services/auth/add_profile.dart';
+import 'package:nonghai/services/caller.dart';
+import 'package:permission_handler/permission_handler.dart';
+
+class EditHomePage extends StatefulWidget {
+  final Map<String, dynamic> userData;
+
+  const EditHomePage({super.key, required this.userData});
+
+  @override
+  State<EditHomePage> createState() => _EditHomePageState();
+}
+
+class _EditHomePageState extends State<EditHomePage> {
+  bool _isLoading = true;
+  late String _uid;
+  late String _username;
+  late String _address;
+  late String _phone;
+  late String _image;
+  late List<dynamic> _petDetails;
+  int _petCount = 0;
+  XFile? _newImage;
+  final List<String> _deletedPetIds = [];
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeUserData();
+    _usernameController.text = _username;
+    _addressController.text = _address;
+    _phoneController.text = _phone;
+  }
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _addressController.dispose();
+    _phoneController.dispose();
+    super.dispose();
+  }
+
+  void _initializeUserData() {
+    // Extract user data from the widget's userData map
+    _uid = widget.userData['id'] ?? FirebaseAuth.instance.currentUser!.uid;
+    _username = widget.userData['username'] ?? 'No Username';
+    _address = widget.userData['address'] ?? 'No Address';
+    _phone = widget.userData['phone'] ?? 'No Phone';
+    _image = widget.userData['image'] ?? '';
+    _petDetails = widget.userData['pets'] ?? '';
+    _petCount = _petDetails.length;
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  Future<void> _pickImage() async {
+    var status = await Permission.storage.request();
+    var cameraStatus = await Permission.camera.request();
+
+    if (status.isGranted && cameraStatus.isGranted) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text(
+              'Select Image Source',
+              textAlign: TextAlign.center,
+            ),
+            content: SizedBox(
+              height: 100,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      TextButton(
+                        child: const Text('Camera'),
+                        onPressed: () async {
+                          Navigator.of(context).pop();
+                          final ImagePicker picker = ImagePicker();
+                          final XFile? selectedImage = await picker.pickImage(
+                              source: ImageSource.camera);
+                          if (selectedImage != null) {
+                            setState(() {
+                              _newImage = selectedImage;
+                            });
+                            await SaveProfile();
+                          }
+                        },
+                      ),
+                      const SizedBox(width: 20),
+                      TextButton(
+                        child: const Text('Gallery'),
+                        onPressed: () async {
+                          Navigator.of(context).pop();
+                          final ImagePicker picker = ImagePicker();
+                          final XFile? selectedImage = await picker.pickImage(
+                              source: ImageSource.gallery);
+                          if (selectedImage != null) {
+                            setState(() {
+                              _newImage = selectedImage;
+                            });
+                            await SaveProfile();
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    } else {
+      _showError('Storage permission denied');
+    }
+  }
+
+  Future<void> SaveProfile() async {
+    if (_newImage != null) {
+      try {
+        // Convert the image file to Uint8List for uploading
+        Uint8List imageFile = await _newImage!.readAsBytes();
+
+        // Define the path for the image upload
+        String folderPath = 'profileImage/$_uid.jpg'; // Save as userId.jpg
+
+        // Save the profile image and get the new image URL
+        String imgUrl = await StoreProfile().saveData(
+          userId: _uid,
+          file: imageFile,
+          folderPath: folderPath,
+        );
+
+        // Update the state with the new image URL
+        setState(() {
+          _image = imgUrl; // Update the local image URL with the new one
+        });
+
+        print('Uploaded image URL: $imgUrl');
+      } catch (e) {
+        _showError("Failed to update profile image: $e");
+      }
+    } else {
+      _showError("Can't update new profile");
+    }
+  }
+
+  // Function to show delete confirmation dialog
+  void _showDeleteConfirmationDialog(BuildContext context, String petId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Pet'),
+          content: const Text('Are you sure you want to delete this pet?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                _deletedPetIds.add(petId); // Add petId to deleted list
+                setState(() {
+                  _petDetails.removeWhere((pet) => pet['id'] == petId);
+                  _petCount = _petDetails.length;
+                });
+                Navigator.of(context).pop(); // Close the dialog after deletion
+              },
+              child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Password Reset'),
+          content: const Text(
+              'Are you sure you want to reset your password? An email will be sent to your registered email address.'),
+          actions: [
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: const Text('Confirm'),
+              onPressed: () async {
+                Navigator.of(context)
+                    .pop(); // Close the dialog before sending the email
+                _sendPasswordResetEmail(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _sendPasswordResetEmail(BuildContext context) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null && user.email != null) {
+        // Store a reference to the scaffold messenger before the await.
+        final messenger = ScaffoldMessenger.of(context);
+
+        await FirebaseAuth.instance.sendPasswordResetEmail(email: user.email!);
+
+        // Ensure the widget is still mounted before showing the snackbar.
+        if (context.mounted) {
+          messenger.showSnackBar(
+            const SnackBar(content: Text('Password reset email sent!')),
+          );
+        }
+      } else if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No email found for the current user.')),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${e.toString()}')),
+        );
+      }
+    }
+  }
+
+// // Function to delete pet by ID (implement your API call here)
+//   Future<void> _deletePetById(String petId) async {
+//     // Add your API call logic here to delete the pet by ID
+//     print('Deleting pet with ID: $petId');
+//     // Example: await apiService.deletePet(petId);
+//     try {
+//       final response = await Caller.dio.delete("/pet/$petId");
+
+//       if (response.statusCode == 200) {
+//         setState(() {
+//           _petDetails.removeWhere((pet) => pet['id'] == petId);
+//           _petCount = _petDetails.length; // Update the pet count.
+//         });
+//         print('Pet with ID: $petId deleted successfully');
+//       }
+//     } catch (e) {
+//       print('Error occurred while delete pet: $e');
+//       _showError("An error occurred. Please try again later.");
+//     }
+//   }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isLoading) {
+      // Show a loading spinner while fetching data
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(35, 85, 35, 0),
+          child: Column(
+            children: [
+              // Profile Image with Icon Overlay
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  // CircleAvatar with opacity
+                  Opacity(
+                    opacity: 0.55, // Set opacity to 60%
+                    child: CircleAvatar(
+                      radius: 47,
+                      backgroundImage: (_image.isNotEmpty)
+                          ? NetworkImage(_image) // Load image from URL
+                          : const AssetImage(
+                                  'assets/images/default_profile.png')
+                              as ImageProvider, // Fallback to a placeholder if _image is empty
+                    ),
+                  ),
+                  // Icon on top of the CircleAvatar
+                  GestureDetector(
+                    onTap: () {
+                      // Handle image selection here (e.g., open image picker)
+                      _pickImage();
+                    },
+                    child: const Icon(
+                      Icons.photo_library_outlined,
+                      size: 28,
+                      color: Colors.black87, // Icon color
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              // Editable TextFields for User Info
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 50),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(32.0),
+                    // boxShadow: [
+                    //   BoxShadow(
+                    //     color: Colors.grey.withOpacity(0.2),
+                    //     spreadRadius: 1,
+                    //     blurRadius: 5,
+                    //     offset: const Offset(0, 3),
+                    //   ),
+                    // ],
+                  ),
+                  child: Row(
+                    children: [
+                      const Text(
+                        'Name',
+                        style: TextStyle(
+                            fontSize: 16,
+                            color: Color(0xff1E1E1E),
+                            fontFamily: 'Frodoka',
+                            fontWeight: FontWeight.w400),
+                      ),
+                      const Spacer(),
+                      Expanded(
+                        child: TextFormField(
+                          controller: _usernameController,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            color: Color(0xff2C3F50),
+                            fontFamily: 'Frodoka',
+                            fontWeight: FontWeight.w500,
+                          ),
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            // hintText: 'Enter username',
+                          ),
+                          keyboardType: TextInputType.name,
+                          onChanged: (value) {
+                            setState(() {
+                              _username = value;
+                            });
+                          },
+                        ),
+                      ),
+                      // const Spacer()
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Address field
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16.0),
+                  // boxShadow: [
+                  //   BoxShadow(
+                  //     color: Colors.grey.withOpacity(0.2),
+                  //     spreadRadius: 1,
+                  //     blurRadius: 5,
+                  //     offset: const Offset(0, 3),
+                  //   ),
+                  // ],
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.home_outlined,
+                      color: Color(0xff333333),
+                      size: 24,
+                    ),
+                    const SizedBox(width: 20),
+                    Expanded(
+                      child: TextFormField(
+                        initialValue: _address,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Color(0xff1E1E1E),
+                          fontFamily: 'Frodoka',
+                          fontWeight: FontWeight.w400,
+                        ),
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          hintText: 'Enter address',
+                        ),
+                        keyboardType: TextInputType.streetAddress,
+                        onChanged: (value) {
+                          setState(() {
+                            _address = value;
+                          });
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
+
+              // Phone field
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16.0),
+                  // boxShadow: [
+                  //   BoxShadow(
+                  //     color: Colors.grey.withOpacity(0.2),
+                  //     spreadRadius: 1,
+                  //     blurRadius: 5,
+                  //     offset: const Offset(0, 3),
+                  //   ),
+                  // ],
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.phone_in_talk_outlined,
+                      color: Color(0xff333333),
+                      size: 24,
+                    ),
+                    const SizedBox(width: 20),
+                    Expanded(
+                      child: TextFormField(
+                        initialValue: _phone,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Color(0xff1E1E1E),
+                          fontFamily: 'Frodoka',
+                          fontWeight: FontWeight.w400,
+                        ),
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          hintText: 'Enter phone number',
+                        ),
+                        keyboardType: TextInputType.phone,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(RegExp(
+                              r'^\d+[\.,-]?\d*?$')), // Allow digits, ., -, and ,
+                        ],
+                        onChanged: (value) {
+                          setState(() {
+                            _phone = value;
+                          });
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
+                child: Row(
+                  children: [
+                    const Spacer(),
+                    GestureDetector(
+                      onTap: () async {
+                        _showConfirmationDialog(context);
+                      },
+                      child: const Text(
+                        "Reset password",
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Color(0xff333333),
+                          fontFamily: 'Frodoka',
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Pet section
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0, 0, 0, 12),
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.fromLTRB(0, 0, 0, 12),
+                        child: Row(
+                          children: [
+                            Text('Your Family', style: TextStyle(fontSize: 16))
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        width: double.maxFinite,
+                        height: MediaQuery.of(context).size.height * 0.41,
+                        child: _petCount == 0
+                            ? const Center(
+                                child: Text(
+                                  'No pet in family right now',
+                                  style: TextStyle(
+                                    fontFamily: 'Fredoka',
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              )
+                            : GridView.builder(
+                                padding: EdgeInsets.zero,
+                                itemCount: _petCount,
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  mainAxisSpacing: 15.0,
+                                  crossAxisSpacing: 12.0,
+                                  childAspectRatio: 2.05 / 2.6,
+                                ),
+                                itemBuilder: (context, index) {
+                                  final pet = _petDetails[index];
+                                  return Card(
+                                    color:
+                                        Theme.of(context).colorScheme.tertiary,
+                                    margin:
+                                        const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                    elevation: 1,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Stack(
+                                      children: [
+                                        Opacity(
+                                          opacity:
+                                              0.55, // Adjust the opacity level as needed.
+                                          child: Column(
+                                            children: [
+                                              SizedBox(
+                                                width: double.infinity,
+                                                height: 155,
+                                                child: ClipRRect(
+                                                    borderRadius:
+                                                        const BorderRadius
+                                                            .vertical(
+                                                      top: Radius.circular(8),
+                                                    ),
+                                                    child: Container(
+                                                      color:
+                                                          const Color.fromARGB(
+                                                              255,
+                                                              227,
+                                                              225,
+                                                              225),
+                                                      child: pet['img'] != '' &&
+                                                              pet['img'] != null
+                                                          ? Image.network(
+                                                              pet['img'],
+                                                              fit: BoxFit.cover,
+                                                              errorBuilder:
+                                                                  (context,
+                                                                      error,
+                                                                      stackTrace) {
+                                                                return const Center(
+                                                                  child: Text(
+                                                                    'No preview image',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          16,
+                                                                      color: Color.fromARGB(
+                                                                          255,
+                                                                          135,
+                                                                          135,
+                                                                          135), // Customize text color if needed
+                                                                    ),
+                                                                  ),
+                                                                );
+                                                              },
+                                                            )
+                                                          : const Center(
+                                                              child: Text(
+                                                                'No preview image',
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontSize: 16,
+                                                                  color: Colors
+                                                                      .grey, // Customize text color if needed
+                                                                ),
+                                                              ),
+                                                            ),
+                                                    )),
+                                              ),
+                                              Expanded(
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.fromLTRB(
+                                                          8, 5, 8, 5),
+                                                  child: Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.end,
+                                                    children: [
+                                                      Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            pet['name'],
+                                                            style: Theme.of(
+                                                                    context)
+                                                                .textTheme
+                                                                .labelLarge,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            '${pet['sex']} - ${pet['age']}',
+                                                            style: Theme.of(
+                                                                    context)
+                                                                .textTheme
+                                                                .displayMedium,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                          ),
+                                                          const Spacer(),
+                                                          if (pet['status'] !=
+                                                                  null &&
+                                                              pet['status'] !=
+                                                                  "")
+                                                            Container(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .symmetric(
+                                                                horizontal: 11,
+                                                                vertical: 1.5,
+                                                              ),
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                color: pet['status'] ==
+                                                                        'Lost'
+                                                                    ? Colors.red
+                                                                    : Colors
+                                                                        .green,
+                                                                shape: BoxShape
+                                                                    .rectangle,
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            8),
+                                                              ),
+                                                              child: Text(
+                                                                pet['status'],
+                                                                style: Theme.of(
+                                                                        context)
+                                                                    .textTheme
+                                                                    .displaySmall,
+                                                              ),
+                                                            ),
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Positioned(
+                                          top: 60,
+                                          right: 60,
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              _showDeleteConfirmationDialog(
+                                                  context, pet['id']);
+                                            },
+                                            child: Container(
+                                              padding: const EdgeInsets.all(6),
+                                              child: const Icon(
+                                                Icons.delete_outline_rounded,
+                                                size: 27,
+                                                color: Colors.black,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const BottomNavPage(
+                              page: 1,
+                            ),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white),
+                      child: const Text(
+                        'Cancel',
+                        style: TextStyle(
+                            fontSize: 20,
+                            color: Color(0xffBFBFBF),
+                            fontFamily: 'Frodoka',
+                            fontWeight: FontWeight.w500),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 15,
+                  ),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        // Handle save logic, such as updating the user data in the backend
+                        _saveChanges();
+                      },
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xffC8A48A)),
+                      child: const Text(
+                        'Confirm',
+                        style: TextStyle(
+                            fontSize: 20,
+                            color: Color(0xffFFFFFF),
+                            fontFamily: 'Frodoka',
+                            fontWeight: FontWeight.w500),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _saveChanges() async {
+    bool isValid = true;
+
+    if (_username == '' || _username.isEmpty) {
+      _showDialog("Username");
+      isValid = false;
+    } else if (_address == '' || _address.isEmpty) {
+      _showDialog("Address");
+      isValid = false;
+    } else if (_phone == '' || _phone.isEmpty) {
+      _showDialog("Phone number");
+      isValid = false;
+    }
+
+    // If any of the fields are invalid, return early to avoid updating with empty values.
+    if (!isValid) return;
+
+    print('Updated username: $_username');
+    print('Updated address: $_address');
+    print('Updated phone: $_phone');
+
+    // Delete all pets in the deleted list
+    for (String petId in _deletedPetIds) {
+      try {
+        final response = await Caller.dio.delete("/pet/$petId");
+        if (response.statusCode == 200) {
+          print('Pet with ID: $petId deleted successfully from API');
+        } else {
+          print('Failed to delete pet with ID: $petId');
+        }
+      } catch (e) {
+        print('Error occurred while deleting pet with ID: $petId: $e');
+      }
+    }
+
+    // Reset the deleted pet IDs list
+    _deletedPetIds.clear();
+
+    // Proceed with the API call to update user data
+    try {
+      final response = await Caller.dio.put(
+        "/user/$_uid",
+        data: {
+          "username": _username,
+          "address": _address,
+          "phone": _phone,
+          "image": _image,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        print('User data updated successfully');
+        // Optionally, show a success message or navigate back
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const BottomNavPage(
+              page: 1,
+            ),
+          ),
+        );
+      } else {
+        print('Failed to update user data: ${response.statusCode}');
+        _showError("Failed to update user data. Please try again.");
+      }
+    } catch (e) {
+      print('Error occurred while updating user data: $e');
+      _showError("An error occurred. Please try again later.");
+    }
+  }
+
+  Future _showDialog(String show) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Invalid ' + show),
+          content: Text(show + ' should not be empty.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showError(String show) async {
+    if (mounted) {
+      return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Error'),
+            content: Text(show),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      // Handle the case where the widget is not mounted, if necessary.
+      print("Widget is not mounted, cannot show dialog.");
+      return Future.value();
+    }
+  }
+}
