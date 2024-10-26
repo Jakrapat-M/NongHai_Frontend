@@ -50,7 +50,7 @@ class NotificationService {
         // Navigate to Chat Page
         MaterialPageRoute materialPageRoute = MaterialPageRoute(
           builder: (context) => ChatRoomPage(
-            receiverID: message.data['chat_with'],
+            receiverID: message.data['identifer'],
           ),
         );
 
@@ -81,7 +81,7 @@ class NotificationService {
 
   void firebaseMessagingForegroundHandler(RemoteMessage message) {
     // print(object)
-    final hideNoti = ShowOrHideNoti().showOrHideNoti(message.data['chat_with']);
+    final hideNoti = ShowOrHideNoti().showOrHideNoti(message.data['identifer']);
     if (message.notification != null && !hideNoti) {
       final snackbar = SnackBar(
         backgroundColor: Colors.white,
