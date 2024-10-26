@@ -81,7 +81,11 @@ class NotificationService {
 
   void firebaseMessagingForegroundHandler(RemoteMessage message) {
     // print(object)
-    final hideNoti = ShowOrHideNoti().showOrHideNoti(message.data['identifer']);
+    var hideNoti = false;
+    if (message.data['navigate_to'] == 'chat') {
+      hideNoti = ShowOrHideNoti().showOrHideNoti(message.data['identifer']);
+    }
+
     if (message.notification != null && !hideNoti) {
       final snackbar = SnackBar(
         backgroundColor: Colors.white,
