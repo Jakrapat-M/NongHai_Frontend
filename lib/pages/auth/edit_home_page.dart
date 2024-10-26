@@ -1,8 +1,10 @@
-// ignore_for_file: prefer_interpolation_to_compose_strings, avoid_print, unnecessary_null_comparison, use_build_context_synchronously, non_constant_identifier_names
+// ignore_for_file: prefer_interpolation_to_compose_strings, avoid_print, unnecessary_null_comparison, use_build_context_synchronously, non_constant_identifier_names, prefer_typing_uninitialized_variables
 
 // import 'dart:io';
 // import 'dart:typed_data'; //unnecessary
 
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -27,7 +29,9 @@ class _EditHomePageState extends State<EditHomePage> {
   late String _username;
   late String _address;
   late String _phone;
-  late String _image;
+  late String _image = '';
+  // var image;
+  late String? imgUrl;
   late List<dynamic> _petDetails;
   int _petCount = 0;
   XFile? _newImage;
@@ -40,9 +44,6 @@ class _EditHomePageState extends State<EditHomePage> {
   void initState() {
     super.initState();
     _initializeUserData();
-    _usernameController.text = _username;
-    _addressController.text = _address;
-    _phoneController.text = _phone;
   }
 
   @override
@@ -62,6 +63,11 @@ class _EditHomePageState extends State<EditHomePage> {
     _image = widget.userData['image'] ?? '';
     _petDetails = widget.userData['pets'] ?? '';
     _petCount = _petDetails.length;
+    imgUrl = '';
+
+    _usernameController.text = _username;
+    _addressController.text = _address;
+    _phoneController.text = _phone;
 
     setState(() {
       _isLoading = false;
@@ -69,71 +75,90 @@ class _EditHomePageState extends State<EditHomePage> {
   }
 
   Future<void> _pickImage() async {
-    var status = await Permission.storage.request();
-    var cameraStatus = await Permission.camera.request();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'Select Image Source',
+            textAlign: TextAlign.center,
+          ),
+          content: SizedBox(
+            height: 100,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    TextButton(
+                      child: const Text('Camera'),
+                      onPressed: () async {
+                        Navigator.of(context).pop();
 
-    if (status.isGranted && cameraStatus.isGranted) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text(
-              'Select Image Source',
-              textAlign: TextAlign.center,
-            ),
-            content: SizedBox(
-              height: 100,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      TextButton(
-                        child: const Text('Camera'),
-                        onPressed: () async {
-                          Navigator.of(context).pop();
+                        // Request camera permission each time
+                        var cameraStatus = await Permission.camera.request();
+
+                        if (cameraStatus.isGranted) {
                           final ImagePicker picker = ImagePicker();
                           final XFile? selectedImage = await picker.pickImage(
-                              source: ImageSource.camera);
+                            source: ImageSource.camera,
+                          );
                           if (selectedImage != null) {
                             setState(() {
                               _newImage = selectedImage;
                             });
-                            await SaveProfile();
                           }
-                        },
-                      ),
-                      const SizedBox(width: 20),
-                      TextButton(
-                        child: const Text('Gallery'),
-                        onPressed: () async {
-                          Navigator.of(context).pop();
-                          final ImagePicker picker = ImagePicker();
-                          final XFile? selectedImage = await picker.pickImage(
-                              source: ImageSource.gallery);
-                          if (selectedImage != null) {
+                        } else {
+                          _showMessage(
+                            'Camera permission denied. Please allow permission in settings.',
+                          );
+                        }
+                      },
+                    ),
+                    const SizedBox(width: 20),
+                    TextButton(
+                      child: const Text('Gallery'),
+                      onPressed: () async {
+                        Navigator.of(context).pop();
+
+                        // Request storage permission for gallery access
+                        var galleryStatus = await Permission.storage.request();
+
+                        if (galleryStatus.isGranted) {
+                          FilePickerResult? result =
+                              await FilePicker.platform.pickFiles(
+                            type: FileType.image,
+                            allowMultiple: false,
+                          );
+
+                          if (result != null && result.files.isNotEmpty) {
+                            String path = result.files.single.path!;
                             setState(() {
-                              _newImage = selectedImage;
+                              _newImage = XFile(path);
                             });
-                            await SaveProfile();
+                          } else {
+                            _showMessage('No file selected.');
                           }
-                        },
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                        } else {
+                          _showMessage(
+                            'Storage permission denied. Please allow permission in settings.',
+                          );
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ],
             ),
-          );
-        },
-      );
-    } else {
-      _showError('Storage permission denied');
-    }
+          ),
+        );
+      },
+    );
   }
 
   Future<void> SaveProfile() async {
+    print(_newImage);
     if (_newImage != null) {
       try {
         // Convert the image file to Uint8List for uploading
@@ -143,24 +168,27 @@ class _EditHomePageState extends State<EditHomePage> {
         String folderPath = 'profileImage/$_uid.jpg'; // Save as userId.jpg
 
         // Save the profile image and get the new image URL
-        String imgUrl = await StoreProfile().saveData(
+        imgUrl = await StoreProfile().saveData(
           userId: _uid,
           file: imageFile,
           folderPath: folderPath,
         );
+        // print(imgUrl);
 
         // Update the state with the new image URL
-        setState(() {
-          _image = imgUrl; // Update the local image URL with the new one
-        });
+        // setState(() {
+        // _image = imgUrl!; // Update the local image URL with the new one
+        // });
+        print(_image);
 
         print('Uploaded image URL: $imgUrl');
       } catch (e) {
         _showError("Failed to update profile image: $e");
       }
-    } else {
-      _showError("Can't update new profile");
     }
+    // else {
+    //   _showError("Can't update new profile");
+    // }
   }
 
   // Function to show delete confirmation dialog
@@ -299,14 +327,19 @@ class _EditHomePageState extends State<EditHomePage> {
                 children: [
                   // CircleAvatar with opacity
                   Opacity(
-                    opacity: 0.55, // Set opacity to 60%
+                    opacity: 0.55, // Set opacity to 55%
                     child: CircleAvatar(
                       radius: 47,
-                      backgroundImage: (_image.isNotEmpty)
-                          ? NetworkImage(_image) // Load image from URL
-                          : const AssetImage(
-                                  'assets/images/default_profile.png')
-                              as ImageProvider, // Fallback to a placeholder if _image is empty
+                      backgroundImage: (_newImage !=
+                              null) // Check if a new image is selected
+                          ? FileImage(File(_newImage!
+                              .path)) // Load image from the newly selected XFile
+                          : (_image != null && _image.isNotEmpty)
+                              ? NetworkImage(
+                                  _image) // Load image from URL if no new image is selected
+                              : const AssetImage(
+                                      'assets/images/default_profile.png') // Fallback to a placeholder if no image exists
+                                  as ImageProvider,
                     ),
                   ),
                   // Icon on top of the CircleAvatar
@@ -468,7 +501,7 @@ class _EditHomePageState extends State<EditHomePage> {
                         keyboardType: TextInputType.phone,
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(RegExp(
-                              r'^\d+[\.,-]?\d*?$')), // Allow digits, ., -, and ,
+                              r'^[\d\-,.]*$')) // Allow digits, ., -, and ,
                         ],
                         onChanged: (value) {
                           setState(() {
@@ -758,6 +791,7 @@ class _EditHomePageState extends State<EditHomePage> {
                     child: ElevatedButton(
                       onPressed: () {
                         // Handle save logic, such as updating the user data in the backend
+                        // SaveProfile();
                         _saveChanges();
                       },
                       style: ElevatedButton.styleFrom(
@@ -781,8 +815,16 @@ class _EditHomePageState extends State<EditHomePage> {
     );
   }
 
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      // No casting needed
+      SnackBar(content: Text(message)),
+    );
+  }
+
   Future<void> _saveChanges() async {
     bool isValid = true;
+    await SaveProfile();
 
     if (_username == '' || _username.isEmpty) {
       _showDialog("Username");
@@ -820,6 +862,8 @@ class _EditHomePageState extends State<EditHomePage> {
     _deletedPetIds.clear();
 
     // Proceed with the API call to update user data
+    // print(_image);
+    // print(imgUrl);
     try {
       final response = await Caller.dio.put(
         "/user/$_uid",
@@ -827,7 +871,7 @@ class _EditHomePageState extends State<EditHomePage> {
           "username": _username,
           "address": _address,
           "phone": _phone,
-          "image": _image,
+          "image": imgUrl,
         },
       );
 

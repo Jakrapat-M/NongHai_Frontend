@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print, unnecessary_null_comparison, prefer_const_constructors, use_build_context_synchronously
 
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -55,78 +56,86 @@ class _AddPetProfilePageState extends State<AddPetProfilePage> {
   }
 
   Future<void> _pickImage() async {
-    // Check storage permission status first
-    var status = await Permission.storage.status;
-    var cameraStatus = await Permission.camera.request();
-    if (status.isDenied) {
-      // If the permission is denied, request permission
-      status = await Permission.storage.request();
-    } else if (cameraStatus.isDenied) {
-      cameraStatus = await Permission.camera.request();
-    }
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'Select Image Source',
+            textAlign: TextAlign.center,
+          ),
+          content: SizedBox(
+            height: 100,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    TextButton(
+                      child: const Text('Camera'),
+                      onPressed: () async {
+                        Navigator.of(context).pop();
 
-    if (status.isGranted && cameraStatus.isGranted) {
-      // Show dialog to choose image source
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text(
-              'Select Image Source',
-              textAlign: TextAlign.center,
-            ),
-            content: SizedBox(
-              height: 100,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      TextButton(
-                        child: const Text('Camera'),
-                        onPressed: () async {
-                          Navigator.of(context).pop(); // Close the dialog
+                        // Request camera permission each time
+                        var cameraStatus = await Permission.camera.request();
+
+                        if (cameraStatus.isGranted) {
                           final ImagePicker picker = ImagePicker();
                           final XFile? selectedImage = await picker.pickImage(
-                              source: ImageSource.camera);
+                            source: ImageSource.camera,
+                          );
                           if (selectedImage != null) {
                             setState(() {
                               _image = selectedImage;
                             });
                           }
-                        },
-                      ),
-                      const SizedBox(width: 20),
-                      TextButton(
-                        child: const Text('Gallery'),
-                        onPressed: () async {
-                          Navigator.of(context).pop(); // Close the dialog
-                          final ImagePicker picker = ImagePicker();
-                          final XFile? selectedImage = await picker.pickImage(
-                              source: ImageSource.gallery);
-                          if (selectedImage != null) {
+                        } else {
+                          _showMessage(
+                            'Camera permission denied. Please allow permission in settings.',
+                          );
+                        }
+                      },
+                    ),
+                    const SizedBox(width: 20),
+                    TextButton(
+                      child: const Text('Gallery'),
+                      onPressed: () async {
+                        Navigator.of(context).pop();
+
+                        // Request storage permission for gallery access
+                        var galleryStatus = await Permission.storage.request();
+
+                        if (galleryStatus.isGranted) {
+                          FilePickerResult? result =
+                              await FilePicker.platform.pickFiles(
+                            type: FileType.image,
+                            allowMultiple: false,
+                          );
+
+                          if (result != null && result.files.isNotEmpty) {
+                            String path = result.files.single.path!;
                             setState(() {
-                              _image = selectedImage;
+                              _image = XFile(path);
                             });
+                          } else {
+                            _showMessage('No file selected.');
                           }
-                        },
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                        } else {
+                          _showMessage(
+                            'Storage permission denied. Please allow permission in settings.',
+                          );
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ],
             ),
-          );
-        },
-      );
-    } else if (status.isPermanentlyDenied) {
-      // If permission is permanently denied, you can prompt the user to go to settings
-      _showMessage(
-          'Storage permission is permanently denied. Please enable it in app settings.');
-    } else {
-      _showMessage('Storage permission denied');
-    }
+          ),
+        );
+      },
+    );
   }
 
   void _showMessage(String message) {

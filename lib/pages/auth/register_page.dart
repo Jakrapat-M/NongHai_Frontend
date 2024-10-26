@@ -30,75 +30,95 @@ class _RegisterPageState extends State<RegisterPage> {
   // }
 
   void createAccount(BuildContext context) async {
-    if (passwordController.text == confirmPasswordController.text &&
-        passwordController.text.length >= 6) {
-      final email = emailController.text;
-      final FirebaseAuth auth = FirebaseAuth.instance;
+    final email = emailController.text.trim();
+    final username = usernameController.text.trim();
+    final password = passwordController.text;
+    final confirmPassword = confirmPasswordController.text;
 
-      try {
-        // Sign up with Firebase Authentication
-        UserCredential userCredential =
-            await auth.createUserWithEmailAndPassword(
-          email: email,
-          password: passwordController.text,
-        );
+    if (email.isEmpty ||
+        username.isEmpty ||
+        password.isEmpty ||
+        confirmPassword.isEmpty) {
+      // Show error message if any field is empty
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill out all fields.')),
+      );
+      return; // Return early if validation fails
+    }
 
-        // Get the Firebase User's UID
-        String uid = userCredential.user?.uid ?? "";
+    if (!isValidEmail(email)) {
+      // Show error if the email is not valid
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a valid email address.')),
+      );
+      return;
+    }
 
-        // Prepare user data for the next step
-        final userData = {
-          "id": uid,
-          "username": usernameController.text,
-          "name": "-",
-          "surname": "-",
-          "email": email,
-          "password": passwordController.text,
-          "phone": "-",
-          "address": "-",
-          "latitude": 13.7540,
-          "longitude": 100.5014, // latitude / longitude of TH
-          "image": ""
-        };
+    if (password != confirmPassword) {
+      // Show error if passwords don't match
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Passwords do not match.')),
+      );
+      return;
+    }
 
-        // Navigate to Add Profile Image page and pass userData
-        if (mounted) {
-          Navigator.pushReplacementNamed(context, '/addProfileImage',
-              arguments: userData);
-        }
-      } on FirebaseAuthException catch (e) {
-        String errorMessage;
-        if (e.code == 'email-already-in-use') {
-          errorMessage =
-              'The provided email is already registered. Please use a different email.';
-        } else {
-          errorMessage = e.message ?? 'An error occurred. Please try again.';
-        }
+    if (password.length < 6) {
+      // Show error if password is less than 6 characters
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Password must be at least 6 characters long.')),
+      );
+      return;
+    }
 
-        if (mounted) {
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: const Text('Error'),
-              content: Text(errorMessage),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('OK'),
-                ),
-              ],
-            ),
-          );
-        }
+    final FirebaseAuth auth = FirebaseAuth.instance;
+
+    try {
+      // Sign up with Firebase Authentication
+      UserCredential userCredential = await auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      // Get the Firebase User's UID
+      String uid = userCredential.user?.uid ?? "";
+
+      // Prepare user data for the next step
+      final userData = {
+        "id": uid,
+        "username": username,
+        "name": "-",
+        "surname": "-",
+        "email": email,
+        "password": password,
+        "phone": "-",
+        "address": "-",
+        "latitude": 13.7540,
+        "longitude": 100.5014, // latitude / longitude of TH
+        "image": ""
+      };
+
+      // Navigate to Add Profile Image page and pass userData
+      if (mounted) {
+        // Navigator.of(context).popUntil((route) => route.isFirst);
+        Navigator.pushReplacementNamed(context, '/addProfileImage',
+            arguments: userData);
       }
-    } else {
+    } on FirebaseAuthException catch (e) {
+      String errorMessage;
+      if (e.code == 'email-already-in-use') {
+        errorMessage =
+            'The provided email is already registered. Please use a different email.';
+      } else {
+        errorMessage = e.message ?? 'An error occurred. Please try again.';
+      }
+
       if (mounted) {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Invalid Password'),
-            content: const Text(
-                'Please ensure your password has at least 6 characters and matches.'),
+            title: const Text('Error'),
+            content: Text(errorMessage),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),

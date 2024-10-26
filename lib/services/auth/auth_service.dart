@@ -1,57 +1,223 @@
+// ignore_for_file: use_build_context_synchronously, avoid_print
+
+// import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:nonghai/services/auth/login_or_registoer.dart';
+import 'package:nonghai/services/caller.dart';
 
 class AuthService {
-  // instance of auth
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-
-  //instance of firestore
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  //get user
   User? getCurrentUser() => _firebaseAuth.currentUser;
 
-  //sign in user
-  Future<UserCredential> signInWithEmailandPassword(String email, String password) async {
+  Future<bool> signInWithEmailAndPassword(String email, String password) async {
     try {
-      //sign in
-      UserCredential userCredential =
-          await _firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
+      // Sign in
+      UserCredential userCredential = await _firebaseAuth
+          .signInWithEmailAndPassword(email: email, password: password);
 
-      //add a new document for the user in users collection if it doens not already exist
-      _firestore
-          .collection('users')
-          .doc(userCredential.user!.uid)
-          .set({'uid': userCredential.user!.uid, 'email': email}, SetOptions(merge: true));
+      // Add a new document for the user in users collection if it does not already exist
+      await _firestore.collection('users').doc(userCredential.user!.uid).set(
+          {'uid': userCredential.user!.uid, 'email': email},
+          SetOptions(merge: true));
 
-      return userCredential;
-    }
-    // catch any errors
-    on FirebaseAuthException catch (e) {
-      throw Exception(e.code);
+      return true; // Return true on success
+    } on FirebaseAuthException catch (e) {
+      // Handle specific FirebaseAuthException cases
+      if (e.code == 'user-not-found') {
+        return false; // No user found
+      } else if (e.code == 'wrong-password') {
+        return false; // Incorrect password
+      } else {
+        return false; // Other errors
+      }
+    } catch (e) {
+      // Handle other errors
+      return false; // General failure
     }
   }
 
-  //create new user
-  Future<UserCredential> signUpWithEmailandPassword(String email, String password) async {
+  Future<UserCredential> signUpWithEmailAndPassword(
+      String email, String password) async {
     try {
-      UserCredential userCredential =
-          await _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
-
-      //after creating the user, create a new document for the user in the users collection
-      _firestore
+      UserCredential userCredential = await _firebaseAuth
+          .createUserWithEmailAndPassword(email: email, password: password);
+      await _firestore
           .collection('users')
           .doc(userCredential.user!.uid)
           .set({'uid': userCredential.user!.uid, 'email': email});
-
       return userCredential;
     } on FirebaseAuthException catch (e) {
       throw Exception(e.code);
     }
   }
 
-  //sign user out
   Future<void> signOut() async {
     return await _firebaseAuth.signOut();
+  }
+
+  // Change to public method
+  Future<void> signInWithCustomToken(BuildContext context) async {
+    String? uid = _firebaseAuth.currentUser?.uid;
+    if (uid == null) {
+      _showMessage('No user is currently signed in.');
+      return;
+    }
+
+    try {
+      String customToken = await fetchCustomToken(uid);
+      await _firebaseAuth.signInWithCustomToken(customToken);
+      print("re-signin success");
+      // Navigator.pushReplacementNamed(context, '/');
+    } catch (e) {
+      print("error: $e");
+      _showMessage('Sign-in failed: ${e.toString()}');
+    }
+  }
+
+  Future<String> fetchCustomToken(String uid) async {
+    try {
+      final response = await Caller.dio
+          .post("/user/$uid/token"); // Adjust the request type if necessary
+
+      // Print the response data for debugging
+      print('Response data: ${response.data}');
+      print(response.statusCode);
+
+      // Check if the response is successful
+      if (response.statusCode == 200) {
+        // If response.data is a Map, directly access the customToken
+        if (response.data is Map<String, dynamic>) {
+          final customToken =
+              response.data['customToken']; // Access the customToken
+
+          if (customToken is String) {
+            print(customToken);
+            return customToken; // Return the customToken as a String
+          } else {
+            throw Exception('Custom token is not a String.');
+          }
+        } else {
+          throw Exception('Unexpected response format. Expected a Map.');
+        }
+      } else {
+        throw Exception(
+            'Failed to load custom token, status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error fetching custom token: ${e.toString()}');
+    }
+  }
+
+  void _showMessage(String message) {
+    print(
+        message); // Example, consider using SnackBar or AlertDialog for better UX
+  }
+
+  Future<void> deleteUser(BuildContext context) async {
+    User? user = _firebaseAuth.currentUser;
+
+    if (user == null) {
+      _showErrorDialog(context, 'No user is currently signed in.');
+      return;
+    }
+
+    // Prompt the user for their password
+    // print("ppp");
+    String password = await _promptForPassword(context);
+    // print("ooo");
+    if (password.isEmpty) {
+      _showErrorDialog(context, 'Password cannot be empty.');
+      return;
+    }
+    // print('iii');
+
+    try {
+      // Re-authenticate with the provided password
+      final credential =
+          EmailAuthProvider.credential(email: user.email!, password: password);
+      await user.reauthenticateWithCredential(credential);
+
+      // Delete the user from FirebaseAuth and Firestore
+      await user.delete();
+      await _firestore.collection('users').doc(user.uid).delete();
+
+      // After deletion, navigate to the register page
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                const LoginOrRegistoer()), // Replace with your RegisterPage
+        (route) => false,
+      );
+    } on FirebaseAuthException catch (e) {
+      // Show a specific error based on FirebaseAuthException codes
+      switch (e.code) {
+        case 'requires-recent-login':
+          _showErrorDialog(
+              context, 'Please sign in again to delete your account.');
+          break;
+        case 'user-not-found':
+          _showErrorDialog(context, 'User not found. Please sign in again.');
+          break;
+        default:
+          _showErrorDialog(context,
+              'An error occurred: Please check if your password is correct.');
+          break;
+      }
+    } catch (e) {
+      // General error handling
+      _showErrorDialog(context, 'An unexpected error occurred: $e');
+    }
+  }
+
+// Mockup of a function to prompt for a password
+  Future<String> _promptForPassword(BuildContext context) async {
+    return await showDialog<String>(
+          context: context,
+          builder: (context) {
+            TextEditingController passwordController = TextEditingController();
+            return AlertDialog(
+              title: const Text('Enter your password'),
+              content: TextField(
+                controller: passwordController,
+                obscureText: true,
+                decoration: const InputDecoration(labelText: 'Password'),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(passwordController.text);
+                  },
+                  child: const Text('Submit'),
+                ),
+              ],
+            );
+          },
+        ) ??
+        '';
+  }
+
+  void _showErrorDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Error'),
+          content: Text(message),
+          actions: [
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }

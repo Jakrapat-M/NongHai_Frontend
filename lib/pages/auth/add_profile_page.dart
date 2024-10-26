@@ -1,4 +1,5 @@
 // ignore_for_file: avoid_print, library_prefixes, use_build_context_synchronously
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nonghai/components/custom_button.dart';
@@ -19,6 +20,16 @@ class _AddProfilePageState extends State<AddProfilePage> {
   // final FirebaseAuth _auth = FirebaseAuth.instance; // Firebase Auth instance
 
   @override
+  void initState() {
+    super.initState();
+
+    // Close any open dialogs automatically when AddProfilePage is shown
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Navigator.of(context).popUntil((route) => route.isFirst);
+    });
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     // Retrieve the userData passed from the RegisterPage
@@ -27,68 +38,86 @@ class _AddProfilePageState extends State<AddProfilePage> {
   }
 
   Future<void> _pickImage() async {
-    // Request storage permission
-    var status = await Permission.storage.request();
-    var cameraStatus = await Permission.camera.request();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'Select Image Source',
+            textAlign: TextAlign.center,
+          ),
+          content: SizedBox(
+            height: 100,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    TextButton(
+                      child: const Text('Camera'),
+                      onPressed: () async {
+                        Navigator.of(context).pop();
 
-    if (status.isGranted && cameraStatus.isGranted) {
-      // Show dialog to choose image source
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text(
-              'Select Image Source',
-              textAlign: TextAlign.center,
-            ),
-            content: SizedBox(
-              height: 100,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      TextButton(
-                        child: const Text('Camera'),
-                        onPressed: () async {
-                          Navigator.of(context).pop();
+                        // Request camera permission each time
+                        var cameraStatus = await Permission.camera.request();
+
+                        if (cameraStatus.isGranted) {
                           final ImagePicker picker = ImagePicker();
                           final XFile? selectedImage = await picker.pickImage(
-                              source: ImageSource.camera);
+                            source: ImageSource.camera,
+                          );
                           if (selectedImage != null) {
                             setState(() {
                               _image = selectedImage;
                             });
                           }
-                        },
-                      ),
-                      const SizedBox(width: 20),
-                      TextButton(
-                        child: const Text('Gallery'),
-                        onPressed: () async {
-                          Navigator.of(context).pop();
-                          final ImagePicker picker = ImagePicker();
-                          final XFile? selectedImage = await picker.pickImage(
-                              source: ImageSource.gallery);
-                          if (selectedImage != null) {
+                        } else {
+                          _showMessage(
+                            'Camera permission denied. Please allow permission in settings.',
+                          );
+                        }
+                      },
+                    ),
+                    const SizedBox(width: 20),
+                    TextButton(
+                      child: const Text('Gallery'),
+                      onPressed: () async {
+                        Navigator.of(context).pop();
+
+                        // Request storage permission for gallery access
+                        var galleryStatus = await Permission.storage.request();
+
+                        if (galleryStatus.isGranted) {
+                          FilePickerResult? result =
+                              await FilePicker.platform.pickFiles(
+                            type: FileType.image,
+                            allowMultiple: false,
+                          );
+
+                          if (result != null && result.files.isNotEmpty) {
+                            String path = result.files.single.path!;
                             setState(() {
-                              _image = selectedImage;
+                              _image = XFile(path);
                             });
+                          } else {
+                            _showMessage('No file selected.');
                           }
-                        },
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                        } else {
+                          _showMessage(
+                            'Storage permission denied. Please allow permission in settings.',
+                          );
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ],
             ),
-          );
-        },
-      );
-    } else {
-      _showMessage('Storage permission denied');
-    }
+          ),
+        );
+      },
+    );
   }
 
   void _next() {

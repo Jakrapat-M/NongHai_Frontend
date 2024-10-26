@@ -2,6 +2,9 @@
 
 // import 'dart:typed_data';
 
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -30,11 +33,12 @@ class _EditPetPageState extends State<EditPetPage> {
       _note,
       _hair,
       _animalType,
+      image,
       _weight,
       _age,
       _selectedGender = '';
   // late int _weight;
-  var image;
+  // late dynamic image;
   XFile? _newImage;
   late Map<String, dynamic> petDetails;
   bool _isLoading = true;
@@ -138,6 +142,7 @@ class _EditPetPageState extends State<EditPetPage> {
     setState(() {
       _isLoading = true; // Optionally, show a loading indicator
     });
+    await SaveProfile();
     String name = nameController.text.isEmpty ? '-' : nameController.text;
     String breed =
         breedController.text.isEmpty ? 'Unknown' : breedController.text;
@@ -209,68 +214,93 @@ class _EditPetPageState extends State<EditPetPage> {
   }
 
   Future<void> _pickImage() async {
-    var status = await Permission.storage.request();
-    var cameraStatus = await Permission.camera.request();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'Select Image Source',
+            textAlign: TextAlign.center,
+          ),
+          content: SizedBox(
+            height: 100,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    TextButton(
+                      child: const Text('Camera'),
+                      onPressed: () async {
+                        Navigator.of(context).pop();
 
-    if (status.isGranted && cameraStatus.isGranted) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text(
-              'Select Image Source',
-              textAlign: TextAlign.center,
-            ),
-            content: SizedBox(
-              height: 100,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      TextButton(
-                        child: const Text('Camera'),
-                        onPressed: () async {
-                          Navigator.of(context).pop();
+                        // Request camera permission each time
+                        var cameraStatus = await Permission.camera.request();
+
+                        if (cameraStatus.isGranted) {
                           final ImagePicker picker = ImagePicker();
                           final XFile? selectedImage = await picker.pickImage(
-                              source: ImageSource.camera);
+                            source: ImageSource.camera,
+                          );
                           if (selectedImage != null) {
                             setState(() {
                               _newImage = selectedImage;
                             });
-                            await SaveProfile();
                           }
-                        },
-                      ),
-                      const SizedBox(width: 20),
-                      TextButton(
-                        child: const Text('Gallery'),
-                        onPressed: () async {
-                          Navigator.of(context).pop();
-                          final ImagePicker picker = ImagePicker();
-                          final XFile? selectedImage = await picker.pickImage(
-                              source: ImageSource.gallery);
-                          if (selectedImage != null) {
+                        } else {
+                          _showMessage(
+                            'Camera permission denied. Please allow permission in settings.',
+                          );
+                        }
+                      },
+                    ),
+                    const SizedBox(width: 20),
+                    TextButton(
+                      child: const Text('Gallery'),
+                      onPressed: () async {
+                        Navigator.of(context).pop();
+
+                        // Request storage permission for gallery access
+                        var galleryStatus = await Permission.storage.request();
+
+                        if (galleryStatus.isGranted) {
+                          FilePickerResult? result =
+                              await FilePicker.platform.pickFiles(
+                            type: FileType.image,
+                            allowMultiple: false,
+                          );
+
+                          if (result != null && result.files.isNotEmpty) {
+                            String path = result.files.single.path!;
                             setState(() {
-                              _newImage = selectedImage;
+                              _newImage = XFile(path);
                             });
-                            await SaveProfile();
+                          } else {
+                            _showMessage('No file selected.');
                           }
-                        },
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                        } else {
+                          _showMessage(
+                            'Storage permission denied. Please allow permission in settings.',
+                          );
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ],
             ),
-          );
-        },
-      );
-    } else {
-      _showError('Storage permission denied');
-    }
+          ),
+        );
+      },
+    );
+  }
+
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      // No casting needed
+      SnackBar(content: Text(message)),
+    );
   }
 
   Future<void> SaveProfile() async {
@@ -299,9 +329,10 @@ class _EditPetPageState extends State<EditPetPage> {
       } catch (e) {
         _showError("Failed to update profile image: $e");
       }
-    } else {
-      _showError("Can't update new profile");
     }
+    // else {
+    //   _showError("Can't update new profile");
+    // }
   }
 
   Future<void> _showError(String show) async {
@@ -395,15 +426,17 @@ class _EditPetPageState extends State<EditPetPage> {
                               Opacity(
                                 opacity: 0.55,
                                 child: CircleAvatar(
-                                    backgroundColor: Colors.grey.shade300,
-                                    radius: 125,
-                                    backgroundImage:
-                                        (image != null && image != '')
-                                            ? NetworkImage(
-                                                image) // Load image from URL
-                                            : null
-                                    // backgroundImage: AssetImage('assets/images/meme1.jpg'),
-                                    ),
+                                  backgroundColor: Colors.grey.shade300,
+                                  radius: 125,
+                                  backgroundImage: (_newImage !=
+                                          null) // Check if a new image is selected
+                                      ? FileImage(File(_newImage!
+                                          .path)) // Load image from the newly selected XFile
+                                      : (image != '' && image.isNotEmpty)
+                                          ? NetworkImage(
+                                              image) // Load image from URL if no new image is selected
+                                          : null,
+                                ),
                               ),
                               // Icon on top of the CircleAvatar
                               GestureDetector(

@@ -430,8 +430,8 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
                         keyboardType:
                             TextInputType.number, // Use the number keyboard
                         inputFormatters: [
-                          FilteringTextInputFormatter
-                              .digitsOnly, // Allow only digits
+                          FilteringTextInputFormatter.allow(
+                              RegExp(r'^\d*\.?\d*'))
                         ],
                       )),
                 ),

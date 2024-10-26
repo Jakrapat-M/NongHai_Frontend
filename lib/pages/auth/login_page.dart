@@ -19,17 +19,32 @@ class _LoginPageState extends State<LoginPage> {
   final passwordController = TextEditingController();
   TextEditingController forgetEmailController = TextEditingController();
 
-  void signIn() {
-    // final email = emailController.text;
-    // final password = passwordController.text;
+  void signIn() async {
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter both email and password.'),
+        ),
+      );
+      return; // Return early if validation fails
+    }
+
     final authService = AuthService();
-    try {
-      authService.signInWithEmailandPassword(
-          emailController.text, passwordController.text);
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(e.toString()),
-      ));
+    bool success =
+        await authService.signInWithEmailAndPassword(email, password);
+
+    if (success) {
+      // Handle successful sign-in (e.g., navigate to the next screen)
+    } else {
+      // Show an error message in a SnackBar
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Incorrect email or password. Please try again.'),
+        ),
+      );
     }
   }
 

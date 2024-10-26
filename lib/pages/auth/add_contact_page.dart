@@ -1,10 +1,9 @@
 // ignore_for_file: avoid_print, unnecessary_null_comparison, use_build_context_synchronously, non_constant_identifier_names
 
 import 'dart:io';
-import 'dart:typed_data';
-
 // import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 // import 'package:nonghai/pages/auth/add_pet_info_page.dart';
 import 'package:nonghai/pages/auth/add_pet_profile_page.dart';
@@ -228,6 +227,10 @@ class _AddContactPageState extends State<AddContactPage> {
                   ),
                   initialCountryCode: 'TH', // Set the initial country code
                   disableLengthCheck: true,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(
+                        RegExp(r'^[\d\-,.]*$')) // Allow digits, ., -, and ,
+                  ],
                   onChanged: (phone) {
                     setState(() {
                       _phoneNumber =

@@ -1,9 +1,12 @@
-// ignore_for_file: use_build_context_synchronously, avoid_print, prefer_typing_uninitialized_variables, unnecessary_null_comparison
+// ignore_for_file: use_build_context_synchronously, avoid_print, prefer_typing_uninitialized_variables, unnecessary_null_comparison, curly_braces_in_flow_control_structures
 
-import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+// import 'package:nonghai/pages/auth/login_page.dart';
 import 'package:nonghai/services/auth/auth_service.dart';
+import 'package:nonghai/services/auth/auth_service_inherited.dart';
+// import 'package:nonghai/services/auth/login_or_registoer.dart';
 import 'package:nonghai/services/caller.dart';
 import 'package:nonghai/pages/bottom_nav_page.dart';
 // import 'package:nonghai/services/navigatorObserver.dart';
@@ -18,37 +21,45 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  late final AuthService authService = AuthService();
   var _username, _address, _phone, _image;
   int _petCount = 0;
   List<dynamic> _pets = [], _petDetails = [];
   bool _isLoading = true;
   String _errorMessage = '';
   String uid = "";
-  var profileImageUrl;
+  bool _hasError = false;
+  // var profileImageUrl;
   bool _showOptions = false;
   //  bool _isEditing = false;
   final MyRouteObserver myRouteObserver = MyRouteObserver();
 
-  Future<void> fetchUserData() async {
+  // Function to handle user account deletion
+  void _deleteUser(BuildContext context) async {
+    final authService = AuthServiceInherited.of(context)?.authService;
+
+    if (authService != null) {
+      try {
+        await authService.signInWithCustomToken(context);
+        await authService.deleteUser(context);
+        // Navigator.pushAndRemoveUntil(
+        //   context,
+        //   MaterialPageRoute(
+        //       builder: (context) =>
+        //           const LoginOrRegistoer()), // replace with the actual route for your register page
+        //   (Route<dynamic> route) => false, // Remove all previous routes
+        // );
+      } catch (e) {
+        _showMessage(e.toString());
+      }
+    } else {
+      _showMessage('AuthService not available.');
+    }
+  }
+
+  Future<void> fetchUserData(BuildContext context) async {
     uid = FirebaseAuth.instance.currentUser!.uid;
-    DocumentSnapshot doc = await FirebaseFirestore.instance
-        .collection('userProfile')
-        .doc(uid)
-        .get();
-
-    if (doc.exists && mounted) {
-      setState(() {
-        profileImageUrl = doc['image'];
-      });
-    }
-
-    if (uid == null && mounted) {
-      setState(() {
-        _errorMessage = 'No user is currently signed in.';
-        _isLoading = false;
-      });
-      return;
-    }
+    print(uid);
 
     try {
       final response = await Caller.dio.get("/user/$uid");
@@ -70,18 +81,12 @@ class _HomePageState extends State<HomePage> {
         setState(() {
           _username = userData['data']['username'];
           _address = userData['data']['address'];
-
-          // Check if phone contains '/' and extract the number after it
           String fetchedPhone = userData['data']['phone'];
           _phone = fetchedPhone.contains('/')
               ? fetchedPhone.split('/').last
               : fetchedPhone;
-
-          // Pets data can be null, provide fallback
           _pets = userData['data']['pets'] ?? [];
           _petCount = _pets.length;
-
-          // Map pet details
           _petDetails = _pets.map((pet) {
             return {
               'id': pet['id'],
@@ -92,90 +97,95 @@ class _HomePageState extends State<HomePage> {
               'status': pet['status'] != null ? pet['status'].toString() : ''
             };
           }).toList();
-
-          // Set image, fallback to empty string if null
           _image = userData['data']['image'] ?? '';
           _isLoading = false;
         });
-      } else if (mounted) {
-        setState(() {
-          _errorMessage = 'Failed to fetch user data: ${response.statusCode}';
-          _isLoading = false;
-        });
-
-        // // Show a dialog with a sign-out option.
-        // if (mounted && _isCurrentPage) {
-        //   showDialog(
-        //     context: context,
-        //     builder: (context) {
-        //       return AlertDialog(
-        //         title: Text('An Error Occurred'),
-        //         content: Text(_errorMessage ?? 'Unknown error'),
-        //         actions: [
-        //           // TextButton(
-        //           //   onPressed: () {
-        //           //     Navigator.of(context).pop(); // Close the dialog
-        //           //   },
-        //           //   child: Text('Cancel'),
-        //           // ),
-        //           TextButton(
-        //             onPressed: () async {
-        //               Navigator.of(context).pop(); // Close the dialog
-        //               await FirebaseAuth.instance.signOut();
-        //               if (mounted) {
-        //                 Navigator.pushReplacementNamed(context, '/');
-        //               }
-        //             },
-        //             child: Text('Go back to login'),
-        //           ),
-        //         ],
-        //       );
-        //     },
-        //   );
-        // }
+      } else {
+        if (mounted) {
+          setState(() {
+            _errorMessage = 'Failed to fetch user data: ${response.statusCode}';
+            _isLoading = false;
+          });
+        }
       }
     } catch (e) {
-      if (mounted) {
-        setState(() {
-          print(e);
+      print("error: $e");
+      if (uid == null) {
+        if (mounted) {
           _errorMessage =
               'Error occurred while logging in, Please try again later.';
-          _isLoading = false;
-        });
-      }
+          // Use the context passed to this method for the dialog
+          _showErrorDialog(context, _errorMessage);
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      } else if (uid != null) {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+            _errorMessage =
+                'Error occurred while registering, Please register again.';
+            _hasError = true; // Set error state to true
+          });
 
-      // Show a dialog with a sign-out option.
-      // print(_isTextVisible);
-      // if (mounted) {
-      //   showDialog(
-      //     context: context,
-      //     builder: (context) {
-      //       return AlertDialog(
-      //         title: Text('An Error Occurred'),
-      //         content: Text(_errorMessage ?? 'Unknown error'),
-      //         actions: [
-      //           TextButton(
-      //             onPressed: () async {
-      //               Navigator.of(context).pop(); // Close the dialog
-      //               await FirebaseAuth.instance.signOut();
-      //               if (mounted) {
-      //                 Navigator.pushReplacementNamed(context, '/');
-      //               }
-      //             },
-      //             child: Text('Go back to login'),
-      //           ),
-      //         ],
-      //       );
-      //     },
-      //   );
-      // }
+          // Print the error message
+          print(_errorMessage);
+        }
+      }
     }
+  }
+
+// Function to show error dialog
+  void _showErrorDialog(BuildContext dialogContext, String message) {
+    showDialog(
+      context: dialogContext,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('An Error Occurred'),
+          content: Text(message),
+          actions: [
+            if (uid == null)
+              TextButton(
+                onPressed: () async {
+                  Navigator.of(dialogContext).pop(); // Close the dialog
+                  await FirebaseAuth.instance.signOut();
+                  if (mounted) {
+                    Navigator.pushReplacementNamed(dialogContext, '/');
+                  }
+                },
+                child: const Text('Go back to login'),
+              ),
+            if (uid != null)
+              TextButton(
+                onPressed: () async {
+                  // Close the dialog
+                  Navigator.of(dialogContext).pop();
+
+                  // Ensure _deleteUser is called only if still mounted
+                  if (mounted) {
+                    _deleteUser(context);
+                  }
+                },
+                child: const Text('Go to register'),
+              ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showMessage(String message) {
+    if (mounted)
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
   }
 
   @override
   void initState() {
     super.initState();
-    fetchUserData();
+    fetchUserData(context);
   }
 
   @override
@@ -187,6 +197,30 @@ class _HomePageState extends State<HomePage> {
       return const Scaffold(
         body: Center(
           child: CircularProgressIndicator(),
+        ),
+      );
+    }
+    if (_hasError) {
+      return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(_errorMessage), // Display error message
+              TextButton(
+                onPressed: () async {
+                  // Close the dialog
+                  // Navigator.of(context).pop();
+
+                  // Ensure _deleteUser is called only if still mounted
+                  if (mounted) {
+                    _deleteUser(context);
+                  }
+                },
+                child: const Text('Go to register'),
+              ),
+            ],
+          ),
         ),
       );
     }
