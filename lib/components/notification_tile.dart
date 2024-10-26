@@ -75,7 +75,7 @@ class _NotificationTileState extends State<NotificationTile> {
       builder: (context) => TrackingPage(
         petId: notiObject?.petId ?? 'Unknown Pet',
         petName: trackerNotiInfo?.petName ?? 'Unknown Pet',
-        petImage: trackerNotiInfo?.petImage ?? '',
+        petImage: notiObject?.image ?? '',
       ),
     );
     Navigator.of(context).push(materialPageRoute).then((value) {
@@ -141,8 +141,9 @@ class _NotificationTileState extends State<NotificationTile> {
             CircleAvatar(
               backgroundColor: Theme.of(context).colorScheme.secondary,
               radius: 30,
-              // TODO: Change to pet image
-              backgroundImage: const AssetImage("assets/images/default_profile.png"),
+              backgroundImage: notiObject?.image != null && notiObject!.image!.isNotEmpty
+                  ? NetworkImage(notiObject!.image!)
+                  : const AssetImage("assets/images/default_profile.png") as ImageProvider,
             ),
             const SizedBox(width: 16.0),
             Expanded(

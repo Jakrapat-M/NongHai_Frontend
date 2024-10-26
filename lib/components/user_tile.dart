@@ -9,6 +9,7 @@ import 'package:nonghai/services/chat/chat_service.dart';
 import 'package:nonghai/services/noti/show_or_hide_noti.dart';
 import 'package:nonghai/types/chat_room_data.dart';
 import 'package:nonghai/types/user_data.dart';
+import 'package:path/path.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import 'dart:ui'; // Import this for using BackdropFilter
@@ -91,7 +92,6 @@ class _UserTileState extends State<UserTile> {
   @override
   Widget build(BuildContext context) {
     final getLastMessage = chatService.getLastMessage(chatRoomID!);
-
     return StreamBuilder(
       stream: getLastMessage,
       builder: (context, snapshot) {
@@ -156,6 +156,10 @@ class _UserTileState extends State<UserTile> {
     String time,
     bool isRead,
   ) {
+    if (userData == null) {
+      return const SizedBox.shrink();
+    }
+
     final userLabel = userData?.name ?? "Unknown User";
     return GestureDetector(
       onTap: () {
@@ -191,8 +195,9 @@ class _UserTileState extends State<UserTile> {
             CircleAvatar(
               backgroundColor: Theme.of(context).colorScheme.secondary,
               radius: 30,
-              // TODO: change to user image
-              backgroundImage: const AssetImage("assets/images/default_profile.png"),
+              backgroundImage: userData?.image != null && userData!.image!.isNotEmpty
+                  ? NetworkImage(userData!.image!)
+                  : const AssetImage("assets/images/default_profile.png"),
             ),
             const SizedBox(width: 16.0),
             Expanded(
