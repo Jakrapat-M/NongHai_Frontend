@@ -32,4 +32,28 @@ class TokenService {
       }
     }
   }
+
+  Future<void> removeUserToken(String? uid) async {
+    if (uid == null) {
+      final authService = AuthService();
+      uid = authService.getCurrentUser()!.uid;
+    }
+
+    final token = await _firebaseMessaging.getToken();
+    if (kDebugMode) {
+      print('Deleting token for user: $uid Token: $token');
+    }
+    try {
+      // Delete a user token in the backend
+      final resp =
+          await Caller.dio.delete('/token/removeUserToken', data: {"user_id": uid, "token": token});
+      if (resp.statusCode == 200) {
+        print('Token deleted successfully');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Network error occurred: $e');
+      }
+    }
+  }
 }

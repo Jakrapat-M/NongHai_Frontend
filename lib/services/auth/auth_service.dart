@@ -62,6 +62,8 @@ class AuthService {
   }
 
   Future<void> signOut() async {
+    //delete the device token for the user
+    TokenService().removeUserToken(_firebaseAuth.currentUser!.uid);
     return await _firebaseAuth.signOut();
   }
 
