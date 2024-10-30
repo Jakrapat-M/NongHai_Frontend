@@ -159,7 +159,7 @@ class _UserTileState extends State<UserTile> {
       return const SizedBox.shrink();
     }
 
-    final userLabel = userData?.name ?? "Unknown User";
+    final userLabel = userData?.username ?? "Unknown User";
     return GestureDetector(
       onTap: () {
         MaterialPageRoute materialPageRoute = MaterialPageRoute(
