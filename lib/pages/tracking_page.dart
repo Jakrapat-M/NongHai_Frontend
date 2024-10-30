@@ -65,7 +65,7 @@ class _TrackingPageState extends State<TrackingPage> {
                 backgroundColor:
                     Theme.of(context).colorScheme.secondaryContainer,
                 foregroundImage:
-                    AssetImage(widget.petImage ?? "/assets/images/Logo.png"),
+                    NetworkImage(widget.petImage ?? "/assets/images/Logo.png"),
               ),
               const SizedBox(height: 15),
               Text(

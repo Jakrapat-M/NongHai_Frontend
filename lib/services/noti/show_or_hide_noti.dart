@@ -1,5 +1,3 @@
-import 'dart:math';
-
 String _chatingWith = '';
 
 class ShowOrHideNoti {
