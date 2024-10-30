@@ -4,8 +4,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:nonghai/pages/tracking_page.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../services/caller.dart';
+import 'edit_pet_page.dart';
 
 class PetProfilePage extends StatefulWidget {
   final String petID;
@@ -37,6 +39,21 @@ class _PetProfilePageState extends State<PetProfilePage> {
     return DateFormat('d MMMM yyyy').format(date);
   }
 
+  Future<void> _launchMap() async {
+    final lat = ownerData['latitude'];
+    final long = ownerData['longitude'];
+    if (lat != null && long != null) {
+      Uri url = Uri.parse(
+          'https://www.google.com/maps/search/?api=1&query=$lat,$long');
+      if (!await launchUrl(
+        url,
+        mode: LaunchMode.externalApplication,
+      )) {
+        throw Exception('Could not launch $url');
+      }
+    }
+  }
+
   Future<void> fetchPetDetails() async {
     try {
       final response = await Caller.dio.get("/pet/${widget.petID}");
@@ -56,8 +73,8 @@ class _PetProfilePageState extends State<PetProfilePage> {
             fetchOwnerData(petDetails['user_id']);
           }
           //อย่าลืมลบออก
-          fetchOwnerData(petDetails['user_id']);
-          print(ownerData['phone']);
+          // fetchOwnerData(petDetails['user_id']);
+          // print(ownerData['phone']);
 
           // print(isOwner);
           // print(isSafe);
@@ -109,10 +126,27 @@ class _PetProfilePageState extends State<PetProfilePage> {
     );
 
     if (response.statusCode == 200) {
+      petDetails['status'] = isSafe ? "Safe" : "Lost";
       print('Pet updated with image URL successfully.');
     } else {
       print('Failed to update pet image URL: ${response.data}');
     }
+  }
+
+  Future<void> _makePhoneCall() async {
+    final Uri launchUri = Uri(
+      scheme: 'tel',
+      path: phone,
+    );
+    await launchUrl(launchUri);
+  }
+
+  Future<void> _rescuerPhoneCall() async {
+    final Uri launchUri = Uri(
+      scheme: 'tel',
+      path: '086 602 3482',
+    );
+    await launchUrl(launchUri);
   }
 
   @override
@@ -120,16 +154,17 @@ class _PetProfilePageState extends State<PetProfilePage> {
     var image = petDetails['image'];
     print(petDetails);
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        body: Center(
+            child: CircularProgressIndicator(
+          backgroundColor: Theme.of(context).colorScheme.surface,
+        )),
+      );
     }
     if (_errorMessage.isNotEmpty) {
       return Center(child: Text(_errorMessage));
     }
-    // return Scaffold(
-    //   appBar: AppBar(
-    //     title: Text("tttt"),
-    //   ),
-    // );
     String? fetchedPhone = ownerData['phone'];
 
     if (fetchedPhone != null && fetchedPhone.isNotEmpty) {
@@ -207,19 +242,61 @@ class _PetProfilePageState extends State<PetProfilePage> {
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(0, 0, 0, 15),
                   child: CircleAvatar(
-                    radius: 125,
-                    backgroundImage: (image != null && image != '')
-                        ? NetworkImage(image) // Load image from URL
-                        : const AssetImage('assets/images/meme2.jpg')
-                            as ImageProvider, // Fallback to a placeholder if _image is empty
-                    // backgroundImage: AssetImage('assets/images/meme1.jpg'),
-                  ),
+                      backgroundColor: Colors.grey.shade300,
+                      radius: 125,
+                      backgroundImage: (image != null && image != '')
+                          ? NetworkImage(image) // Load image from URL
+                          : null
+                      // backgroundImage: AssetImage('assets/images/meme1.jpg'),
+                      ),
                 ),
               ),
-              Text(
-                petDetails['name'],
-                style: Theme.of(context).textTheme.headlineLarge,
-                overflow: TextOverflow.clip,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    petDetails['name'],
+                    style: Theme.of(context).textTheme.headlineLarge,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (isOwner)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(8, 7, 0, 0),
+                      child: GestureDetector(
+                        onTap: () async {
+                          // Navigate to edit page or perform edit action
+                          final result = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => EditPetPage(
+                                petData: petDetails,
+                              ),
+                            ),
+                          );
+                          if (result == true) {
+                            // Refresh the pet details here
+                            _isLoading = true;
+                            fetchPetDetails();
+                          }
+                        },
+                        child: Container(
+                          width: 30,
+                          height: 30,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Theme.of(context).colorScheme.secondary,
+                          ),
+                          child: const Center(
+                            child: Icon(
+                              Icons.edit,
+                              size: 19,
+                              color: Color(0xff333333),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 6),
@@ -333,7 +410,7 @@ class _PetProfilePageState extends State<PetProfilePage> {
                                 child: Center(
                                   child: Text(
                                     formatDateOfBirth(
-                                        petDetails['date_of_birth'] ?? ''),
+                                        petDetails['date_of_birth']),
                                     style:
                                         Theme.of(context).textTheme.titleMedium,
                                     textAlign: TextAlign.center,
@@ -513,6 +590,7 @@ class _PetProfilePageState extends State<PetProfilePage> {
                               child: Text(
                                 petDetails['note'],
                                 style: Theme.of(context).textTheme.titleMedium,
+                                overflow: TextOverflow.clip,
                               ),
                             ),
                           )
@@ -522,7 +600,7 @@ class _PetProfilePageState extends State<PetProfilePage> {
                   ],
                 ),
               ),
-              if (isOwner)
+              if (!isOwner)
                 Padding(
                     padding: const EdgeInsets.fromLTRB(5, 0, 5, 10),
                     child: Column(children: [
@@ -648,6 +726,7 @@ class _PetProfilePageState extends State<PetProfilePage> {
                               ),
                               onPressed: () {
                                 // Action for the second icon button
+                                _makePhoneCall();
                               },
                             ),
                           ),
@@ -668,12 +747,14 @@ class _PetProfilePageState extends State<PetProfilePage> {
                               ),
                               onPressed: () {
                                 // Action for the third icon button
+                                _launchMap();
                               },
                             ),
                           ),
                           ElevatedButton(
                             onPressed: () {
                               // Action for the text button
+                              _rescuerPhoneCall();
                             },
                             style: ElevatedButton.styleFrom(
                                 foregroundColor: Colors.green,

@@ -80,6 +80,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     if (_messageController.text.isNotEmpty) {
       await _chatService.sendMessage(
           widget.receiverID, _messageController.text);
+      await _chatService.sendMessage(
+          widget.receiverID, _messageController.text);
       _messageController.clear();
       scrollDown();
     }
