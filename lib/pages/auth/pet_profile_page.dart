@@ -3,7 +3,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:nonghai/pages/chat/chat_room_page.dart';
 import 'package:nonghai/pages/tracking_page.dart';
+import 'package:nonghai/services/chat/chat_service.dart';
+import 'package:nonghai/services/noti/show_or_hide_noti.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../services/caller.dart';
@@ -43,8 +46,7 @@ class _PetProfilePageState extends State<PetProfilePage> {
     final lat = ownerData['latitude'];
     final long = ownerData['longitude'];
     if (lat != null && long != null) {
-      Uri url = Uri.parse(
-          'https://www.google.com/maps/search/?api=1&query=$lat,$long');
+      Uri url = Uri.parse('https://www.google.com/maps/search/?api=1&query=$lat,$long');
       if (!await launchUrl(
         url,
         mode: LaunchMode.externalApplication,
@@ -104,8 +106,7 @@ class _PetProfilePageState extends State<PetProfilePage> {
         print(ownerData);
       } else {
         setState(() {
-          _errorMessage =
-              'Failed to fetch owner details: ${response.statusCode}';
+          _errorMessage = 'Failed to fetch owner details: ${response.statusCode}';
         });
       }
     } catch (e) {
@@ -178,6 +179,7 @@ class _PetProfilePageState extends State<PetProfilePage> {
     }
     print(phone);
 
+    final chatService = ChatService();
     return Scaffold(
       appBar: AppBar(
         // title: Text(petDetails['name'] ?? 'Pet Details'),
@@ -186,17 +188,14 @@ class _PetProfilePageState extends State<PetProfilePage> {
           child: Row(
             children: [
               Icon(
-                isSafe
-                    ? Icons.check_circle_outline_rounded
-                    : Icons.error_outline_rounded,
+                isSafe ? Icons.check_circle_outline_rounded : Icons.error_outline_rounded,
                 color: isSafe ? Colors.green : Colors.red,
                 size: 30,
               ),
               const Padding(padding: EdgeInsets.all(8)),
               Text(
                 isSafe ? 'SAFE' : 'LOST',
-                style: TextStyle(
-                    color: isSafe ? Colors.green : Colors.red, fontSize: 30),
+                style: TextStyle(color: isSafe ? Colors.green : Colors.red, fontSize: 30),
               ),
               const Spacer(),
               isOwner == true
@@ -215,8 +214,8 @@ class _PetProfilePageState extends State<PetProfilePage> {
                         );
                       },
                       child: Container(
-                        decoration: const BoxDecoration(
-                            shape: BoxShape.circle, color: Color(0xffE8E8E8)),
+                        decoration:
+                            const BoxDecoration(shape: BoxShape.circle, color: Color(0xffE8E8E8)),
                         padding: const EdgeInsets.all(7),
                         child: Image.asset(
                           'assets/images/location_track.png',
@@ -225,8 +224,7 @@ class _PetProfilePageState extends State<PetProfilePage> {
                         ),
                       ),
                     )
-                  : const SizedBox
-                      .shrink(), // This will show nothing if isOwner is false
+                  : const SizedBox.shrink(), // This will show nothing if isOwner is false
             ],
           ),
         ),
@@ -313,8 +311,7 @@ class _PetProfilePageState extends State<PetProfilePage> {
                 // decoration: BoxDecoration(
                 //     borderRadius: BorderRadius.circular(50),
                 //     color: Colors.red),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 1),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 1),
                 child: Text(
                   petDetails['sex'],
                   style: const TextStyle(
@@ -333,8 +330,7 @@ class _PetProfilePageState extends State<PetProfilePage> {
                         Expanded(
                           child: Container(
                             decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(18),
-                                color: Colors.white),
+                                borderRadius: BorderRadius.circular(18), color: Colors.white),
                             child: Padding(
                               padding: const EdgeInsets.symmetric(vertical: 8),
                               child: Column(
@@ -342,8 +338,7 @@ class _PetProfilePageState extends State<PetProfilePage> {
                                 children: [
                                   Text(
                                     'age',
-                                    style:
-                                        Theme.of(context).textTheme.titleSmall,
+                                    style: Theme.of(context).textTheme.titleSmall,
                                   ),
                                   Text(
                                     petDetails['age'],
@@ -362,8 +357,7 @@ class _PetProfilePageState extends State<PetProfilePage> {
                         Expanded(
                           child: Container(
                             decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(18),
-                                color: Colors.white),
+                                borderRadius: BorderRadius.circular(18), color: Colors.white),
                             child: Padding(
                               padding: const EdgeInsets.symmetric(vertical: 8),
                               child: Column(
@@ -371,8 +365,7 @@ class _PetProfilePageState extends State<PetProfilePage> {
                                 children: [
                                   Text(
                                     'weight',
-                                    style:
-                                        Theme.of(context).textTheme.titleSmall,
+                                    style: Theme.of(context).textTheme.titleSmall,
                                   ),
                                   Text(
                                     '${petDetails['weight']} kg',
@@ -409,10 +402,8 @@ class _PetProfilePageState extends State<PetProfilePage> {
                               Expanded(
                                 child: Center(
                                   child: Text(
-                                    formatDateOfBirth(
-                                        petDetails['date_of_birth']),
-                                    style:
-                                        Theme.of(context).textTheme.titleMedium,
+                                    formatDateOfBirth(petDetails['date_of_birth']),
+                                    style: Theme.of(context).textTheme.titleMedium,
                                     textAlign: TextAlign.center,
                                   ),
                                 ),
@@ -441,8 +432,7 @@ class _PetProfilePageState extends State<PetProfilePage> {
                               child: Text(
                                 petDetails['hair_color'],
                                 style: Theme.of(context).textTheme.titleMedium,
-                                textAlign: TextAlign
-                                    .center, // Center the text in the second part
+                                textAlign: TextAlign.center, // Center the text in the second part
                               ),
                             ),
                           ],
@@ -460,21 +450,16 @@ class _PetProfilePageState extends State<PetProfilePage> {
                                 color: Colors.white,
                               ),
                               child: Padding(
-                                padding:
-                                    const EdgeInsets.fromLTRB(20, 5, 20, 5),
+                                padding: const EdgeInsets.fromLTRB(20, 5, 20, 5),
                                 child: Row(
                                   children: [
                                     Text(
                                       'Eyes',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleSmall,
+                                      style: Theme.of(context).textTheme.titleSmall,
                                     ),
                                     const Spacer(),
                                     Text(petDetails['eyes'],
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium,
+                                        style: Theme.of(context).textTheme.titleMedium,
                                         overflow: TextOverflow.ellipsis)
                                   ],
                                 ),
@@ -489,22 +474,17 @@ class _PetProfilePageState extends State<PetProfilePage> {
                                 color: Colors.white,
                               ),
                               child: Padding(
-                                padding:
-                                    const EdgeInsets.fromLTRB(11, 5, 11, 5),
+                                padding: const EdgeInsets.fromLTRB(11, 5, 11, 5),
                                 child: Row(
                                   children: [
                                     Text(
                                       'Blood Type',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleSmall,
+                                      style: Theme.of(context).textTheme.titleSmall,
                                     ),
                                     const Spacer(),
                                     Text(
                                       petDetails['blood_type'],
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium,
+                                      style: Theme.of(context).textTheme.titleMedium,
                                       overflow: TextOverflow.ellipsis,
                                     )
                                   ],
@@ -521,11 +501,9 @@ class _PetProfilePageState extends State<PetProfilePage> {
                           IntrinsicWidth(
                             child: Container(
                               decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(50),
-                                  color: Colors.white),
+                                  borderRadius: BorderRadius.circular(50), color: Colors.white),
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 22, vertical: 0),
+                                padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 0),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -535,8 +513,7 @@ class _PetProfilePageState extends State<PetProfilePage> {
                                         setState(() {
                                           isSafe = value;
                                         });
-                                        _updatePetStatus(
-                                            petDetails['id'], isSafe);
+                                        _updatePetStatus(petDetails['id'], isSafe);
                                         // You might want to send this updated status to your backend here.
                                       },
                                       activeColor: Colors.green,
@@ -576,16 +553,14 @@ class _PetProfilePageState extends State<PetProfilePage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Text("Additional note",
-                              style: Theme.of(context).textTheme.headlineSmall),
+                          Text("Additional note", style: Theme.of(context).textTheme.headlineSmall),
                           const Padding(padding: EdgeInsets.all(3)),
                           Container(
                             padding: const EdgeInsets.all(20),
                             height: 200,
                             width: double.infinity,
                             decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(15),
-                                color: Colors.white),
+                                borderRadius: BorderRadius.circular(15), color: Colors.white),
                             child: SingleChildScrollView(
                               child: Text(
                                 petDetails['note'],
@@ -632,10 +607,8 @@ class _PetProfilePageState extends State<PetProfilePage> {
                               radius: 50,
                               backgroundImage: (ownerData['image'] != null &&
                                       ownerData['image'] != '')
-                                  ? NetworkImage(
-                                      ownerData['image']) // Load image from URL
-                                  : const AssetImage(
-                                          'assets/images/default_profile.png')
+                                  ? NetworkImage(ownerData['image']) // Load image from URL
+                                  : const AssetImage('assets/images/default_profile.png')
                                       as ImageProvider, // Fallback to a placeholder if _image is empty
                               // backgroundImage: AssetImage('assets/images/meme1.jpg'),
                             ),
@@ -699,13 +672,29 @@ class _PetProfilePageState extends State<PetProfilePage> {
                             child: IconButton(
                               icon: Icon(
                                 Icons.message_outlined,
-                                color: isSafe
-                                    ? const Color(0xff5DB671)
-                                    : const Color(0xffDF2D2D),
+                                color: isSafe ? const Color(0xff5DB671) : const Color(0xffDF2D2D),
                                 size: 20,
                               ),
                               onPressed: () {
-                                // Action for the first icon button
+                                //
+                                MaterialPageRoute materialPageRoute = MaterialPageRoute(
+                                  builder: (context) => ChatRoomPage(
+                                    receiverID: ownerData['id'],
+                                  ),
+                                );
+                                Navigator.of(context)
+                                    .push(
+                                  materialPageRoute,
+                                )
+                                    .then((value) {
+                                  ShowOrHideNoti().resetChatting();
+                                  // mark chat as read where navigate back from chat room
+                                  chatService.setRead(ownerData['id']);
+                                  // Refresh the chat room list
+                                  setState(() {
+                                    //refresh chat room list
+                                  });
+                                });
                               },
                             ),
                           ),
@@ -719,9 +708,7 @@ class _PetProfilePageState extends State<PetProfilePage> {
                             child: IconButton(
                               icon: Icon(
                                 Icons.phone_in_talk_outlined,
-                                color: isSafe
-                                    ? const Color(0xff5DB671)
-                                    : const Color(0xffDF2D2D),
+                                color: isSafe ? const Color(0xff5DB671) : const Color(0xffDF2D2D),
                                 size: 20,
                               ),
                               onPressed: () {
@@ -740,9 +727,7 @@ class _PetProfilePageState extends State<PetProfilePage> {
                             child: IconButton(
                               icon: Icon(
                                 Icons.location_on_outlined,
-                                color: isSafe
-                                    ? const Color(0xff5DB671)
-                                    : const Color(0xffDF2D2D),
+                                color: isSafe ? const Color(0xff5DB671) : const Color(0xffDF2D2D),
                                 size: 20,
                               ),
                               onPressed: () {
@@ -760,17 +745,14 @@ class _PetProfilePageState extends State<PetProfilePage> {
                                 foregroundColor: Colors.green,
                                 backgroundColor: Colors.white, // Text color
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(
-                                      20), // Rounded edges
+                                  borderRadius: BorderRadius.circular(20), // Rounded edges
                                 ),
                                 minimumSize: Size(170, 35)),
                             child: Row(
                               children: [
                                 Icon(
                                   Icons.phone_in_talk_outlined,
-                                  color: isSafe
-                                      ? const Color(0xff5DB671)
-                                      : const Color(0xffDF2D2D),
+                                  color: isSafe ? const Color(0xff5DB671) : const Color(0xffDF2D2D),
                                   size: 20,
                                 ),
                                 const Padding(padding: EdgeInsets.all(3)),
