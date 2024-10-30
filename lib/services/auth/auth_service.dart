@@ -26,7 +26,7 @@ class AuthService {
           SetOptions(merge: true));
 
       //create a device token for the user
-      TokenService().createUserToken();
+      TokenService().createUserToken(userCredential.user!.uid);
 
       return true; // Return true on success
     } on FirebaseAuthException catch (e) {
@@ -54,7 +54,7 @@ class AuthService {
           .doc(userCredential.user!.uid)
           .set({'uid': userCredential.user!.uid, 'email': email});
 
-      TokenService().createUserToken();
+      TokenService().createUserToken(userCredential.user!.uid);
       return userCredential;
     } on FirebaseAuthException catch (e) {
       throw Exception(e.code);

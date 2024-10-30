@@ -8,6 +8,7 @@ import 'package:intl_phone_field/intl_phone_field.dart';
 // import 'package:nonghai/pages/auth/add_pet_info_page.dart';
 import 'package:nonghai/pages/auth/add_pet_profile_page.dart';
 import 'package:nonghai/services/auth/add_profile.dart';
+import 'package:nonghai/services/noti/token_service.dart';
 import '../../components/custom_button.dart';
 import '../../components/custom_text_field.dart';
 // import '../../services/auth/auth_service.dart';
@@ -32,8 +33,7 @@ class _AddContactPageState extends State<AddContactPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     // Retrieve the userData passed from the RegisterPage
-    userData =
-        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    userData = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
   }
 
   Future<void> _createUser(BuildContext context) async {
@@ -59,6 +59,7 @@ class _AddContactPageState extends State<AddContactPage> {
           data: userData,
         );
 
+        TokenService().createUserToken(userData!['id']);
         // Handle the API response
         if (response.statusCode == 201) {
           Navigator.of(context).pushAndRemoveUntil(
@@ -68,8 +69,7 @@ class _AddContactPageState extends State<AddContactPage> {
                   // userId: userData!['id'], // Pass your userData if needed
                   ),
             ),
-            (Route<dynamic> route) =>
-                false, // This ensures no previous routes remain
+            (Route<dynamic> route) => false, // This ensures no previous routes remain
           );
         } else {
           // Handle error from API
@@ -141,8 +141,8 @@ class _AddContactPageState extends State<AddContactPage> {
       String folderPath = 'profileImage/$userId.jpg'; // Save as userId.jpg
 
       // Save the profile image and pass the userId and folderPath
-      String imgUrl = await StoreProfile()
-          .saveData(userId: userId, file: imageFile, folderPath: folderPath);
+      String imgUrl =
+          await StoreProfile().saveData(userId: userId, file: imageFile, folderPath: folderPath);
 
       // Set userData['image'] with the URL
       userData!['image'] = imgUrl;
@@ -162,8 +162,7 @@ class _AddContactPageState extends State<AddContactPage> {
     print(userData);
     return Scaffold(
       appBar: AppBar(
-        title: Text("Your Contact",
-            style: Theme.of(context).bannerTheme.contentTextStyle),
+        title: Text("Your Contact", style: Theme.of(context).bannerTheme.contentTextStyle),
       ),
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: Padding(
@@ -215,14 +214,12 @@ class _AddContactPageState extends State<AddContactPage> {
                     // ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                          color: Colors.transparent), // No underline
+                      borderSide: const BorderSide(color: Colors.transparent), // No underline
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                          color:
-                              Colors.transparent), // No underline when focused
+                      borderSide:
+                          const BorderSide(color: Colors.transparent), // No underline when focused
                     ),
                   ),
                   initialCountryCode: 'TH', // Set the initial country code
