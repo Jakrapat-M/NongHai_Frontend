@@ -7,10 +7,9 @@ import 'package:nonghai/types/tracking_info.dart';
 
 class TrackingPage extends StatefulWidget {
   final String petId;
-  final String? petName;
-  final String? petImage;
-  const TrackingPage(
-      {super.key, required this.petId, this.petName, this.petImage});
+  String? petName;
+  String? petImage;
+  TrackingPage({super.key, required this.petId, this.petName, this.petImage});
 
   @override
   State<TrackingPage> createState() => _TrackingPageState();
@@ -18,7 +17,7 @@ class TrackingPage extends StatefulWidget {
 
 class _TrackingPageState extends State<TrackingPage> {
   bool isLoading = true;
-  String loadName = 'Undefined';
+  String loadName = '';
   String loadImage = '';
   List<TrackingInfo> trackingInfo = [];
   void getTracking() async {
@@ -48,8 +47,8 @@ class _TrackingPageState extends State<TrackingPage> {
       );
       if (resp.statusCode == 200) {
         setState(() {
-          loadName = resp.data['data']['name'];
-          loadImage = resp.data['data']['image'];
+          widget.petName = resp.data['data']['name'];
+          widget.petImage = resp.data['data']['image'];
         });
       }
     } catch (e) {
@@ -62,7 +61,10 @@ class _TrackingPageState extends State<TrackingPage> {
   @override
   void initState() {
     super.initState();
-    if (widget.petName == null || widget.petImage == null) {
+    if (widget.petName == null ||
+        widget.petImage == null ||
+        widget.petName!.isEmpty ||
+        widget.petImage!.isEmpty) {
       getPetInfo();
     }
     getTracking();
@@ -74,7 +76,7 @@ class _TrackingPageState extends State<TrackingPage> {
   }
 
   ImageProvider getImage() {
-    if (loadImage.isEmpty && widget.petImage == null) {
+    if (widget.petImage == null || widget.petImage!.isEmpty) {
       return const AssetImage("assets/images/Logo.png");
     } else {
       return NetworkImage(widget.petImage!);
