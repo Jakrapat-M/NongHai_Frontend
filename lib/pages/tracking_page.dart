@@ -62,10 +62,10 @@ class _TrackingPageState extends State<TrackingPage> {
   @override
   void initState() {
     super.initState();
-    getTracking();
     if (widget.petName == null || widget.petImage == null) {
       getPetInfo();
     }
+    getTracking();
   }
 
   @override

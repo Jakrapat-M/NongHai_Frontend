@@ -164,17 +164,30 @@ class _MyAppState extends State<MyApp> {
   void openAppLink(Uri uri) {
     final fragment = uri.fragment;
 
-    // Print the full URI for debugging purposes
-    debugPrint('Navigating to: $fragment');
+    // Show plain white loading dialog
+    showDialog(
+      context: widget.navigatorKey.currentState!.context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return const Center(
+          child: SizedBox(
+              width: 50, // Small fixed size for the loading indicator
+              height: 50,
+              child: CircularProgressIndicator()),
+        );
+      },
+    );
+
+    // Execute createTracking and close the loading dialog when done
     createTracking(fragment).then((value) {
+      Navigator.of(widget.navigatorKey.currentState!.context)
+          .pop(); // Close loading dialog
       widget.navigatorKey.currentState?.push(MaterialPageRoute(
         builder: (context) {
           return PetProfilePage(petID: fragment);
         },
       ));
     });
-
-    // Navigate to TrackingPage
   }
 
   // This widget is the root of your application.

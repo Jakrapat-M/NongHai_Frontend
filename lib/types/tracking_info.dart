@@ -15,7 +15,7 @@ class TrackingInfo {
   @JsonKey(name: 'finder_phone')
   String finderPhone;
 
-  @JsonKey(name: 'finder_image')
+  @JsonKey(name: 'finder_img')
   String? finderImage;
 
   @JsonKey(name: 'lat')
