@@ -1,3 +1,5 @@
+import 'dart:math';
+
 String _chatingWith = '';
 
 class ShowOrHideNoti {
@@ -18,9 +20,10 @@ class ShowOrHideNoti {
     if (_chatingWith == messageFrom) {
       print('Hide notification');
       return true;
+    } else {
+      print('Show notification');
+      return false;
     }
-    print('Show notification');
-    return false;
   }
 
   // Reset method to clear the `chatingWith` value

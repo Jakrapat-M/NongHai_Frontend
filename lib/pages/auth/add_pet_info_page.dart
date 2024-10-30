@@ -8,7 +8,6 @@ import 'package:flutter/services.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:nonghai/components/validate_text_field.dart';
 import 'package:nonghai/pages/auth/additional_note_page.dart';
-import 'package:nonghai/pages/nfc_page.dart';
 
 import '../../components/custom_button.dart';
 import '../../components/custom_text_field.dart';
@@ -133,10 +132,11 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
           await SaveProfile();
         }
 
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => NfcPage(petId: response.data['data'])));
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const BottomNavPage(page: 1)),
+          (Route<dynamic> route) => false,
+        );
       } else {
         _showAlertDialog();
       }

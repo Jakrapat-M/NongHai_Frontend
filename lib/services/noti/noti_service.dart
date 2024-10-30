@@ -15,8 +15,12 @@ class NotificationService {
   }
 
   Future<void> initialize() async {
-    final settings =
-        await _firebaseMessaging.requestPermission(provisional: true);
+    final settings = await _firebaseMessaging.requestPermission(
+      provisional: true,
+      alert: true,
+      badge: true,
+      sound: true,
+    );
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
       print('User granted permission');
     } else {
@@ -46,7 +50,7 @@ class NotificationService {
         // Navigate to Chat Page
         MaterialPageRoute materialPageRoute = MaterialPageRoute(
           builder: (context) => ChatRoomPage(
-            receiverID: message.data['chat_with'],
+            receiverID: message.data['identifer'],
           ),
         );
 
@@ -76,7 +80,12 @@ class NotificationService {
   }
 
   void firebaseMessagingForegroundHandler(RemoteMessage message) {
-    final hideNoti = ShowOrHideNoti().showOrHideNoti(message.data['chat_with']);
+    // print(object)
+    var hideNoti = false;
+    if (message.data['navigate_to'] == 'chat') {
+      hideNoti = ShowOrHideNoti().showOrHideNoti(message.data['identifer']);
+    }
+
     if (message.notification != null && !hideNoti) {
       final snackbar = SnackBar(
         backgroundColor: Colors.white,
@@ -93,8 +102,7 @@ class NotificationService {
                 '${message.notification!.title!}: ',
                 style: const TextStyle(
                     fontSize: 14,
-                    color: Colors
-                        .black), // Optional: Change text color for better visibility
+                    color: Colors.black), // Optional: Change text color for better visibility
               ),
               const SizedBox(width: 8),
               Text(
@@ -103,8 +111,7 @@ class NotificationService {
                 message.notification!.body!,
                 style: const TextStyle(
                     fontSize: 14,
-                    color: Colors
-                        .black), // Optional: Change text color for better visibility
+                    color: Colors.black), // Optional: Change text color for better visibility
               ),
             ],
           ),
@@ -114,14 +121,12 @@ class NotificationService {
           top: 16.0,
           left: 16.0,
           right: 16.0,
-          bottom:
-              MediaQuery.of(_navigatorKey.currentContext!).size.height - 100,
+          bottom: MediaQuery.of(_navigatorKey.currentContext!).size.height - 100,
         ),
         duration: const Duration(seconds: 3),
       );
 
-      ScaffoldMessenger.of(_navigatorKey.currentContext!)
-          .showSnackBar(snackbar);
+      ScaffoldMessenger.of(_navigatorKey.currentContext!).showSnackBar(snackbar);
     }
   }
 }

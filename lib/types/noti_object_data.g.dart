@@ -19,6 +19,7 @@ NotificationObject _$NotificationObjectFromJson(Map<String, dynamic> json) =>
       petId: json['pet_id'] as String,
       trackingId: json['tracking_id'] as String,
       isRead: json['is_read'] as bool,
+      image: json['image'] as String?,
     );
 
 Map<String, dynamic> _$NotificationObjectToJson(NotificationObject instance) =>
@@ -30,4 +31,5 @@ Map<String, dynamic> _$NotificationObjectToJson(NotificationObject instance) =>
       'pet_id': instance.petId,
       'tracking_id': instance.trackingId,
       'is_read': instance.isRead,
+      'image': instance.image,
     };

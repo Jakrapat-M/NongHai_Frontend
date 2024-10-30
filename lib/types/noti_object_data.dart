@@ -25,6 +25,9 @@ class NotificationObject {
   @JsonKey(name: 'is_read')
   final bool isRead;
 
+  @JsonKey(name: 'image')
+  String? image;
+
   NotificationObject({
     this.id,
     this.createdAt,
@@ -33,6 +36,7 @@ class NotificationObject {
     required this.petId,
     required this.trackingId,
     required this.isRead,
+    this.image,
   });
 
   // Factory method to create a NotificationObject from JSON

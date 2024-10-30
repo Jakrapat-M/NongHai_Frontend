@@ -26,8 +26,8 @@ class _ChatHomePageState extends State<ChatHomePage> {
 
   getChatRoom() async {
     try {
-      final resp = await Caller.dio
-          .get('/chat/getChatRoom', data: {"user_id": authService.getCurrentUser()!.uid});
+      final resp =
+          await Caller.dio.get('/chat/getChatRoom?userId=${authService.getCurrentUser()!.uid}');
       if (resp.statusCode == 200) {
         return resp.data['data'];
       }

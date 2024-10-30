@@ -39,7 +39,7 @@ class _UserTileState extends State<UserTile> {
 
   Future<ChatRoomData?> getChatRoomData(String chatID) async {
     try {
-      final resp = await Caller.dio.get('/chat/getCurrentUserChatRoom', data: {"chat_id": chatID});
+      final resp = await Caller.dio.get('/chat/getCurrentUserChatRoom?chatId=$chatID');
       if (resp.statusCode == 200) {
         return ChatRoomData.fromJson(resp.data['data']);
       }
@@ -91,7 +91,6 @@ class _UserTileState extends State<UserTile> {
   @override
   Widget build(BuildContext context) {
     final getLastMessage = chatService.getLastMessage(chatRoomID!);
-
     return StreamBuilder(
       stream: getLastMessage,
       builder: (context, snapshot) {
@@ -156,6 +155,10 @@ class _UserTileState extends State<UserTile> {
     String time,
     bool isRead,
   ) {
+    if (userData == null) {
+      return const SizedBox.shrink();
+    }
+
     final userLabel = userData?.name ?? "Unknown User";
     return GestureDetector(
       onTap: () {
@@ -191,8 +194,9 @@ class _UserTileState extends State<UserTile> {
             CircleAvatar(
               backgroundColor: Theme.of(context).colorScheme.secondary,
               radius: 30,
-              // TODO: change to user image
-              backgroundImage: const AssetImage("assets/images/default_profile.png"),
+              backgroundImage: userData?.image != null && userData!.image!.isNotEmpty
+                  ? NetworkImage(userData!.image!)
+                  : const AssetImage("assets/images/default_profile.png"),
             ),
             const SizedBox(width: 16.0),
             Expanded(

@@ -191,7 +191,7 @@ class ChatService {
         body: message,
         notificationData: {
           'navigateto': 'chat',
-          'chat_with': chatWith,
+          'identifier': chatWith,
         },
       ),
     );
