@@ -38,10 +38,8 @@ class NotificationService {
       case 'tracking':
         _navigatorKey.currentState?.push(MaterialPageRoute(
           builder: (context) {
-            return const TrackingPage(
-              petId: "111",
-              petName: 'Ella',
-              petImage: 'petImage',
+            return TrackingPage(
+              petId: message.data['identifer'],
             );
           },
         ));
