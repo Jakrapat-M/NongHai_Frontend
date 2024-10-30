@@ -56,8 +56,12 @@ class ChatService {
           .doc(chatRoomID)
           .collection('messages')
           .add(newMessage.toMap());
+    } catch (e) {
+      print('Error sending message: $e');
     } finally {
       // Call the server to set unread status
+
+      // print('Setting unread status' + chatRoomID + " " + currentUserID);
       await Caller.dio.post(
         '/chat/setUnread',
         data: {
@@ -65,7 +69,11 @@ class ChatService {
           'sender_id': currentUserID,
         },
       );
-      sendChatNoti(currentUserID, receiverID, message);
+      try {
+        sendChatNoti(currentUserID, receiverID, message);
+      } catch (e) {
+        print('Error sending chat notification: $e');
+      }
     }
   }
 
@@ -111,7 +119,13 @@ class ChatService {
           'sender_id': currentUserID,
         },
       );
-      sendChatNoti(currentUserID, receiverID, "Image");
+      try {
+        sendChatNoti(currentUserID, receiverID, "Image");
+      } catch (e) {
+        if (kDebugMode) {
+          print('Error sending image message: $e');
+        }
+      }
     } catch (e) {
       if (kDebugMode) {
         print('Error sending image message: $e');
