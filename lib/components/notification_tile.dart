@@ -51,8 +51,7 @@ class _NotificationTileState extends State<NotificationTile> {
     print('getNotificationData for notiId: ${widget.notiId}');
     try {
       final resp = await Caller.dio.get(
-        '/tracking/getTrackingById',
-        data: {"tracking_id": notiObject?.trackingId},
+        '/tracking/getTrackingById?tracking_id=${notiObject?.trackingId}',
       );
 
       if (resp.statusCode == 200) {
@@ -74,8 +73,6 @@ class _NotificationTileState extends State<NotificationTile> {
     MaterialPageRoute materialPageRoute = MaterialPageRoute(
       builder: (context) => TrackingPage(
         petId: notiObject?.petId ?? 'Unknown Pet',
-        petName: trackerNotiInfo?.petName ?? 'Unknown Pet',
-        petImage: notiObject?.image ?? '',
       ),
     );
     Navigator.of(context).push(materialPageRoute).then((value) {
@@ -141,9 +138,11 @@ class _NotificationTileState extends State<NotificationTile> {
             CircleAvatar(
               backgroundColor: Theme.of(context).colorScheme.secondary,
               radius: 30,
-              backgroundImage: notiObject?.image != null && notiObject!.image!.isNotEmpty
-                  ? NetworkImage(notiObject!.image!)
-                  : const AssetImage("assets/images/default_profile.png") as ImageProvider,
+              backgroundImage:
+                  notiObject?.image != null && notiObject!.image!.isNotEmpty
+                      ? NetworkImage(notiObject!.image!)
+                      : const AssetImage("assets/images/default_profile.png")
+                          as ImageProvider,
             ),
             const SizedBox(width: 16.0),
             Expanded(
@@ -171,7 +170,8 @@ class _NotificationTileState extends State<NotificationTile> {
             const SizedBox(width: 8.0),
             Text(
               timeAgo,
-              style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 12),
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary, fontSize: 12),
             ),
             const SizedBox(width: 8.0),
             Icon(

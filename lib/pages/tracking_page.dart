@@ -7,10 +7,10 @@ import 'package:nonghai/types/tracking_info.dart';
 
 class TrackingPage extends StatefulWidget {
   final String petId;
-  final String petName;
+  final String? petName;
   final String? petImage;
   const TrackingPage(
-      {super.key, required this.petId, required this.petName, this.petImage});
+      {super.key, required this.petId, this.petName, this.petImage});
 
   @override
   State<TrackingPage> createState() => _TrackingPageState();
@@ -18,6 +18,8 @@ class TrackingPage extends StatefulWidget {
 
 class _TrackingPageState extends State<TrackingPage> {
   bool isLoading = true;
+  String loadName = 'Undefined';
+  String loadImage = "/assets/images/Logo.png";
   List<TrackingInfo> trackingInfo = [];
   void getTracking() async {
     try {
@@ -39,10 +41,31 @@ class _TrackingPageState extends State<TrackingPage> {
     }
   }
 
+  void getPetInfo() async {
+    try {
+      final resp = await Caller.dio.get(
+        '/pet/${widget.petId}',
+      );
+      if (resp.statusCode == 200) {
+        setState(() {
+          loadName = resp.data['data']['name'];
+          loadImage = resp.data['data']['image'];
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Network error occurred: $e');
+      }
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     getTracking();
+    if (widget.petName == null || widget.petImage == null) {
+      getPetInfo();
+    }
   }
 
   @override
@@ -64,12 +87,11 @@ class _TrackingPageState extends State<TrackingPage> {
                 radius: 50,
                 backgroundColor:
                     Theme.of(context).colorScheme.secondaryContainer,
-                foregroundImage:
-                    NetworkImage(widget.petImage ?? "/assets/images/Logo.png"),
+                foregroundImage: NetworkImage(widget.petImage ?? loadImage),
               ),
               const SizedBox(height: 15),
               Text(
-                widget.petName,
+                widget.petName ?? loadName,
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
               const SizedBox(height: 20),
