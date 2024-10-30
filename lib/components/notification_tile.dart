@@ -67,10 +67,10 @@ class _NotificationTileState extends State<NotificationTile> {
 
   handleTap() async {
     SendNotiService().readNotification(widget.notiId);
-
+    print('Navigate to TrackingPage with petId: ${notiObject!.petId}');
     MaterialPageRoute materialPageRoute = MaterialPageRoute(
       builder: (context) => TrackingPage(
-        petId: notiObject?.petId ?? 'Unknown Pet',
+        petId: notiObject!.petId,
       ),
     );
     Navigator.of(context).push(materialPageRoute).then((value) {
@@ -117,7 +117,7 @@ class _NotificationTileState extends State<NotificationTile> {
     }
 
     final address = trackerNotiInfo?.address ?? 'Unknown';
-    String timeAgo = timeago.format(trackerNotiInfo!.createdAt!);
+    String timeAgo = timeago.format(trackerNotiInfo!.createdAt);
 
     return GestureDetector(
       onTap: () {

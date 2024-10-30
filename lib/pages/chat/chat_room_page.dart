@@ -76,8 +76,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   // send message
   void sendMessage() async {
     if (_messageController.text.isNotEmpty) {
-      await _chatService.sendMessage(
-          widget.receiverID, _messageController.text);
+      await _chatService.sendMessage(widget.receiverID, _messageController.text);
       _messageController.clear();
       scrollDown();
     }
@@ -85,8 +84,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
 
   Future<void> _pickAndSendImage() async {
     try {
-      final XFile? pickedFile =
-          await _picker.pickImage(source: ImageSource.gallery);
+      final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
 
       if (pickedFile != null) {
         File imageFile = File(pickedFile.path);
@@ -100,8 +98,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   }
 
   Future<void> _captureAndSendImage() async {
-    final XFile? capturedFile =
-        await _picker.pickImage(source: ImageSource.camera);
+    final XFile? capturedFile = await _picker.pickImage(source: ImageSource.camera);
 
     if (capturedFile != null) {
       File imageFile = File(capturedFile.path);
@@ -154,7 +151,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
       );
     }
 
-    String receiverName = userData?.name ?? '';
+    String receiverName = userData?.username ?? '';
     return Scaffold(
       appBar: CustomAppBar(title: receiverName),
       body: SafeArea(
@@ -192,11 +189,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
         return ListView(
           reverse: true,
           controller: _scrollController,
-          children: snapshot.data!.docs
-              .map((doc) => _buildMessageItem(doc))
-              .toList()
-              .reversed
-              .toList(),
+          children:
+              snapshot.data!.docs.map((doc) => _buildMessageItem(doc)).toList().reversed.toList(),
         );
       },
     );
@@ -209,8 +203,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     bool isCurrentUser = data["senderID"] == _authService.getCurrentUser()!.uid;
 
     // Align message to the right if it's from the current user
-    var alignment =
-        isCurrentUser ? Alignment.centerRight : Alignment.centerLeft;
+    var alignment = isCurrentUser ? Alignment.centerRight : Alignment.centerLeft;
 
     return Container(
       alignment: alignment,
@@ -247,10 +240,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
       child: Row(
         children: [
           IconButton(
-            icon: Icon(Icons.camera_alt,
-                color: Theme.of(context).colorScheme.primary),
-            onPressed:
-                _captureAndSendImage, // Call the method to capture an image using the camera
+            icon: Icon(Icons.camera_alt, color: Theme.of(context).colorScheme.primary),
+            onPressed: _captureAndSendImage, // Call the method to capture an image using the camera
           ),
           Expanded(
             child: TextField(
@@ -273,14 +264,11 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
             ),
           ),
           IconButton(
-            icon:
-                Icon(Icons.image, color: Theme.of(context).colorScheme.primary),
-            onPressed:
-                _pickAndSendImage, // Call the method to pick an image from the gallery
+            icon: Icon(Icons.image, color: Theme.of(context).colorScheme.primary),
+            onPressed: _pickAndSendImage, // Call the method to pick an image from the gallery
           ),
           IconButton(
-            icon:
-                Icon(Icons.send, color: Theme.of(context).colorScheme.primary),
+            icon: Icon(Icons.send, color: Theme.of(context).colorScheme.primary),
             onPressed: sendMessage,
           ),
         ],
