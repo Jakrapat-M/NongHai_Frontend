@@ -9,7 +9,6 @@ import 'package:nonghai/services/chat/chat_service.dart';
 import 'package:nonghai/services/noti/show_or_hide_noti.dart';
 import 'package:nonghai/types/chat_room_data.dart';
 import 'package:nonghai/types/user_data.dart';
-import 'package:path/path.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import 'dart:ui'; // Import this for using BackdropFilter
@@ -40,7 +39,7 @@ class _UserTileState extends State<UserTile> {
 
   Future<ChatRoomData?> getChatRoomData(String chatID) async {
     try {
-      final resp = await Caller.dio.get('/chat/getCurrentUserChatRoom', data: {"chat_id": chatID});
+      final resp = await Caller.dio.get('/chat/getCurrentUserChatRoom?chatId=$chatID');
       if (resp.statusCode == 200) {
         return ChatRoomData.fromJson(resp.data['data']);
       }
