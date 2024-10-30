@@ -6,16 +6,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:nonghai/components/custom_button.dart';
+import 'package:nonghai/components/custom_text_field.dart';
 import 'package:nonghai/components/validate_text_field.dart';
 import 'package:nonghai/pages/auth/additional_note_page.dart';
+import 'package:nonghai/pages/bottom_nav_page.dart';
 import 'package:nonghai/pages/nfc_page.dart';
+import 'package:nonghai/services/auth/add_profile.dart';
+import 'package:nonghai/services/caller.dart';
 
-import '../../components/custom_button.dart';
-import '../../components/custom_text_field.dart';
-import '../../services/auth/add_profile.dart';
-import '../../services/auth/auth_service.dart';
-import '../../services/caller.dart';
-import '../bottom_nav_page.dart';
 import 'home_page.dart';
 
 class AddPetInfoPage extends StatefulWidget {
@@ -134,9 +133,9 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
         }
 
         Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => NfcPage(petId: response.data['data'])));
+          context,
+          MaterialPageRoute(builder: (context) => NfcPage(petId: petId)),
+        );
       } else {
         _showAlertDialog();
       }

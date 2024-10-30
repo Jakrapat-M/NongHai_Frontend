@@ -3,25 +3,21 @@ import 'package:app_links/app_links.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
-// import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:nonghai/pages/auth/edit_home_page.dart';
+import 'package:nonghai/pages/auth/edit_pet_page.dart';
 import 'package:nonghai/pages/nfc_page.dart';
 import 'package:nonghai/services/auth/auth_service.dart';
-import 'package:nonghai/services/auth/auth_service_inherited.dart'; // Import the inherited widget
-// import 'package:flutter/painting.dart';
-// import 'package:flutter/rendering.dart';
-// import 'package:flutter/widgets.dart';
+import 'package:nonghai/services/auth/auth_service_inherited.dart';
 import 'package:nonghai/pages/tracking_page.dart';
 import 'package:nonghai/services/auth/auth_service.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:nonghai/services/auth/login_or_registoer.dart';
 import 'package:nonghai/firebase_options.dart';
 import 'package:nonghai/pages/auth/home_page.dart';
 import 'package:nonghai/services/auth/auth_gate.dart';
 import 'package:nonghai/services/noti/noti_service.dart';
-// import 'package:nonghai/services/auth/auth_service.dart';
-// import 'package:provider/provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:nonghai/services/caller.dart';
 
@@ -67,7 +63,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final _navigatorKey = GlobalKey<NavigatorState>();
   // final MyRouteObserver myRouteObserver = MyRouteObserver();
   late AppLinks _appLinks;
   StreamSubscription<Uri>? _linkSubscription;
@@ -191,7 +186,7 @@ class _MyAppState extends State<MyApp> {
     return AuthServiceInherited(
       authService: authService,
       child: MaterialApp(
-        navigatorKey: _navigatorKey,
+        navigatorKey: widget.navigatorKey,
         title: 'Nonghai',
         theme: ThemeData(
           colorScheme: ThemeData().colorScheme.copyWith(
@@ -316,7 +311,6 @@ class _MyAppState extends State<MyApp> {
           '/editHome': (context) => const EditHomePage(
                 userData: {},
               ),
-          '/testnfc': (context) => const TestNfcPage(),
           '/addProfileImage': (context) => const AddProfilePage(),
           '/addContact': (context) => const AddContactPage(),
           '/addPetProfileImage': (context) => const AddPetProfilePage(),
