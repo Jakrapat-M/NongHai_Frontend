@@ -19,7 +19,7 @@ class TrackingPage extends StatefulWidget {
 class _TrackingPageState extends State<TrackingPage> {
   bool isLoading = true;
   String loadName = 'Undefined';
-  String loadImage = "/assets/images/Logo.png";
+  String loadImage = '';
   List<TrackingInfo> trackingInfo = [];
   void getTracking() async {
     try {
@@ -62,15 +62,23 @@ class _TrackingPageState extends State<TrackingPage> {
   @override
   void initState() {
     super.initState();
-    getTracking();
     if (widget.petName == null || widget.petImage == null) {
       getPetInfo();
     }
+    getTracking();
   }
 
   @override
   void dispose() {
     super.dispose();
+  }
+
+  ImageProvider getImage() {
+    if (loadImage.isEmpty && widget.petImage == null) {
+      return const AssetImage("assets/images/Logo.png");
+    } else {
+      return NetworkImage(widget.petImage!);
+    }
   }
 
   @override
@@ -87,7 +95,7 @@ class _TrackingPageState extends State<TrackingPage> {
                 radius: 50,
                 backgroundColor:
                     Theme.of(context).colorScheme.secondaryContainer,
-                foregroundImage: NetworkImage(widget.petImage ?? loadImage),
+                foregroundImage: getImage(),
               ),
               const SizedBox(height: 15),
               Text(
