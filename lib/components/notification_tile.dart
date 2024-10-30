@@ -27,12 +27,10 @@ class _NotificationTileState extends State<NotificationTile> {
   bool isLoading2 = true;
 
   getNotiData() async {
-    print('getNotiData for notiId: ${widget.notiId}');
+    // print('getNotiData for notiId: ${widget.notiId}');
     try {
-      final response = await Caller.dio.get(
-        '/notification/getNotification',
-        data: {"noti_id": widget.notiId},
-      );
+      final response =
+          await Caller.dio.get('/notification/getNotification?notiID=${widget.notiId}');
 
       if (response.statusCode == 200) {
         setState(() {
@@ -48,10 +46,10 @@ class _NotificationTileState extends State<NotificationTile> {
   }
 
   getNotificationData() async {
-    print('getNotificationData for notiId: ${widget.notiId}');
+    // print('getNotificationData for notiId: ${widget.notiId}');
     try {
       final resp = await Caller.dio.get(
-        '/tracking/getTrackingById?tracking_id=${notiObject?.trackingId}',
+        '/tracking/getTrackingById?trackingId=${notiObject?.trackingId}',
       );
 
       if (resp.statusCode == 200) {
@@ -62,7 +60,7 @@ class _NotificationTileState extends State<NotificationTile> {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Network error occurred on get noti data: $e');
+        print('Network error occurred on get noti data for: ${notiObject?.trackingId} $e');
       }
     }
   }
@@ -119,7 +117,7 @@ class _NotificationTileState extends State<NotificationTile> {
     }
 
     final address = trackerNotiInfo?.address ?? 'Unknown';
-    String timeAgo = timeago.format(trackerNotiInfo!.createdAt);
+    String timeAgo = timeago.format(trackerNotiInfo!.createdAt!);
 
     return GestureDetector(
       onTap: () {
@@ -138,11 +136,9 @@ class _NotificationTileState extends State<NotificationTile> {
             CircleAvatar(
               backgroundColor: Theme.of(context).colorScheme.secondary,
               radius: 30,
-              backgroundImage:
-                  notiObject?.image != null && notiObject!.image!.isNotEmpty
-                      ? NetworkImage(notiObject!.image!)
-                      : const AssetImage("assets/images/default_profile.png")
-                          as ImageProvider,
+              backgroundImage: notiObject?.image != null && notiObject!.image!.isNotEmpty
+                  ? NetworkImage(notiObject!.image!)
+                  : const AssetImage("assets/images/default_profile.png") as ImageProvider,
             ),
             const SizedBox(width: 16.0),
             Expanded(
@@ -170,8 +166,7 @@ class _NotificationTileState extends State<NotificationTile> {
             const SizedBox(width: 8.0),
             Text(
               timeAgo,
-              style: TextStyle(
-                  color: Theme.of(context).colorScheme.primary, fontSize: 12),
+              style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 12),
             ),
             const SizedBox(width: 8.0),
             Icon(

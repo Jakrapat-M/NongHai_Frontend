@@ -21,8 +21,7 @@ class _NotificationPageState extends State<NotificationPage> {
   getNotification() async {
     try {
       final resp = await Caller.dio.get(
-        '/notification/getNotificationObject',
-        data: {"user_id": currentUserId},
+        '/notification/getNotificationObject?userID=$currentUserId',
       );
       if (resp.statusCode == 200) {
         setState(() {
@@ -65,7 +64,6 @@ class _NotificationPageState extends State<NotificationPage> {
         final notification = notifications![index];
         return NotificationTile(
           notiId: notification['id'],
-
         );
       },
     );
