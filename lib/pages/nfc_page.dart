@@ -24,6 +24,7 @@ class _NfcPageState extends State<NfcPage> {
       NdefRecord.createUri(
           Uri.parse('${dotenv.get('NFC_URL')}/tracking#${widget.petId}')),
     ]);
+    print('NFC URL: ${dotenv.get('NFC_URL')}/tracking#${widget.petId}');
   }
 
   @override
