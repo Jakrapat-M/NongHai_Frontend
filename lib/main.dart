@@ -27,6 +27,8 @@ import 'pages/auth/add_profile_page.dart';
 import 'pages/auth/additional_note_page.dart';
 import 'pages/auth/pet_profile_page.dart';
 
+
+final navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -36,7 +38,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  final navigatorKey = GlobalKey<NavigatorState>();
+  
   final notificationService = NotificationService(navigatorKey: navigatorKey);
 
   await notificationService.initialize();

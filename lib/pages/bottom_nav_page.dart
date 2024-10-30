@@ -1,7 +1,13 @@
+import 'dart:async'; // Import Timer class
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:nonghai/main.dart';
 import 'package:nonghai/pages/chat/chat_home_page.dart';
 import 'package:nonghai/pages/auth/home_page.dart';
 import 'package:nonghai/pages/notification_page.dart';
+import 'package:nonghai/services/auth/auth_service.dart';
+import 'package:nonghai/services/caller.dart';
+import 'package:nonghai/services/noti/noti_service.dart';
 
 class BottomNavPage extends StatefulWidget {
   const BottomNavPage({super.key, required this.page});
@@ -12,12 +18,87 @@ class BottomNavPage extends StatefulWidget {
 }
 
 class _BottomNavPageState extends State<BottomNavPage> {
+  final uid = AuthService().getCurrentUser()!.uid;
+  bool hasUnreadMessages = false;
+  bool hasUnreadNotifications = false;
   int _selectedPageIndex = 0;
+  Timer? _refreshTimer;
 
   @override
   void initState() {
     super.initState();
     _selectedPageIndex = widget.page;
+
+    // Initialize notification service and setup listeners
+    NotificationService(navigatorKey: navigatorKey).initialize();
+    _setupFirebaseListeners();
+
+    // Initial data fetch
+    checkAllReadChat();
+    checkAllReadNotification();
+
+    // Start periodic refresh every X seconds
+    _startAutoRefresh(const Duration(seconds: 1)); // Adjust the duration as needed
+  }
+
+  @override
+  void dispose() {
+    _refreshTimer?.cancel(); // Cancel the timer to prevent memory leaks
+    super.dispose();
+  }
+
+  void _startAutoRefresh(Duration interval) {
+    _refreshTimer = Timer.periodic(interval, (timer) {
+      checkAllReadChat();
+      checkAllReadNotification();
+    });
+  }
+
+  Future<void> checkAllReadChat() async {
+    final resp = await Caller.dio.get('/chat/hasUnreadMessage?userId=$uid');
+    setState(() {
+      hasUnreadMessages = resp.data['data'];
+    });
+  }
+
+  Future<void> checkAllReadNotification() async {
+    final resp = await Caller.dio.get('/notification/hasUnreadNotification?userID=$uid');
+    setState(() {
+      hasUnreadNotifications = resp.data['data'];
+    });
+  }
+
+  void _setupFirebaseListeners() {
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+      await checkAllReadChat();
+      await checkAllReadNotification();
+    });
+
+    FirebaseMessaging.onMessageOpenedApp.listen((message) {
+      NotificationService(navigatorKey: navigatorKey).handleMessage(message);
+    });
+  }
+
+  Widget _buildIconWithBadge(IconData icon, bool showBadge) {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Icon(icon, size: 28),
+        if (showBadge)
+          Positioned(
+            right: -2,
+            top: -2,
+            child: Container(
+              width: 8,
+              height: 8,
+              decoration: const BoxDecoration(
+                color: Colors.red,
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+      ],
+    );
   }
 
   static final List<Widget> _widgetOptions = <Widget>[
@@ -36,17 +117,17 @@ class _BottomNavPageState extends State<BottomNavPage> {
           ),
           bottomNavigationBar: BottomNavigationBar(
             backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-            items: const <BottomNavigationBarItem>[
+            items: <BottomNavigationBarItem>[
               BottomNavigationBarItem(
-                icon: Center(child: Icon(Icons.chat_outlined)),
+                icon: _buildIconWithBadge(Icons.chat_outlined, hasUnreadMessages),
                 label: 'Chat',
               ),
-              BottomNavigationBarItem(
+              const BottomNavigationBarItem(
                 icon: SizedBox.shrink(), // Empty space for the middle item
                 label: '',
               ),
               BottomNavigationBarItem(
-                icon: Center(child: Icon(Icons.notifications_none_rounded)),
+                icon: _buildIconWithBadge(Icons.notifications_none_rounded, hasUnreadNotifications),
                 label: 'Notifications',
               ),
             ],
@@ -54,12 +135,14 @@ class _BottomNavPageState extends State<BottomNavPage> {
             onTap: (index) {
               setState(() {
                 _selectedPageIndex = index;
+                if (index == 0) hasUnreadMessages = false;
+                if (index == 2) hasUnreadNotifications = false;
               });
             },
             selectedIconTheme: Theme.of(context).appBarTheme.iconTheme,
             unselectedIconTheme: Theme.of(context).appBarTheme.iconTheme,
-            showSelectedLabels: false, // Hide the label of the selected item
-            showUnselectedLabels: false, // Hide the labels of unselected items
+            showSelectedLabels: false,
+            showUnselectedLabels: false,
             elevation: 0,
           ),
         ),
@@ -74,13 +157,11 @@ class _BottomNavPageState extends State<BottomNavPage> {
                   height: 70,
                   child: FloatingActionButton(
                     elevation: 1,
-                    backgroundColor:
-                        Theme.of(context).appBarTheme.backgroundColor,
+                    backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
                     shape: const CircleBorder(),
                     onPressed: () {
                       setState(() {
-                        _selectedPageIndex =
-                            1; // Set to the index of the Home page
+                        _selectedPageIndex = 1; // Navigate to Home page
                       });
                     },
                     child: const Image(
@@ -91,7 +172,7 @@ class _BottomNavPageState extends State<BottomNavPage> {
               ),
             ],
           ),
-        )
+        ),
       ],
     );
   }
