@@ -38,7 +38,7 @@ class _BottomNavPageState extends State<BottomNavPage> {
     checkAllReadNotification();
 
     // Start periodic refresh every X seconds
-    _startAutoRefresh(const Duration(seconds: 1)); // Adjust the duration as needed
+    _startAutoRefresh(const Duration(seconds: 10)); // Adjust the duration as needed
   }
 
   @override
