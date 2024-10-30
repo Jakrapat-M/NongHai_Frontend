@@ -142,6 +142,29 @@ class _PetProfilePageState extends State<PetProfilePage> {
     await launchUrl(launchUri);
   }
 
+  final chatService = ChatService();
+  Future<void> _chat() async {
+    ChatService().createChatRoom(ownerData['id']);
+    MaterialPageRoute materialPageRoute = MaterialPageRoute(
+      builder: (context) => ChatRoomPage(
+        receiverID: ownerData['id'],
+      ),
+    );
+    Navigator.of(context)
+        .push(
+      materialPageRoute,
+    )
+        .then((value) {
+      ShowOrHideNoti().resetChatting();
+      // mark chat as read where navigate back from chat room
+      chatService.setRead(ownerData['id']);
+      // Refresh the chat room list
+      setState(() {
+        //refresh chat room list
+      });
+    });
+  }
+
   Future<void> _rescuerPhoneCall() async {
     final Uri launchUri = Uri(
       scheme: 'tel',
@@ -179,7 +202,6 @@ class _PetProfilePageState extends State<PetProfilePage> {
     }
     print(phone);
 
-    final chatService = ChatService();
     return Scaffold(
       appBar: AppBar(
         // title: Text(petDetails['name'] ?? 'Pet Details'),
@@ -676,25 +698,8 @@ class _PetProfilePageState extends State<PetProfilePage> {
                                 size: 20,
                               ),
                               onPressed: () {
-                                //
-                                MaterialPageRoute materialPageRoute = MaterialPageRoute(
-                                  builder: (context) => ChatRoomPage(
-                                    receiverID: ownerData['id'],
-                                  ),
-                                );
-                                Navigator.of(context)
-                                    .push(
-                                  materialPageRoute,
-                                )
-                                    .then((value) {
-                                  ShowOrHideNoti().resetChatting();
-                                  // mark chat as read where navigate back from chat room
-                                  chatService.setRead(ownerData['id']);
-                                  // Refresh the chat room list
-                                  setState(() {
-                                    //refresh chat room list
-                                  });
-                                });
+                                //Navigate to chat room
+                                _chat();
                               },
                             ),
                           ),
