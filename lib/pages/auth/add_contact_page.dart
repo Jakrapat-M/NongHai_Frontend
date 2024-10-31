@@ -2,12 +2,15 @@
 
 import 'dart:io';
 // import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 // import 'package:nonghai/pages/auth/add_pet_info_page.dart';
 import 'package:nonghai/pages/auth/add_pet_profile_page.dart';
 import 'package:nonghai/services/auth/add_profile.dart';
+import 'package:nonghai/services/location_service.dart';
 import 'package:nonghai/services/noti/token_service.dart';
 import '../../components/custom_button.dart';
 import '../../components/custom_text_field.dart';
@@ -33,7 +36,8 @@ class _AddContactPageState extends State<AddContactPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     // Retrieve the userData passed from the RegisterPage
-    userData = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    userData =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
   }
 
   Future<void> _createUser(BuildContext context) async {
@@ -69,7 +73,8 @@ class _AddContactPageState extends State<AddContactPage> {
                   // userId: userData!['id'], // Pass your userData if needed
                   ),
             ),
-            (Route<dynamic> route) => false, // This ensures no previous routes remain
+            (Route<dynamic> route) =>
+                false, // This ensures no previous routes remain
           );
         } else {
           // Handle error from API
@@ -141,8 +146,8 @@ class _AddContactPageState extends State<AddContactPage> {
       String folderPath = 'profileImage/$userId.jpg'; // Save as userId.jpg
 
       // Save the profile image and pass the userId and folderPath
-      String imgUrl =
-          await StoreProfile().saveData(userId: userId, file: imageFile, folderPath: folderPath);
+      String imgUrl = await StoreProfile()
+          .saveData(userId: userId, file: imageFile, folderPath: folderPath);
 
       // Set userData['image'] with the URL
       userData!['image'] = imgUrl;
@@ -159,10 +164,41 @@ class _AddContactPageState extends State<AddContactPage> {
 
   @override
   Widget build(BuildContext context) {
+    bool isLoading = false;
+    String address = '';
+
+    Future<void> getLocation() async {
+      isLoading = true;
+      Future<Position?> location = LocationService().getLocation();
+      location.then((value) async {
+        if (value != null) {
+          print('Location: ${value.latitude}, ${value.longitude}');
+          try {
+            final resp =
+                await Caller.dio.get('/tracking/getAddressByLatLng', data: {
+              'lat': value.latitude,
+              'lng': value.longitude,
+            });
+            if (resp.statusCode == 200) {
+              setState(() {
+                address = resp.data;
+                isLoading = false;
+              });
+            }
+          } catch (e) {
+            if (kDebugMode) {
+              print('Network error occurred: $e');
+            }
+          }
+        }
+      });
+    }
+
     print(userData);
     return Scaffold(
       appBar: AppBar(
-        title: Text("Your Contact", style: Theme.of(context).bannerTheme.contentTextStyle),
+        title: Text("Your Contact",
+            style: Theme.of(context).bannerTheme.contentTextStyle),
       ),
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: Padding(
@@ -214,12 +250,14 @@ class _AddContactPageState extends State<AddContactPage> {
                     // ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Colors.transparent), // No underline
+                      borderSide: const BorderSide(
+                          color: Colors.transparent), // No underline
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide:
-                          const BorderSide(color: Colors.transparent), // No underline when focused
+                      borderSide: const BorderSide(
+                          color:
+                              Colors.transparent), // No underline when focused
                     ),
                   ),
                   initialCountryCode: 'TH', // Set the initial country code

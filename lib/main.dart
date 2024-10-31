@@ -15,6 +15,7 @@ import 'package:nonghai/services/auth/login_or_registoer.dart';
 import 'package:nonghai/firebase_options.dart';
 import 'package:nonghai/pages/auth/home_page.dart';
 import 'package:nonghai/services/auth/auth_gate.dart';
+import 'package:nonghai/services/location_service.dart';
 import 'package:nonghai/services/noti/noti_service.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:nonghai/services/caller.dart';
@@ -100,7 +101,7 @@ class _MyAppState extends State<MyApp> {
       double long = 0.0000000;
 
       print("currentUserId: $currentUserId");
-      final position = await _getLocation();
+      final position = await LocationService().getLocation();
       if (position != null) {
         lat = position.latitude;
         long = position.longitude;
@@ -129,36 +130,36 @@ class _MyAppState extends State<MyApp> {
     return true;
   }
 
-  Future<Position?> _getLocation() async {
-    print("test getLocaion");
-    bool serviceEnabled;
-    LocationPermission permission;
+  // Future<Position?> _getLocation() async {
+  //   print("test getLocaion");
+  //   bool serviceEnabled;
+  //   LocationPermission permission;
 
-    print('Checking location');
-    // Test if location services are enabled.
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      print("Location services are disabled.");
-      return null;
-    }
+  //   print('Checking location');
+  //   // Test if location services are enabled.
+  //   serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  //   if (!serviceEnabled) {
+  //     print("Location services are disabled.");
+  //     return null;
+  //   }
 
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        print("Location permissions are denied");
-        return null;
-      }
-    }
-    if (permission == LocationPermission.deniedForever) {
-      print(
-          'Location permissions are permanently denied, we cannot request permissions.');
-      return null;
-    }
-    print("get location success");
+  //   permission = await Geolocator.checkPermission();
+  //   if (permission == LocationPermission.denied) {
+  //     permission = await Geolocator.requestPermission();
+  //     if (permission == LocationPermission.denied) {
+  //       print("Location permissions are denied");
+  //       return null;
+  //     }
+  //   }
+  //   if (permission == LocationPermission.deniedForever) {
+  //     print(
+  //         'Location permissions are permanently denied, we cannot request permissions.');
+  //     return null;
+  //   }
+  //   print("get location success");
 
-    return await Geolocator.getCurrentPosition();
-  }
+  //   return await Geolocator.getCurrentPosition();
+  // }
 
   void openAppLink(Uri uri) {
     final fragment = uri.fragment;
