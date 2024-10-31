@@ -141,7 +141,7 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
       }
     } catch (e) {
       print('Error occurred: ${e.toString()}');
-      _showAlertDialog();
+      // _showAlertDialog();
     }
   }
 

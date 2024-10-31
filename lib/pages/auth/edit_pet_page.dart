@@ -235,8 +235,11 @@ class _EditPetPageState extends State<EditPetPage> {
                       onPressed: () async {
                         Navigator.of(context).pop();
 
-                        // Request camera permission each time
-                        var cameraStatus = await Permission.camera.request();
+                        // Check and request camera permission
+                        var cameraStatus = await Permission.camera.status;
+                        if (!cameraStatus.isGranted) {
+                          cameraStatus = await Permission.camera.request();
+                        }
 
                         if (cameraStatus.isGranted) {
                           final ImagePicker picker = ImagePicker();
@@ -261,8 +264,11 @@ class _EditPetPageState extends State<EditPetPage> {
                       onPressed: () async {
                         Navigator.of(context).pop();
 
-                        // Request storage permission for gallery access
-                        var galleryStatus = await Permission.storage.request();
+                        // Check and request storage/gallery permission
+                        var galleryStatus = await Permission.storage.status;
+                        if (!galleryStatus.isGranted) {
+                          galleryStatus = await Permission.storage.request();
+                        }
 
                         if (galleryStatus.isGranted) {
                           FilePickerResult? result =
