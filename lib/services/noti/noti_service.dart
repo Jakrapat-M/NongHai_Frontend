@@ -2,12 +2,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'package:flutter/material.dart';
-import 'package:nonghai/main.dart';
 import 'package:nonghai/pages/chat/chat_room_page.dart';
 import 'package:nonghai/pages/tracking_page.dart';
 import 'package:nonghai/services/chat/chat_service.dart';
 import 'package:nonghai/services/noti/show_or_hide_noti.dart';
-import 'package:path/path.dart';
 
 class NotificationService {
   final _firebaseMessaging = FirebaseMessaging.instance;
@@ -109,7 +107,8 @@ class NotificationService {
                 '${message.notification!.title!}: ',
                 style: const TextStyle(
                     fontSize: 14,
-                    color: Colors.black), // Optional: Change text color for better visibility
+                    color: Colors
+                        .black), // Optional: Change text color for better visibility
               ),
               const SizedBox(width: 8),
               Text(
@@ -118,7 +117,8 @@ class NotificationService {
                 message.notification!.body!,
                 style: const TextStyle(
                     fontSize: 14,
-                    color: Colors.black), // Optional: Change text color for better visibility
+                    color: Colors
+                        .black), // Optional: Change text color for better visibility
               ),
             ],
           ),
@@ -128,12 +128,14 @@ class NotificationService {
           top: 16.0,
           left: 16.0,
           right: 16.0,
-          bottom: MediaQuery.of(_navigatorKey.currentContext!).size.height - 100,
+          bottom:
+              MediaQuery.of(_navigatorKey.currentContext!).size.height - 100,
         ),
         duration: const Duration(seconds: 3),
       );
 
-      ScaffoldMessenger.of(_navigatorKey.currentContext!).showSnackBar(snackbar);
+      ScaffoldMessenger.of(_navigatorKey.currentContext!)
+          .showSnackBar(snackbar);
     }
   }
 }

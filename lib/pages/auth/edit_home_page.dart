@@ -11,7 +11,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:nonghai/pages/bottom_nav_page.dart';
 import 'package:nonghai/services/auth/add_profile.dart';
 import 'package:nonghai/services/caller.dart';
 import 'package:nonghai/services/location_service.dart';

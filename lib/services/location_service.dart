@@ -1,6 +1,4 @@
-import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:nonghai/services/caller.dart';
 
 class LocationService {
   Future<Position?> getLocation() async {

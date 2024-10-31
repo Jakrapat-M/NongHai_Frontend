@@ -5,6 +5,7 @@ import 'package:nonghai/components/tracking_object.dart';
 import 'package:nonghai/services/caller.dart';
 import 'package:nonghai/types/tracking_info.dart';
 
+// ignore: must_be_immutable
 class TrackingPage extends StatefulWidget {
   final String petId;
   String? petName;
