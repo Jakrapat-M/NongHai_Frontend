@@ -6,7 +6,7 @@ import 'package:nonghai/services/caller.dart';
 class TokenService {
   final _firebaseMessaging = FirebaseMessaging.instance;
   Future<void> createUserToken(String? uid) async {
-    print('Creating token for user: $uid');
+    debugPrint('Creating token for user: $uid');
 
     if (uid == null) {
       final authService = AuthService();
@@ -22,9 +22,9 @@ class TokenService {
       final resp =
           await Caller.dio.post('/token/createUserToken', data: {"user_id": uid, "token": token});
       if (resp.statusCode == 200 && resp.data['data'] == "Token already exist") {
-        print('Token already exist');
+        debugPrint('Token already exist');
       } else if (resp.statusCode == 200) {
-        print('Token created successfully');
+        debugPrint('Token created successfully');
       }
     } catch (e) {
       if (kDebugMode) {
@@ -48,7 +48,7 @@ class TokenService {
       final resp =
           await Caller.dio.delete('/token/removeUserToken', data: {"user_id": uid, "token": token});
       if (resp.statusCode == 200) {
-        print('Token deleted successfully');
+        debugPrint('Token deleted successfully');
       }
     } catch (e) {
       if (kDebugMode) {

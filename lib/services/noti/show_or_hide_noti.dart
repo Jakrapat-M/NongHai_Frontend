@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 String _chatingWith = '';
 
 class ShowOrHideNoti {
@@ -5,7 +7,7 @@ class ShowOrHideNoti {
 
   // Setter method to update `_chatingWith` field
   void setChatingWith(String chatWith) {
-    print('Setting chating with: $chatWith');
+    debugPrint('Setting chating with: $chatWith');
     _chatingWith = chatWith;
   }
 
@@ -14,12 +16,12 @@ class ShowOrHideNoti {
 
   // Method to decide whether to show or hide a notification based on `messageFrom`
   bool showOrHideNoti(String messageFrom) {
-    print('Currently chating with: $_chatingWith');
+    debugPrint('Currently chating with: $_chatingWith');
     if (_chatingWith == messageFrom) {
-      print('Hide notification');
+      debugPrint('Hide notification');
       return true;
     } else {
-      print('Show notification');
+      debugPrint('Show notification');
       return false;
     }
   }
@@ -27,6 +29,6 @@ class ShowOrHideNoti {
   // Reset method to clear the `chatingWith` value
   void resetChatting() {
     _chatingWith = '';
-    print('Reset chatingWith to an empty string');
+    debugPrint('Reset chatingWith to an empty string');
   }
 }

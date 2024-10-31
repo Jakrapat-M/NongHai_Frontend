@@ -8,7 +8,7 @@ class SendNotiService {
       final resp =
           await Caller.dio.post('/notification/sendNotification', data: notiEntity.toJson());
       if (resp.statusCode == 200) {
-        print('Notification sent successfully');
+        debugPrint('Notification sent successfully');
       }
     } catch (e) {
       if (kDebugMode) {
@@ -19,7 +19,7 @@ class SendNotiService {
 
   Future<void> readNotification(String notiId) async {
     try {
-      print('setNotificationRead for notiId: $notiId');
+      debugPrint('setNotificationRead for notiId: $notiId');
       await Caller.dio.post(
         '/notification/setNotificationRead',
         data: {"noti_id": notiId},
