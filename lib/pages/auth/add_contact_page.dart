@@ -32,6 +32,7 @@ class _AddContactPageState extends State<AddContactPage> {
   final nameController = TextEditingController();
   final surnameController = TextEditingController();
   // final addrController = TextEditingController();
+  bool isLoading = false;
 
   @override
   void didChangeDependencies() {
@@ -178,11 +179,10 @@ class _AddContactPageState extends State<AddContactPage> {
 
   @override
   Widget build(BuildContext context) {
-    bool isLoading = false;
-    String address = '';
-
     Future<void> getLocation() async {
-      isLoading = true;
+      setState(() {
+        isLoading = true;
+      });
       Future<Position?> location = LocationService().getLocation();
       location.then((value) async {
         if (value != null) {
@@ -195,11 +195,14 @@ class _AddContactPageState extends State<AddContactPage> {
             });
             if (resp.statusCode == 200) {
               setState(() {
-                address = resp.data;
+                _addr = resp.data['data'];
                 isLoading = false;
               });
             }
           } catch (e) {
+            setState(() {
+              isLoading = false;
+            });
             if (kDebugMode) {
               print('Network error occurred: $e');
             }
@@ -244,31 +247,14 @@ class _AddContactPageState extends State<AddContactPage> {
                 padding:
                     const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
               ),
-              onPressed: () {
-                // locationที่ได้ เอาไปใส่ไว้ใน_addr(string)
-                setState(() {
-                  // _addr = newLocation;
-                });
-              },
-              child: _addr == null || _addr == ""
+              onPressed: getLocation,
+              child: isLoading
                   ? Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
-                          Icons.location_on,
+                        CircularProgressIndicator(
                           color: Theme.of(context).colorScheme.primary,
                         ),
-                        const Spacer(),
-                        // const SizedBox(width: 8),
-                        const Text(
-                          "Get current location",
-                          style: TextStyle(
-                              color: Color(0xffC8A48A),
-                              fontFamily: "Fredoka",
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500),
-                          overflow: TextOverflow.clip,
-                        ),
-                        const Spacer(),
                       ],
                     )
                   : Row(
@@ -277,21 +263,18 @@ class _AddContactPageState extends State<AddContactPage> {
                           Icons.location_on,
                           color: Theme.of(context).colorScheme.primary,
                         ),
-                        // const Spacer(),
                         const SizedBox(width: 8),
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.6,
+                        Expanded(
                           child: Text(
-                            _addr!,
+                            _addr ??
+                                "Get current location", // Display address or default text
                             style: const TextStyle(
                                 color: Color(0xffC8A48A),
                                 fontFamily: "Fredoka",
-                                fontSize: 16,
+                                fontSize: 13,
                                 fontWeight: FontWeight.w500),
-                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        // const Spacer(),
                       ],
                     ),
             ),
