@@ -11,7 +11,6 @@ import 'package:nonghai/pages/auth/edit_pet_page.dart';
 import 'package:nonghai/pages/nfc_page.dart';
 import 'package:nonghai/services/auth/auth_service.dart';
 import 'package:nonghai/services/auth/auth_service_inherited.dart';
-import 'package:nonghai/pages/tracking_page.dart';
 import 'package:nonghai/services/auth/login_or_registoer.dart';
 import 'package:nonghai/firebase_options.dart';
 import 'package:nonghai/pages/auth/home_page.dart';
@@ -340,10 +339,6 @@ class _MyAppState extends State<MyApp> {
           '/nfc': (context) => const NfcPage(
                 petId: '550e8400-e29b-41d4-a716-446655440000',
               ),
-          '/tracking': (context) => const TrackingPage(
-              petId: '550e8400-e29b-41d4-a716-446655440000',
-              petName: 'Ella',
-              petImage: 'assets/images/test.jpg'),
         },
       ),
     );

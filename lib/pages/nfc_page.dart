@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:nfc_manager/nfc_manager.dart';
 import 'package:nonghai/components/custom_appbar_to_home.dart';
 import 'package:nonghai/components/custom_button.dart';
@@ -21,8 +22,9 @@ class _NfcPageState extends State<NfcPage> {
     super.initState();
     message = NdefMessage([
       NdefRecord.createUri(
-          Uri.parse('https://webnonghai.ryyyyyy.com/tracking#${widget.petId}')),
+          Uri.parse('${dotenv.get('NFC_URL')}/tracking#${widget.petId}')),
     ]);
+    print('NFC URL: ${dotenv.get('NFC_URL')}/tracking#${widget.petId}');
   }
 
   @override
