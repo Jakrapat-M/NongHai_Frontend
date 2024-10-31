@@ -2,9 +2,12 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'package:flutter/material.dart';
+import 'package:nonghai/main.dart';
 import 'package:nonghai/pages/chat/chat_room_page.dart';
 import 'package:nonghai/pages/tracking_page.dart';
+import 'package:nonghai/services/chat/chat_service.dart';
 import 'package:nonghai/services/noti/show_or_hide_noti.dart';
+import 'package:path/path.dart';
 
 class NotificationService {
   final _firebaseMessaging = FirebaseMessaging.instance;
@@ -28,6 +31,7 @@ class NotificationService {
     }
   }
 
+  final chatService = ChatService();
   // handle message
   void handleMessage(RemoteMessage? message) {
     print('noti data: ${message?.data}');
@@ -52,9 +56,14 @@ class NotificationService {
           ),
         );
 
-// Use the global navigator key to push the route
-
-        _navigatorKey.currentState?.push(materialPageRoute);
+        // Use the global navigator key to push the route
+        _navigatorKey.currentState?.push(materialPageRoute).then((value) {
+          ShowOrHideNoti().resetChatting();
+          // mark chat as read where navigate back from chat room
+          chatService.setRead(
+            message.data['identifer'],
+          );
+        });
         break;
       default:
         break;

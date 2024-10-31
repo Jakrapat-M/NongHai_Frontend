@@ -205,50 +205,75 @@ class _PetProfilePageState extends State<PetProfilePage> {
     return Scaffold(
       appBar: AppBar(
         // title: Text(petDetails['name'] ?? 'Pet Details'),
-        title: Padding(
-          padding: const EdgeInsets.fromLTRB(50, 0, 20, 0),
+        centerTitle: true,
+        leadingWidth: MediaQuery.of(context).size.width * 0.2,
+        leading: GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+          },
           child: Row(
             children: [
-              Icon(
-                isSafe ? Icons.check_circle_outline_rounded : Icons.error_outline_rounded,
-                color: isSafe ? Colors.green : Colors.red,
-                size: 30,
+              Container(
+                margin: const EdgeInsets.only(left: 20),
+                width: 51,
+                height: 51,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Theme.of(context).colorScheme.secondaryContainer,
+                ),
+                child: const Icon(Icons.arrow_back_rounded, size: 36),
               ),
-              const Padding(padding: EdgeInsets.all(8)),
-              Text(
-                isSafe ? 'SAFE' : 'LOST',
-                style: TextStyle(color: isSafe ? Colors.green : Colors.red, fontSize: 30),
-              ),
-              const Spacer(),
-              isOwner == true
-                  // ? ElevatedButton(onPressed: () {}, child: Text('track'))
-                  ? GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => TrackingPage(
-                              petId: widget.petID,
-                              petName: petDetails['name'],
-                              petImage: petDetails['image'],
-                            ),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        decoration:
-                            const BoxDecoration(shape: BoxShape.circle, color: Color(0xffE8E8E8)),
-                        padding: const EdgeInsets.all(7),
-                        child: Image.asset(
-                          'assets/images/location_track.png',
-                          width: 28,
-                          height: 28,
-                        ),
-                      ),
-                    )
-                  : const SizedBox.shrink(), // This will show nothing if isOwner is false
             ],
           ),
+        ),
+        title: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.1),
+              child: Row(
+                children: [
+                  Icon(
+                    isSafe ? Icons.check_circle_outline_rounded : Icons.error_outline_rounded,
+                    color: isSafe ? Colors.green : Colors.red,
+                    size: 30,
+                  ),
+                  const Padding(padding: EdgeInsets.all(8)),
+                  Text(
+                    isSafe ? 'SAFE' : 'LOST',
+                    style: TextStyle(color: isSafe ? Colors.green : Colors.red, fontSize: 30),
+                  ),
+                ],
+              ),
+            ),
+            const Spacer(),
+            isOwner == true
+                // ? ElevatedButton(onPressed: () {}, child: Text('track'))
+                ? GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => TrackingPage(
+                            petId: widget.petID,
+                            petName: petDetails['name'],
+                            petImage: petDetails['image'],
+                          ),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      decoration:
+                          const BoxDecoration(shape: BoxShape.circle, color: Color(0xffE8E8E8)),
+                      padding: const EdgeInsets.all(7),
+                      child: Image.asset(
+                        'assets/images/location_track.png',
+                        width: 28,
+                        height: 28,
+                      ),
+                    ),
+                  )
+                : const SizedBox.shrink(), // This will show nothing if isOwner is false
+          ],
         ),
         backgroundColor: const Color(0xfff2f2f2),
       ),
