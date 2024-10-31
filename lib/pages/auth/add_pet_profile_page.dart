@@ -239,14 +239,20 @@ class _AddPetProfilePageState extends State<AddPetProfilePage> {
                           50), // Optional: Adjust radius for rounded corners
                     ),
                   ),
-                  child: const Text(
-                    "Skip",
-                    style: TextStyle(
-                      color: Color(0xffC8A48A),
-                      fontFamily: "Fredoka",
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                    ),
+                  child: Row(
+                    children: const [
+                      Spacer(),
+                      Text(
+                        "Skip",
+                        style: TextStyle(
+                          color: Color(0xffC8A48A),
+                          fontFamily: "Fredoka",
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      Spacer(),
+                    ],
                   ),
                 ),
               ),
