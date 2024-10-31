@@ -55,17 +55,25 @@ class _BottomNavPageState extends State<BottomNavPage> {
   }
 
   Future<void> checkAllReadChat() async {
-    final resp = await Caller.dio.get('/chat/hasUnreadMessage?userId=$uid');
-    setState(() {
-      hasUnreadMessages = resp.data['data'];
-    });
+    try {
+      final resp = await Caller.dio.get('/chat/hasUnreadMessage?userId=$uid');
+      setState(() {
+        hasUnreadMessages = resp.data['data'];
+      });
+    } on Exception catch (e) {
+      debugPrint('Error checking unread messages: $e');
+    }
   }
 
   Future<void> checkAllReadNotification() async {
-    final resp = await Caller.dio.get('/notification/hasUnreadNotification?userID=$uid');
-    setState(() {
-      hasUnreadNotifications = resp.data['data'];
-    });
+    try {
+      final resp = await Caller.dio.get('/notification/hasUnreadNotification?userID=$uid');
+      setState(() {
+        hasUnreadNotifications = resp.data['data'];
+      });
+    } on Exception catch (e) {
+      debugPrint('Error checking unread notifications: $e');
+    }
   }
 
   void _setupFirebaseListeners() {

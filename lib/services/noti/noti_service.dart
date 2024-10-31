@@ -79,13 +79,12 @@ class NotificationService {
     FirebaseMessaging.onMessageOpenedApp.listen(handleMessage);
   }
 
-  Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-    await Firebase.initializeApp();
-    print('Handling a background message ${message.messageId}');
-  }
+  // Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  //   await Firebase.initializeApp();
+  //   print('Handling a background message ${message.messageId}');
+  // }
 
   void firebaseMessagingForegroundHandler(RemoteMessage message) {
-    // print(object)
     var hideNoti = false;
     if (message.data['navigate_to'] == 'chat') {
       hideNoti = ShowOrHideNoti().showOrHideNoti(message.data['identifer']);

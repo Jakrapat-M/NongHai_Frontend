@@ -29,9 +29,8 @@ import 'pages/auth/pet_profile_page.dart';
 final navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await dotenv.load(fileName: '.env');
-  WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -41,10 +40,8 @@ void main() async {
   await notificationService.initialize();
   await notificationService.initPushNotification();
 
-  FirebaseMessaging.onMessage
-      .listen(notificationService.firebaseMessagingForegroundHandler);
-  FirebaseMessaging.onBackgroundMessage(
-      notificationService.firebaseMessagingBackgroundHandler);
+  FirebaseMessaging.onMessage.listen(notificationService.firebaseMessagingForegroundHandler);
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   await initializeDateFormatting('th_TH', null);
   runApp(MyApp(navigatorKey: navigatorKey));
@@ -108,12 +105,7 @@ class _MyAppState extends State<MyApp> {
 
       final resp = await Caller.dio.post(
         '/tracking/createTracking',
-        data: {
-          'pet_id': petId,
-          'finder_id': currentUserId,
-          'lat': lat,
-          'long': long
-        },
+        data: {'pet_id': petId, 'finder_id': currentUserId, 'lat': lat, 'long': long},
       );
       if (resp.statusCode == 200) {
         print('Tracking created');
@@ -148,8 +140,7 @@ class _MyAppState extends State<MyApp> {
 
     // Execute createTracking and close the loading dialog when done
     createTracking(fragment).then((value) {
-      Navigator.of(widget.navigatorKey.currentState!.context)
-          .pop(); // Close loading dialog
+      Navigator.of(widget.navigatorKey.currentState!.context).pop(); // Close loading dialog
       widget.navigatorKey.currentState?.push(MaterialPageRoute(
         builder: (context) {
           return PetProfilePage(petID: fragment);
@@ -175,8 +166,7 @@ class _MyAppState extends State<MyApp> {
               onSurface: const Color(0xff2C3F50), //blue surface(box/button)
               secondaryContainer: const Color(0xffE8E8E8), //container
               secondaryFixed: const Color(0xff2C3F50), //container
-              surfaceBright:
-                  const Color(0xff5DB671), // green container box(status)
+              surfaceBright: const Color(0xff5DB671), // green container box(status)
               onErrorContainer: Colors.red // red container box(status)
               ),
           useMaterial3: true,
@@ -312,6 +302,7 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
+//It must be a top-level function (e.g. not a class method which requires initialization).
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
   print('Handling a background message ${message.messageId}');
