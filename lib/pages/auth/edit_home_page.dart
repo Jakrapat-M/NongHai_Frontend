@@ -387,7 +387,7 @@ class _EditHomePageState extends State<EditHomePage> {
                         style: TextStyle(
                             fontSize: 16,
                             color: Color(0xff1E1E1E),
-                            fontFamily: 'Frodoka',
+                            fontFamily: 'Fredoka',
                             fontWeight: FontWeight.w400),
                       ),
                       const Spacer(),
@@ -397,7 +397,7 @@ class _EditHomePageState extends State<EditHomePage> {
                           style: const TextStyle(
                             fontSize: 20,
                             color: Color(0xff2C3F50),
-                            fontFamily: 'Frodoka',
+                            fontFamily: 'Fredoka',
                             fontWeight: FontWeight.w500,
                           ),
                           decoration: const InputDecoration(
@@ -448,7 +448,7 @@ class _EditHomePageState extends State<EditHomePage> {
                         style: const TextStyle(
                           fontSize: 16,
                           color: Color(0xff1E1E1E),
-                          fontFamily: 'Frodoka',
+                          fontFamily: 'Fredoka',
                           fontWeight: FontWeight.w400,
                         ),
                         decoration: const InputDecoration(
@@ -497,7 +497,7 @@ class _EditHomePageState extends State<EditHomePage> {
                         style: const TextStyle(
                           fontSize: 16,
                           color: Color(0xff1E1E1E),
-                          fontFamily: 'Frodoka',
+                          fontFamily: 'Fredoka',
                           fontWeight: FontWeight.w400,
                         ),
                         decoration: const InputDecoration(
@@ -533,7 +533,7 @@ class _EditHomePageState extends State<EditHomePage> {
                         style: TextStyle(
                           fontSize: 13,
                           color: Color(0xff333333),
-                          fontFamily: 'Frodoka',
+                          fontFamily: 'Fredoka',
                           fontWeight: FontWeight.w400,
                         ),
                       ),
@@ -785,7 +785,7 @@ class _EditHomePageState extends State<EditHomePage> {
                         style: TextStyle(
                             fontSize: 20,
                             color: Color(0xffBFBFBF),
-                            fontFamily: 'Frodoka',
+                            fontFamily: 'Fredoka',
                             fontWeight: FontWeight.w500),
                       ),
                     ),
@@ -807,7 +807,7 @@ class _EditHomePageState extends State<EditHomePage> {
                         style: TextStyle(
                             fontSize: 20,
                             color: Color(0xffFFFFFF),
-                            fontFamily: 'Frodoka',
+                            fontFamily: 'Fredoka',
                             fontWeight: FontWeight.w500),
                       ),
                     ),
