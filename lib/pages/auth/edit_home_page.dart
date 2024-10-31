@@ -30,7 +30,7 @@ class _EditHomePageState extends State<EditHomePage> {
   bool _isLoading = true;
   late String _uid;
   late String _username;
-  late String _address;
+  String _address = '';
   late String _phone;
   late String _image = '';
   // var image;
@@ -61,7 +61,7 @@ class _EditHomePageState extends State<EditHomePage> {
     // Extract user data from the widget's userData map
     _uid = widget.userData['id'] ?? FirebaseAuth.instance.currentUser!.uid;
     _username = widget.userData['username'] ?? 'No Username';
-    _address = widget.userData['address'] ?? 'No Address';
+    //_address = widget.userData['address'] ?? 'No Address';
     _phone = widget.userData['phone'] ?? 'No Phone';
     _image = widget.userData['image'] ?? '';
     _petDetails = widget.userData['pets'] ?? '';
@@ -488,16 +488,18 @@ class _EditHomePageState extends State<EditHomePage> {
                                 children: [
                                   const Icon(
                                     Icons.location_on,
-                                    color: Color(0xff333333),
+                                    color: Color(0xffC8A48A),
                                   ),
                                   const SizedBox(width: 25),
                                   Expanded(
                                     child: Text(
-                                      _address ??
-                                          "Get current location", // Display address or default text
+                                      _address.isEmpty
+                                          ? "Update location"
+                                          : _address,
+                                      // Display address or default text
                                       style: const TextStyle(
                                         fontSize: 16,
-                                        color: Color(0xff1E1E1E),
+                                        color: Color(0xffC8A48A),
                                         fontFamily: 'Fredoka',
                                         fontWeight: FontWeight.w400,
                                       ),
@@ -531,7 +533,7 @@ class _EditHomePageState extends State<EditHomePage> {
                   children: [
                     const Icon(
                       Icons.phone_in_talk_outlined,
-                      color: Color(0xff333333),
+                      color: Color(0xff2C3F50),
                       size: 24,
                     ),
                     const SizedBox(width: 20),
@@ -583,7 +585,7 @@ class _EditHomePageState extends State<EditHomePage> {
                         _showConfirmationDialog(context);
                       },
                       child: const Text(
-                        "Reset password",
+                        "Change password",
                         style: TextStyle(
                           fontSize: 13,
                           color: Color(0xff333333),
