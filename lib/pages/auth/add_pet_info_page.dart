@@ -80,33 +80,13 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
   }
 
   Future<void> _createPet(BuildContext context) async {
-    try {
-      // Check for empty fields and show a dialog if any required fields are missing
-      if (breedController.text.isEmpty) {
-        _showAlertDialog();
-        return;
-      }
-      if (nameController.text.isEmpty) {
-        _showAlertDialog();
-        return;
-      }
-      if (weightController.text.isEmpty) {
-        _showAlertDialog();
-        return;
-      }
-      if (hairColorController.text.isEmpty) {
-        _showAlertDialog();
-        return;
-      }
-      if (eyeColorController.text.isEmpty) {
-        _showAlertDialog();
-        return;
-      }
-      if (bloodController.text.isEmpty) {
-        _showAlertDialog();
-        return;
-      }
+    // Validate required fields before proceeding
+    if (!_validateFields()) {
+      _showAlertDialog();
+      return;
+    }
 
+    try {
       // Populate petData with the values from the controllers
       petData!['breed'] = breedController.text;
       petData!['name'] = nameController.text;
@@ -137,12 +117,68 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
           MaterialPageRoute(builder: (context) => NfcPage(petId: petId)),
         );
       } else {
-        _showAlertDialog();
+        _showFailureDialog();
       }
     } catch (e) {
       print('Error occurred: ${e.toString()}');
-      // _showAlertDialog();
+      // _showFailureDialog();
     }
+  }
+
+// Validation function to check if required fields are not empty
+  bool _validateFields() {
+    if (breedController.text.isEmpty) {
+      print('invalid breed');
+      return false;
+    }
+    if (nameController.text.isEmpty) {
+      print('invalid name');
+      return false;
+    }
+    if (weightController.text.isEmpty) {
+      print('invalid weight');
+      return false;
+    }
+    if (hairColorController.text.isEmpty) {
+      print('invalid hair');
+      return false;
+    }
+    if (eyeColorController.text.isEmpty) {
+      print('invalid eye');
+      return false;
+    }
+    if (bloodController.text.isEmpty) {
+      print('invalid blood');
+      return false;
+    }
+    return true;
+  }
+
+  void _showFailureDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Creation Failed'),
+          content: const Text(
+            'Failed to create the pet profile. Please try again later.',
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                // Navigator.pushAndRemoveUntil(
+                //   context,
+                //   MaterialPageRoute(builder: (context) => HomePage()),
+                //   (route) => false, // Remove all routes until the home page
+                // );
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _showAlertDialog() {
@@ -526,25 +562,34 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
                   text: "Next",
                   onTap: () => _createPet(context),
                 ),
-                TextButton(
-                  onPressed: () => _skip(),
-                  style: TextButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(
-                        175, 224, 223, 223), // Background color
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                          50), // Optional: Adjust radius for rounded corners
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+                  child: TextButton(
+                    onPressed: () => _skip(),
+                    style: TextButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(
+                          175, 224, 223, 223), // Background color
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(
+                            50), // Optional: Adjust radius for rounded corners
+                      ),
                     ),
-                  ),
-                  child: const Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 113),
-                    child: const Text(
-                      "Skip",
-                      style: TextStyle(
-                        color: Color(0xffC8A48A),
-                        fontFamily: "Fredoka",
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
+                    child: const Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 0),
+                      child: Row(
+                        children: [
+                          const Spacer(),
+                          const Text(
+                            "Skip",
+                            style: TextStyle(
+                              color: Color(0xffC8A48A),
+                              fontFamily: "Fredoka",
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                          const Spacer(),
+                        ],
                       ),
                     ),
                   ),
