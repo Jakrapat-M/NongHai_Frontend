@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:nonghai/pages/auth/home_page.dart';
+import 'package:nonghai/pages/bottom_nav_page.dart';
 
-class CustomAppBarToHome extends StatelessWidget
-    implements PreferredSizeWidget {
+class CustomAppBarToHome extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final bool? noBackButton;
 
@@ -24,7 +24,9 @@ class CustomAppBarToHome extends StatelessWidget
         leading: GestureDetector(
           onTap: () {
             Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return const HomePage();
+              return const BottomNavPage(
+                page: 1,
+              );
             }));
           },
           child: Row(
