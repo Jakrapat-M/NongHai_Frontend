@@ -33,12 +33,25 @@ class _AddContactPageState extends State<AddContactPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     // Retrieve the userData passed from the RegisterPage
-    userData = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    userData =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+  }
+
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      // No casting needed
+      SnackBar(content: Text(message)),
+    );
   }
 
   Future<void> _createUser(BuildContext context) async {
-    if (_phoneNumber != null &&
-        nameController.text.isNotEmpty &&
+    if (_phoneNumber == null || _phoneNumber!.length < 9) {
+      // Show a message if the phone number has fewer than 9 digits
+      _showMessage("Phone number must be 9 or 10 digits.");
+      return;
+    }
+
+    if (nameController.text.isNotEmpty &&
         surnameController.text.isNotEmpty &&
         addrController.text.isNotEmpty) {
       userData!['phone'] = _phoneNumber!;
@@ -69,7 +82,8 @@ class _AddContactPageState extends State<AddContactPage> {
                   // userId: userData!['id'], // Pass your userData if needed
                   ),
             ),
-            (Route<dynamic> route) => false, // This ensures no previous routes remain
+            (Route<dynamic> route) =>
+                false, // This ensures no previous routes remain
           );
         } else {
           // Handle error from API
@@ -141,8 +155,8 @@ class _AddContactPageState extends State<AddContactPage> {
       String folderPath = 'profileImage/$userId.jpg'; // Save as userId.jpg
 
       // Save the profile image and pass the userId and folderPath
-      String imgUrl =
-          await StoreProfile().saveData(userId: userId, file: imageFile, folderPath: folderPath);
+      String imgUrl = await StoreProfile()
+          .saveData(userId: userId, file: imageFile, folderPath: folderPath);
 
       // Set userData['image'] with the URL
       userData!['image'] = imgUrl;
@@ -162,7 +176,8 @@ class _AddContactPageState extends State<AddContactPage> {
     print(userData);
     return Scaffold(
       appBar: AppBar(
-        title: Text("Your Contact", style: Theme.of(context).bannerTheme.contentTextStyle),
+        title: Text("Your Contact",
+            style: Theme.of(context).bannerTheme.contentTextStyle),
       ),
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: Padding(
@@ -214,20 +229,25 @@ class _AddContactPageState extends State<AddContactPage> {
                     // ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Colors.transparent), // No underline
+                      borderSide: const BorderSide(
+                          color: Colors.transparent), // No underline
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide:
-                          const BorderSide(color: Colors.transparent), // No underline when focused
+                      borderSide: const BorderSide(
+                          color:
+                              Colors.transparent), // No underline when focused
                     ),
                   ),
                   initialCountryCode: 'TH', // Set the initial country code
                   disableLengthCheck: true,
                   inputFormatters: [
-                    FilteringTextInputFormatter.allow(
-                        RegExp(r'^[\d\-,.]*$')) // Allow digits, ., -, and ,
+                    FilteringTextInputFormatter.digitsOnly, // Allow digits only
+
+                    LengthLimitingTextInputFormatter(
+                        10), // Limit input to 10 characters
                   ],
+
                   onChanged: (phone) {
                     setState(() {
                       _phoneNumber =
