@@ -5,7 +5,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:nonghai/pages/auth/edit_home_page.dart';
 import 'package:nonghai/pages/auth/edit_pet_page.dart';
 import 'package:nonghai/pages/nfc_page.dart';
@@ -27,6 +26,7 @@ import 'pages/auth/add_profile_page.dart';
 import 'pages/auth/additional_note_page.dart';
 import 'pages/auth/pet_profile_page.dart';
 
+final navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -36,7 +36,6 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  final navigatorKey = GlobalKey<NavigatorState>();
   final notificationService = NotificationService(navigatorKey: navigatorKey);
 
   await notificationService.initialize();
@@ -129,37 +128,6 @@ class _MyAppState extends State<MyApp> {
     }
     return true;
   }
-
-  // Future<Position?> _getLocation() async {
-  //   print("test getLocaion");
-  //   bool serviceEnabled;
-  //   LocationPermission permission;
-
-  //   print('Checking location');
-  //   // Test if location services are enabled.
-  //   serviceEnabled = await Geolocator.isLocationServiceEnabled();
-  //   if (!serviceEnabled) {
-  //     print("Location services are disabled.");
-  //     return null;
-  //   }
-
-  //   permission = await Geolocator.checkPermission();
-  //   if (permission == LocationPermission.denied) {
-  //     permission = await Geolocator.requestPermission();
-  //     if (permission == LocationPermission.denied) {
-  //       print("Location permissions are denied");
-  //       return null;
-  //     }
-  //   }
-  //   if (permission == LocationPermission.deniedForever) {
-  //     print(
-  //         'Location permissions are permanently denied, we cannot request permissions.');
-  //     return null;
-  //   }
-  //   print("get location success");
-
-  //   return await Geolocator.getCurrentPosition();
-  // }
 
   void openAppLink(Uri uri) {
     final fragment = uri.fragment;

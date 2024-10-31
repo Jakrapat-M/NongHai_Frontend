@@ -27,10 +27,11 @@ class AddContactPage extends StatefulWidget {
 
 class _AddContactPageState extends State<AddContactPage> {
   String? _phoneNumber;
+  String? _addr;
   Map<String, dynamic>? userData;
   final nameController = TextEditingController();
   final surnameController = TextEditingController();
-  final addrController = TextEditingController();
+  // final addrController = TextEditingController();
 
   @override
   void didChangeDependencies() {
@@ -40,15 +41,28 @@ class _AddContactPageState extends State<AddContactPage> {
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
   }
 
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      // No casting needed
+      SnackBar(content: Text(message)),
+    );
+  }
+
   Future<void> _createUser(BuildContext context) async {
-    if (_phoneNumber != null &&
-        nameController.text.isNotEmpty &&
-        surnameController.text.isNotEmpty &&
-        addrController.text.isNotEmpty) {
+    if (_phoneNumber == null || _phoneNumber!.length < 9) {
+      // Show a message if the phone number has fewer than 9 digits
+      _showMessage("Phone number must be 9 or 10 digits.");
+      return;
+    } else if (_addr == null || _addr == "") {
+      _showMessage("Please get your current location.");
+      return;
+    }
+
+    if (nameController.text.isNotEmpty && surnameController.text.isNotEmpty) {
       userData!['phone'] = _phoneNumber!;
       userData!['name'] = nameController.text;
       userData!['surname'] = surnameController.text;
-      userData!['address'] = addrController.text;
+      userData!['address'] = _addr!;
 
       // final authService = AuthService();
       try {
@@ -224,13 +238,84 @@ class _AddContactPageState extends State<AddContactPage> {
                 hintStyle: Theme.of(context).textTheme.displayLarge,
               ),
             ),
+            TextButton(
+              style: TextButton.styleFrom(
+                backgroundColor: Colors.white,
+                padding:
+                    const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+              ),
+              onPressed: () {
+                // locationที่ได้ เอาไปใส่ไว้ใน_addr(string)
+                setState(() {
+                  // _addr = newLocation;
+                });
+              },
+              child: _addr == null || _addr == ""
+                  ? Row(
+                      children: [
+                        Icon(
+                          Icons.location_on,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                        const Spacer(),
+                        // const SizedBox(width: 8),
+                        const Text(
+                          "Get current location",
+                          style: TextStyle(
+                              color: Color(0xffC8A48A),
+                              fontFamily: "Fredoka",
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500),
+                          overflow: TextOverflow.clip,
+                        ),
+                        const Spacer(),
+                      ],
+                    )
+                  : Row(
+                      children: [
+                        Icon(
+                          Icons.location_on,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                        // const Spacer(),
+                        const SizedBox(width: 8),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.6,
+                          child: Text(
+                            _addr!,
+                            style: const TextStyle(
+                                color: Color(0xffC8A48A),
+                                fontFamily: "Fredoka",
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        // const Spacer(),
+                      ],
+                    ),
+            ),
             Padding(
               padding: const EdgeInsets.only(bottom: 12),
-              child: CustomTextField(
-                  controller: addrController,
-                  hintText: "Address",
-                  hintStyle: Theme.of(context).textTheme.displayLarge,
-                  obscureText: false),
+              child: Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.80,
+                      child: const Text(
+                        "*if current location is not your home please edit later at the homepage",
+                        style: TextStyle(
+                            fontFamily: 'Fredoka',
+                            fontSize: 10,
+                            fontWeight: FontWeight.w400,
+                            color: Color(0xffC8A48A)),
+                        overflow: TextOverflow.clip,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
             Padding(
               padding: const EdgeInsets.only(bottom: 12),
@@ -263,9 +348,12 @@ class _AddContactPageState extends State<AddContactPage> {
                   initialCountryCode: 'TH', // Set the initial country code
                   disableLengthCheck: true,
                   inputFormatters: [
-                    FilteringTextInputFormatter.allow(
-                        RegExp(r'^[\d\-,.]*$')) // Allow digits, ., -, and ,
+                    FilteringTextInputFormatter.digitsOnly, // Allow digits only
+
+                    LengthLimitingTextInputFormatter(
+                        10), // Limit input to 10 characters
                   ],
+
                   onChanged: (phone) {
                     setState(() {
                       _phoneNumber =
