@@ -502,12 +502,22 @@ class _EditHomePageState extends State<EditHomePage> {
                         ),
                         decoration: const InputDecoration(
                           border: InputBorder.none,
-                          hintText: 'Enter phone number',
+                          hintText: 'Phone no. has to be 9 or 10 digits',
                         ),
                         keyboardType: TextInputType.phone,
                         inputFormatters: [
-                          FilteringTextInputFormatter.allow(RegExp(
-                              r'^[\d\-,.]*$')) // Allow digits, ., -, and ,
+                          FilteringTextInputFormatter
+                              .digitsOnly, // Allow digits only
+
+                          LengthLimitingTextInputFormatter(
+                              10), // Limit input to 10 characters
+                          // TextInputFormatter.withFunction((oldValue, newValue) {
+                          //   // Ensure length is between 9 and 10 characters
+                          //   if (newValue.text.length < 9) {
+                          //     return oldValue; // Prevent changes if length is less than 9
+                          //   }
+                          //   return newValue;
+                          // }),
                         ],
                         onChanged: (value) {
                           setState(() {
@@ -840,6 +850,10 @@ class _EditHomePageState extends State<EditHomePage> {
       isValid = false;
     } else if (_phone == '' || _phone.isEmpty) {
       _showDialog("Phone number");
+      isValid = false;
+    } else if (_phone.length < 9) {
+      // Check if phone has fewer than 9 digits
+      _showError("Phone number must be 9 or 10 digits");
       isValid = false;
     }
 
