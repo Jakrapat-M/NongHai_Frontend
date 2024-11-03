@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:nonghai/components/chat_bubble.dart';
@@ -44,7 +43,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   }
 
   getuserData() async {
-    print('Fetching Name');
+    debugPrint('Fetching Name');
     try {
       final response = await Caller.dio.get(
         "/user/${widget.receiverID}",
@@ -93,7 +92,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
         scrollDown();
       }
     } catch (e) {
-      print('Error picking image: $e');
+      debugPrint('Error picking image: $e');
     }
   }
 

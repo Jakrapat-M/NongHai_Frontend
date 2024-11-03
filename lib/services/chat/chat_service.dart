@@ -57,7 +57,7 @@ class ChatService {
           .collection('messages')
           .add(newMessage.toMap());
     } catch (e) {
-      print('Error sending message: $e');
+      debugPrint('Error sending message: $e');
     } finally {
       // Call the server to set unread status
 
@@ -72,7 +72,7 @@ class ChatService {
       try {
         sendChatNoti(currentUserID, receiverID, message);
       } catch (e) {
-        print('Error sending chat notification: $e');
+        debugPrint('Error sending chat notification: $e');
       }
     }
   }
@@ -191,7 +191,7 @@ class ChatService {
         },
       );
     } catch (e) {
-      print('Error creating chat room: $e');
+      debugPrint('Error creating chat room: $e');
     }
   }
 

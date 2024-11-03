@@ -77,6 +77,7 @@ class _EditHomePageState extends State<EditHomePage> {
     });
   }
 
+  final ImagePicker _picker = ImagePicker();
   Future<void> _pickImage() async {
     showDialog(
       context: context,
@@ -127,32 +128,13 @@ class _EditHomePageState extends State<EditHomePage> {
                       child: const Text('Gallery'),
                       onPressed: () async {
                         Navigator.of(context).pop();
-
-                        // Check and request storage/gallery permission
-                        var galleryStatus = await Permission.storage.status;
-                        if (!galleryStatus.isGranted) {
-                          galleryStatus = await Permission.storage.request();
-                        }
-
-                        if (galleryStatus.isGranted) {
-                          FilePickerResult? result =
-                              await FilePicker.platform.pickFiles(
-                            type: FileType.image,
-                            allowMultiple: false,
-                          );
-
-                          if (result != null && result.files.isNotEmpty) {
-                            String path = result.files.single.path!;
-                            setState(() {
-                              _newImage = XFile(path);
-                            });
-                          } else {
-                            _showMessage('No file selected.');
-                          }
+                        final XFile? result = await _picker.pickImage(source: ImageSource.gallery);
+                        if (result != null) {
+                          setState(() {
+                            _newImage = result;
+                          });
                         } else {
-                          _showMessage(
-                            'Storage permission denied. Please allow permission in settings.',
-                          );
+                          _showMessage('No file selected.');
                         }
                       },
                     ),
@@ -250,8 +232,7 @@ class _EditHomePageState extends State<EditHomePage> {
             TextButton(
               child: const Text('Confirm'),
               onPressed: () async {
-                Navigator.of(context)
-                    .pop(); // Close the dialog before sending the email
+                Navigator.of(context).pop(); // Close the dialog before sending the email
                 _sendPasswordResetEmail(context);
               },
             ),
@@ -322,8 +303,7 @@ class _EditHomePageState extends State<EditHomePage> {
         if (value != null) {
           print('Location: ${value.latitude}, ${value.longitude}');
           try {
-            final resp =
-                await Caller.dio.get('/tracking/getAddressByLatLng', data: {
+            final resp = await Caller.dio.get('/tracking/getAddressByLatLng', data: {
               'lat': value.latitude,
               'lng': value.longitude,
             });
@@ -371,10 +351,9 @@ class _EditHomePageState extends State<EditHomePage> {
                     opacity: 0.55, // Set opacity to 55%
                     child: CircleAvatar(
                       radius: 47,
-                      backgroundImage: (_newImage !=
-                              null) // Check if a new image is selected
-                          ? FileImage(File(_newImage!
-                              .path)) // Load image from the newly selected XFile
+                      backgroundImage: (_newImage != null) // Check if a new image is selected
+                          ? FileImage(
+                              File(_newImage!.path)) // Load image from the newly selected XFile
                           : (_image != null && _image.isNotEmpty)
                               ? NetworkImage(
                                   _image) // Load image from URL if no new image is selected
@@ -479,8 +458,7 @@ class _EditHomePageState extends State<EditHomePage> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   CircularProgressIndicator(
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
+                                    color: Theme.of(context).colorScheme.primary,
                                   ),
                                 ],
                               )
@@ -493,9 +471,7 @@ class _EditHomePageState extends State<EditHomePage> {
                                   const SizedBox(width: 25),
                                   Expanded(
                                     child: Text(
-                                      _address.isEmpty
-                                          ? "Update location"
-                                          : _address,
+                                      _address.isEmpty ? "Update location" : _address,
                                       // Display address or default text
                                       style: const TextStyle(
                                         fontSize: 16,
@@ -552,11 +528,9 @@ class _EditHomePageState extends State<EditHomePage> {
                         ),
                         keyboardType: TextInputType.phone,
                         inputFormatters: [
-                          FilteringTextInputFormatter
-                              .digitsOnly, // Allow digits only
+                          FilteringTextInputFormatter.digitsOnly, // Allow digits only
 
-                          LengthLimitingTextInputFormatter(
-                              10), // Limit input to 10 characters
+                          LengthLimitingTextInputFormatter(10), // Limit input to 10 characters
                           // TextInputFormatter.withFunction((oldValue, newValue) {
                           //   // Ensure length is between 9 and 10 characters
                           //   if (newValue.text.length < 9) {
@@ -607,9 +581,7 @@ class _EditHomePageState extends State<EditHomePage> {
                       const Padding(
                         padding: EdgeInsets.fromLTRB(0, 0, 0, 12),
                         child: Row(
-                          children: [
-                            Text('Your Family', style: TextStyle(fontSize: 16))
-                          ],
+                          children: [Text('Your Family', style: TextStyle(fontSize: 16))],
                         ),
                       ),
                       SizedBox(
@@ -628,8 +600,7 @@ class _EditHomePageState extends State<EditHomePage> {
                             : GridView.builder(
                                 padding: EdgeInsets.zero,
                                 itemCount: _petCount,
-                                gridDelegate:
-                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                                   crossAxisCount: 2,
                                   mainAxisSpacing: 15.0,
                                   crossAxisSpacing: 12.0,
@@ -638,10 +609,8 @@ class _EditHomePageState extends State<EditHomePage> {
                                 itemBuilder: (context, index) {
                                   final pet = _petDetails[index];
                                   return Card(
-                                    color:
-                                        Theme.of(context).colorScheme.tertiary,
-                                    margin:
-                                        const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                    color: Theme.of(context).colorScheme.tertiary,
+                                    margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
                                     elevation: 1,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
@@ -649,42 +618,30 @@ class _EditHomePageState extends State<EditHomePage> {
                                     child: Stack(
                                       children: [
                                         Opacity(
-                                          opacity:
-                                              0.55, // Adjust the opacity level as needed.
+                                          opacity: 0.55, // Adjust the opacity level as needed.
                                           child: Column(
                                             children: [
                                               SizedBox(
                                                 width: double.infinity,
                                                 height: 155,
                                                 child: ClipRRect(
-                                                    borderRadius:
-                                                        const BorderRadius
-                                                            .vertical(
+                                                    borderRadius: const BorderRadius.vertical(
                                                       top: Radius.circular(8),
                                                     ),
                                                     child: Container(
                                                       color:
-                                                          const Color.fromARGB(
-                                                              255,
-                                                              227,
-                                                              225,
-                                                              225),
-                                                      child: pet['img'] != '' &&
-                                                              pet['img'] != null
+                                                          const Color.fromARGB(255, 227, 225, 225),
+                                                      child: pet['img'] != '' && pet['img'] != null
                                                           ? Image.network(
                                                               pet['img'],
                                                               fit: BoxFit.cover,
                                                               errorBuilder:
-                                                                  (context,
-                                                                      error,
-                                                                      stackTrace) {
+                                                                  (context, error, stackTrace) {
                                                                 return const Center(
                                                                   child: Text(
                                                                     'No preview image',
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontSize:
-                                                                          16,
+                                                                    style: TextStyle(
+                                                                      fontSize: 16,
                                                                       color: Color.fromARGB(
                                                                           255,
                                                                           135,
@@ -698,8 +655,7 @@ class _EditHomePageState extends State<EditHomePage> {
                                                           : const Center(
                                                               child: Text(
                                                                 'No preview image',
-                                                                style:
-                                                                    TextStyle(
+                                                                style: TextStyle(
                                                                   fontSize: 16,
                                                                   color: Colors
                                                                       .grey, // Customize text color if needed
@@ -710,75 +666,51 @@ class _EditHomePageState extends State<EditHomePage> {
                                               ),
                                               Expanded(
                                                 child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.fromLTRB(
-                                                          8, 5, 8, 5),
+                                                  padding: const EdgeInsets.fromLTRB(8, 5, 8, 5),
                                                   child: Column(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.end,
+                                                    mainAxisAlignment: MainAxisAlignment.end,
                                                     children: [
                                                       Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .start,
+                                                        mainAxisAlignment: MainAxisAlignment.start,
                                                         children: [
                                                           Text(
                                                             pet['name'],
-                                                            style: Theme.of(
-                                                                    context)
+                                                            style: Theme.of(context)
                                                                 .textTheme
                                                                 .labelLarge,
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis,
+                                                            overflow: TextOverflow.ellipsis,
                                                           ),
                                                         ],
                                                       ),
                                                       Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .start,
+                                                        mainAxisAlignment: MainAxisAlignment.start,
                                                         children: [
                                                           Text(
                                                             '${pet['sex']} - ${pet['age']}',
-                                                            style: Theme.of(
-                                                                    context)
+                                                            style: Theme.of(context)
                                                                 .textTheme
                                                                 .displayMedium,
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis,
+                                                            overflow: TextOverflow.ellipsis,
                                                           ),
                                                           const Spacer(),
-                                                          if (pet['status'] !=
-                                                                  null &&
-                                                              pet['status'] !=
-                                                                  "")
+                                                          if (pet['status'] != null &&
+                                                              pet['status'] != "")
                                                             Container(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .symmetric(
+                                                              padding: const EdgeInsets.symmetric(
                                                                 horizontal: 11,
                                                                 vertical: 1.5,
                                                               ),
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                color: pet['status'] ==
-                                                                        'Lost'
+                                                              decoration: BoxDecoration(
+                                                                color: pet['status'] == 'Lost'
                                                                     ? Colors.red
-                                                                    : Colors
-                                                                        .green,
-                                                                shape: BoxShape
-                                                                    .rectangle,
+                                                                    : Colors.green,
+                                                                shape: BoxShape.rectangle,
                                                                 borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            8),
+                                                                    BorderRadius.circular(8),
                                                               ),
                                                               child: Text(
                                                                 pet['status'],
-                                                                style: Theme.of(
-                                                                        context)
+                                                                style: Theme.of(context)
                                                                     .textTheme
                                                                     .displaySmall,
                                                               ),
@@ -797,8 +729,7 @@ class _EditHomePageState extends State<EditHomePage> {
                                           right: 60,
                                           child: GestureDetector(
                                             onTap: () {
-                                              _showDeleteConfirmationDialog(
-                                                  context, pet['id']);
+                                              _showDeleteConfirmationDialog(context, pet['id']);
                                             },
                                             child: Container(
                                               padding: const EdgeInsets.all(6),
@@ -835,8 +766,7 @@ class _EditHomePageState extends State<EditHomePage> {
                         // );
                         Navigator.pop(context);
                       },
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white),
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
                       child: const Text(
                         'Cancel',
                         style: TextStyle(
@@ -857,8 +787,7 @@ class _EditHomePageState extends State<EditHomePage> {
                         // SaveProfile();
                         _saveChanges();
                       },
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xffC8A48A)),
+                      style: ElevatedButton.styleFrom(backgroundColor: const Color(0xffC8A48A)),
                       child: const Text(
                         'Confirm',
                         style: TextStyle(

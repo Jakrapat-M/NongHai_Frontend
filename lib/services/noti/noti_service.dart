@@ -1,6 +1,4 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-
 import 'package:flutter/material.dart';
 import 'package:nonghai/pages/chat/chat_room_page.dart';
 import 'package:nonghai/pages/tracking_page.dart';
@@ -23,16 +21,16 @@ class NotificationService {
       sound: true,
     );
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      print('User granted permission');
+      debugPrint('User granted permission');
     } else {
-      print('User declined or has not accepted permission');
+      debugPrint('User declined or has not accepted permission');
     }
   }
 
   final chatService = ChatService();
   // handle message
   void handleMessage(RemoteMessage? message) {
-    print('noti data: ${message?.data}');
+    debugPrint('noti data: ${message?.data}');
 
     if (message == null) return;
 
@@ -66,10 +64,6 @@ class NotificationService {
       default:
         break;
     }
-
-    // navigate to page
-
-    // navigatorKey.currentState?.pushNamed('/notification', arguments: message);
   }
 
   // Background message handler
@@ -79,13 +73,12 @@ class NotificationService {
     FirebaseMessaging.onMessageOpenedApp.listen(handleMessage);
   }
 
-  Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-    await Firebase.initializeApp();
-    print('Handling a background message ${message.messageId}');
-  }
+  // Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  //   await Firebase.initializeApp();
+  //   print('Handling a background message ${message.messageId}');
+  // }
 
   void firebaseMessagingForegroundHandler(RemoteMessage message) {
-    // print(object)
     var hideNoti = false;
     if (message.data['navigate_to'] == 'chat') {
       hideNoti = ShowOrHideNoti().showOrHideNoti(message.data['identifer']);

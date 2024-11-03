@@ -67,7 +67,7 @@ class _NotificationTileState extends State<NotificationTile> {
 
   handleTap() async {
     SendNotiService().readNotification(widget.notiId);
-    print('Navigate to TrackingPage with petId: ${notiObject!.petId}');
+    debugPrint('Navigate to TrackingPage with petId: ${notiObject!.petId}');
     MaterialPageRoute materialPageRoute = MaterialPageRoute(
       builder: (context) => TrackingPage(
         petId: notiObject!.petId,

@@ -30,6 +30,7 @@ class _NotificationPageState extends State<NotificationPage> {
       }
     } catch (e) {
       if (kDebugMode) {
+        
         print('Network error occurred: $e');
       }
     }
