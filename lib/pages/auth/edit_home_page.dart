@@ -4,7 +4,7 @@
 // import 'dart:typed_data'; //unnecessary
 
 import 'dart:io';
-import 'package:file_picker/file_picker.dart';
+// import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +30,7 @@ class _EditHomePageState extends State<EditHomePage> {
   bool _isLoading = true;
   late String _uid;
   late String _username;
+  late String _newAddress = '';
   String _address = '';
   late String _phone;
   late String _image = '';
@@ -61,7 +62,7 @@ class _EditHomePageState extends State<EditHomePage> {
     // Extract user data from the widget's userData map
     _uid = widget.userData['id'] ?? FirebaseAuth.instance.currentUser!.uid;
     _username = widget.userData['username'] ?? 'No Username';
-    //_address = widget.userData['address'] ?? 'No Address';
+    _address = widget.userData['address'] ?? '';
     _phone = widget.userData['phone'] ?? 'No Phone';
     _image = widget.userData['image'] ?? '';
     _petDetails = widget.userData['pets'] ?? '';
@@ -96,7 +97,12 @@ class _EditHomePageState extends State<EditHomePage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     TextButton(
-                      child: const Text('Camera'),
+                      style: TextButton.styleFrom(
+                          backgroundColor: const Color(0xffffffff),
+                          padding: const EdgeInsets.symmetric(horizontal: 18),
+                          elevation: 1,
+                          shadowColor:
+                              const Color.fromARGB(110, 220, 219, 219)),
                       onPressed: () async {
                         Navigator.of(context).pop();
 
@@ -122,13 +128,21 @@ class _EditHomePageState extends State<EditHomePage> {
                           );
                         }
                       },
+                      child: const Text('Camera'),
                     ),
                     const SizedBox(width: 20),
                     TextButton(
+                      style: TextButton.styleFrom(
+                          backgroundColor: const Color(0xffffffff),
+                          padding: const EdgeInsets.symmetric(horizontal: 18),
+                          elevation: 1,
+                          shadowColor:
+                              const Color.fromARGB(110, 220, 219, 219)),
                       child: const Text('Gallery'),
                       onPressed: () async {
                         Navigator.of(context).pop();
-                        final XFile? result = await _picker.pickImage(source: ImageSource.gallery);
+                        final XFile? result = await _picker.pickImage(
+                            source: ImageSource.gallery);
                         if (result != null) {
                           setState(() {
                             _newImage = result;
@@ -192,12 +206,26 @@ class _EditHomePageState extends State<EditHomePage> {
           content: const Text('Are you sure you want to delete this pet?'),
           actions: <Widget>[
             TextButton(
+              style: TextButton.styleFrom(
+                  backgroundColor: const Color(0xffffffff),
+                  padding: const EdgeInsets.symmetric(horizontal: 18),
+                  elevation: 1,
+                  shadowColor: const Color.fromARGB(110, 220, 219, 219)),
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
               },
-              child: const Text('Cancel'),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.grey),
+              ),
             ),
             TextButton(
+              style: TextButton.styleFrom(
+                  backgroundColor: const Color(0xffffffff),
+                  // fixedSize: Size(80, 15),
+                  padding: const EdgeInsets.symmetric(horizontal: 18),
+                  elevation: 1,
+                  shadowColor: const Color.fromARGB(110, 220, 219, 219)),
               onPressed: () {
                 _deletedPetIds.add(petId); // Add petId to deleted list
                 setState(() {
@@ -219,20 +247,35 @@ class _EditHomePageState extends State<EditHomePage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Confirm Password Reset'),
+          title: const Text('Confirm Change Password'),
           content: const Text(
-              'Are you sure you want to reset your password? An email will be sent to your registered email address.'),
+              'In order to change password, the password will be reset. A reset password email will be sent to your registered email address.'),
           actions: [
             TextButton(
-              child: const Text('Cancel'),
+              style: TextButton.styleFrom(
+                  backgroundColor: const Color(0xffffffff),
+                  elevation: 1,
+                  shadowColor: Colors.grey),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.grey),
+              ),
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
               },
             ),
             TextButton(
-              child: const Text('Confirm'),
+              style: TextButton.styleFrom(
+                  backgroundColor: const Color(0xffC8A48A),
+                  elevation: 1,
+                  shadowColor: Colors.grey),
+              child: const Text(
+                'Confirm',
+                style: TextStyle(color: Color(0xffffffff)),
+              ),
               onPressed: () async {
-                Navigator.of(context).pop(); // Close the dialog before sending the email
+                Navigator.of(context)
+                    .pop(); // Close the dialog before sending the email
                 _sendPasswordResetEmail(context);
               },
             ),
@@ -303,13 +346,15 @@ class _EditHomePageState extends State<EditHomePage> {
         if (value != null) {
           print('Location: ${value.latitude}, ${value.longitude}');
           try {
-            final resp = await Caller.dio.get('/tracking/getAddressByLatLng', data: {
+            final resp =
+                await Caller.dio.get('/tracking/getAddressByLatLng', data: {
               'lat': value.latitude,
               'lng': value.longitude,
             });
             if (resp.statusCode == 200) {
               setState(() {
-                _address = resp.data['data'];
+                _newAddress = resp.data['data'];
+                print(_newAddress);
                 isLoadingAddress = false;
               });
             }
@@ -351,9 +396,10 @@ class _EditHomePageState extends State<EditHomePage> {
                     opacity: 0.55, // Set opacity to 55%
                     child: CircleAvatar(
                       radius: 47,
-                      backgroundImage: (_newImage != null) // Check if a new image is selected
-                          ? FileImage(
-                              File(_newImage!.path)) // Load image from the newly selected XFile
+                      backgroundImage: (_newImage !=
+                              null) // Check if a new image is selected
+                          ? FileImage(File(_newImage!
+                              .path)) // Load image from the newly selected XFile
                           : (_image != null && _image.isNotEmpty)
                               ? NetworkImage(
                                   _image) // Load image from URL if no new image is selected
@@ -458,7 +504,8 @@ class _EditHomePageState extends State<EditHomePage> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   CircularProgressIndicator(
-                                    color: Theme.of(context).colorScheme.primary,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
                                   ),
                                 ],
                               )
@@ -471,7 +518,9 @@ class _EditHomePageState extends State<EditHomePage> {
                                   const SizedBox(width: 25),
                                   Expanded(
                                     child: Text(
-                                      _address.isEmpty ? "Update location" : _address,
+                                      _newAddress == ''
+                                          ? "Update location"
+                                          : _newAddress,
                                       // Display address or default text
                                       style: const TextStyle(
                                         fontSize: 16,
@@ -528,9 +577,11 @@ class _EditHomePageState extends State<EditHomePage> {
                         ),
                         keyboardType: TextInputType.phone,
                         inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly, // Allow digits only
+                          FilteringTextInputFormatter
+                              .digitsOnly, // Allow digits only
 
-                          LengthLimitingTextInputFormatter(10), // Limit input to 10 characters
+                          LengthLimitingTextInputFormatter(
+                              10), // Limit input to 10 characters
                           // TextInputFormatter.withFunction((oldValue, newValue) {
                           //   // Ensure length is between 9 and 10 characters
                           //   if (newValue.text.length < 9) {
@@ -581,7 +632,9 @@ class _EditHomePageState extends State<EditHomePage> {
                       const Padding(
                         padding: EdgeInsets.fromLTRB(0, 0, 0, 12),
                         child: Row(
-                          children: [Text('Your Family', style: TextStyle(fontSize: 16))],
+                          children: [
+                            Text('Your Family', style: TextStyle(fontSize: 16))
+                          ],
                         ),
                       ),
                       SizedBox(
@@ -600,7 +653,8 @@ class _EditHomePageState extends State<EditHomePage> {
                             : GridView.builder(
                                 padding: EdgeInsets.zero,
                                 itemCount: _petCount,
-                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
                                   crossAxisCount: 2,
                                   mainAxisSpacing: 15.0,
                                   crossAxisSpacing: 12.0,
@@ -609,8 +663,10 @@ class _EditHomePageState extends State<EditHomePage> {
                                 itemBuilder: (context, index) {
                                   final pet = _petDetails[index];
                                   return Card(
-                                    color: Theme.of(context).colorScheme.tertiary,
-                                    margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                    color:
+                                        Theme.of(context).colorScheme.tertiary,
+                                    margin:
+                                        const EdgeInsets.fromLTRB(0, 0, 0, 0),
                                     elevation: 1,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
@@ -618,108 +674,152 @@ class _EditHomePageState extends State<EditHomePage> {
                                     child: Stack(
                                       children: [
                                         Opacity(
-                                          opacity: 0.55, // Adjust the opacity level as needed.
+                                          opacity:
+                                              0.55, // Adjust the opacity level as needed.
                                           child: Column(
                                             children: [
                                               SizedBox(
                                                 width: double.infinity,
-                                                height: 155,
+                                                height: MediaQuery.of(context)
+                                                        .size
+                                                        .height *
+                                                    0.18,
                                                 child: ClipRRect(
-                                                    borderRadius: const BorderRadius.vertical(
-                                                      top: Radius.circular(8),
-                                                    ),
-                                                    child: Container(
-                                                      color:
-                                                          const Color.fromARGB(255, 227, 225, 225),
-                                                      child: pet['img'] != '' && pet['img'] != null
-                                                          ? Image.network(
-                                                              pet['img'],
-                                                              fit: BoxFit.cover,
-                                                              errorBuilder:
-                                                                  (context, error, stackTrace) {
-                                                                return const Center(
-                                                                  child: Text(
-                                                                    'No preview image',
-                                                                    style: TextStyle(
-                                                                      fontSize: 16,
-                                                                      color: Color.fromARGB(
-                                                                          255,
-                                                                          135,
-                                                                          135,
-                                                                          135), // Customize text color if needed
-                                                                    ),
+                                                  borderRadius:
+                                                      const BorderRadius
+                                                          .vertical(
+                                                    top: Radius.circular(8),
+                                                  ),
+                                                  child: Container(
+                                                    color: const Color.fromARGB(
+                                                        255, 227, 225, 225),
+                                                    child: pet['img'] != '' &&
+                                                            pet['img'] != null
+                                                        ? Image.network(
+                                                            pet['img'],
+                                                            fit: BoxFit.cover,
+                                                            errorBuilder:
+                                                                (context, error,
+                                                                    stackTrace) {
+                                                              return const Center(
+                                                                child: Text(
+                                                                  'No preview image',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontSize:
+                                                                        16,
+                                                                    color: Colors
+                                                                        .grey, // Customize text color if needed
                                                                   ),
-                                                                );
-                                                              },
-                                                            )
-                                                          : const Center(
-                                                              child: Text(
-                                                                'No preview image',
-                                                                style: TextStyle(
-                                                                  fontSize: 16,
-                                                                  color: Colors
-                                                                      .grey, // Customize text color if needed
                                                                 ),
+                                                              );
+                                                            },
+                                                          )
+                                                        : const Center(
+                                                            child: Text(
+                                                              'No preview image',
+                                                              style: TextStyle(
+                                                                fontSize: 16,
+                                                                color: Colors
+                                                                    .grey, // Customize text color if needed
                                                               ),
                                                             ),
-                                                    )),
+                                                          ),
+                                                  ),
+                                                ),
                                               ),
-                                              Expanded(
-                                                child: Padding(
-                                                  padding: const EdgeInsets.fromLTRB(8, 5, 8, 5),
-                                                  child: Column(
-                                                    mainAxisAlignment: MainAxisAlignment.end,
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.fromLTRB(
+                                                        8, 5, 8, 5),
+                                                child: Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.end,
                                                     children: [
                                                       Row(
-                                                        mainAxisAlignment: MainAxisAlignment.start,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
                                                         children: [
-                                                          Text(
-                                                            pet['name'],
-                                                            style: Theme.of(context)
-                                                                .textTheme
-                                                                .labelLarge,
-                                                            overflow: TextOverflow.ellipsis,
+                                                          Container(
+                                                            constraints: BoxConstraints(
+                                                                maxWidth: MediaQuery.of(
+                                                                            context)
+                                                                        .size
+                                                                        .width *
+                                                                    0.35),
+                                                            child: Text(
+                                                              pet['name'],
+                                                              style: Theme.of(
+                                                                      context)
+                                                                  .textTheme
+                                                                  .labelLarge,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                            ),
                                                           ),
                                                         ],
                                                       ),
+                                                      const SizedBox(
+                                                        height: 4,
+                                                      ),
+                                                      // ค่อยมาเปลี่ยนเป็น data1-data2 (sex-year)
                                                       Row(
-                                                        mainAxisAlignment: MainAxisAlignment.start,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
                                                         children: [
                                                           Text(
-                                                            '${pet['sex']} - ${pet['age']}',
-                                                            style: Theme.of(context)
+                                                            pet['sex'] +
+                                                                ' - ' +
+                                                                pet['age'],
+                                                            style: Theme.of(
+                                                                    context)
                                                                 .textTheme
                                                                 .displayMedium,
-                                                            overflow: TextOverflow.ellipsis,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
                                                           ),
                                                           const Spacer(),
-                                                          if (pet['status'] != null &&
-                                                              pet['status'] != "")
+                                                          //add logic if status=safe then green
+                                                          if (pet['status'] !=
+                                                                  null &&
+                                                              pet['status'] !=
+                                                                  "")
                                                             Container(
-                                                              padding: const EdgeInsets.symmetric(
-                                                                horizontal: 11,
-                                                                vertical: 1.5,
-                                                              ),
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .symmetric(
+                                                                      horizontal:
+                                                                          11,
+                                                                      vertical:
+                                                                          1.5),
                                                               decoration: BoxDecoration(
-                                                                color: pet['status'] == 'Lost'
-                                                                    ? Colors.red
-                                                                    : Colors.green,
-                                                                shape: BoxShape.rectangle,
-                                                                borderRadius:
-                                                                    BorderRadius.circular(8),
-                                                              ),
+                                                                  color: pet['status'] ==
+                                                                          'Lost'
+                                                                      ? Colors
+                                                                          .red
+                                                                      : Colors
+                                                                          .green,
+                                                                  shape: BoxShape
+                                                                      .rectangle,
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              8)),
                                                               child: Text(
                                                                 pet['status'],
-                                                                style: Theme.of(context)
+                                                                style: Theme.of(
+                                                                        context)
                                                                     .textTheme
                                                                     .displaySmall,
                                                               ),
                                                             ),
                                                         ],
                                                       ),
-                                                    ],
-                                                  ),
-                                                ),
+                                                    ]),
                                               ),
                                             ],
                                           ),
@@ -729,7 +829,8 @@ class _EditHomePageState extends State<EditHomePage> {
                                           right: 60,
                                           child: GestureDetector(
                                             onTap: () {
-                                              _showDeleteConfirmationDialog(context, pet['id']);
+                                              _showDeleteConfirmationDialog(
+                                                  context, pet['id']);
                                             },
                                             child: Container(
                                               padding: const EdgeInsets.all(6),
@@ -766,7 +867,8 @@ class _EditHomePageState extends State<EditHomePage> {
                         // );
                         Navigator.pop(context);
                       },
-                      style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white),
                       child: const Text(
                         'Cancel',
                         style: TextStyle(
@@ -787,7 +889,8 @@ class _EditHomePageState extends State<EditHomePage> {
                         // SaveProfile();
                         _saveChanges();
                       },
-                      style: ElevatedButton.styleFrom(backgroundColor: const Color(0xffC8A48A)),
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xffC8A48A)),
                       child: const Text(
                         'Confirm',
                         style: TextStyle(
@@ -816,14 +919,15 @@ class _EditHomePageState extends State<EditHomePage> {
 
   Future<void> _saveChanges() async {
     bool isValid = true;
+    String updateAddr;
     await SaveProfile();
 
     if (_username == '' || _username.isEmpty) {
       _showDialog("Username");
       isValid = false;
-    } else if (_address == '' || _address.isEmpty) {
-      _showDialog("Address");
-      isValid = false;
+      // } else if (_address == '' || _address.isEmpty) {
+      //   _showDialog("Address");
+      //   isValid = false;
     } else if (_phone == '' || _phone.isEmpty) {
       _showDialog("Phone number");
       isValid = false;
@@ -836,8 +940,15 @@ class _EditHomePageState extends State<EditHomePage> {
     // If any of the fields are invalid, return early to avoid updating with empty values.
     if (!isValid) return;
 
+    if (_newAddress == '') {
+      updateAddr = _address;
+    } else {
+      print('newAddress updated');
+      updateAddr = _newAddress;
+    }
+
     print('Updated username: $_username');
-    print('Updated address: $_address');
+    print('Updated address: $updateAddr');
     print('Updated phone: $_phone');
 
     // Delete all pets in the deleted list
@@ -865,7 +976,7 @@ class _EditHomePageState extends State<EditHomePage> {
         "/user/$_uid",
         data: {
           "username": _username,
-          "address": _address,
+          "address": updateAddr,
           "phone": _phone,
           "image": imgUrl,
         },

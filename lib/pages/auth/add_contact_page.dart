@@ -268,14 +268,18 @@ class _AddContactPageState extends State<AddContactPage> {
                         ),
                         const SizedBox(width: 8),
                         Expanded(
-                          child: Text(
-                            _addr ??
-                                "Get current location", // Display address or default text
-                            style: const TextStyle(
-                                color: Color(0xffC8A48A),
-                                fontFamily: "Fredoka",
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500),
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 25),
+                            child: Text(
+                              _addr ??
+                                  "Get current location", // Display address or default text
+                              style: const TextStyle(
+                                  color: Color(0xffC8A48A),
+                                  fontFamily: "Fredoka",
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500),
+                              textAlign: TextAlign.center,
+                            ),
                           ),
                         ),
                       ],
@@ -310,43 +314,47 @@ class _AddContactPageState extends State<AddContactPage> {
                   color: const Color(0xffffffff),
                   borderRadius: BorderRadius.circular(50),
                 ),
-                child: IntlPhoneField(
-                  decoration: InputDecoration(
-                    hintText: 'Phone Number',
-                    // labelText: 'Phone Number',
-                    hintStyle: Theme.of(context).textTheme.displayLarge,
-                    // labelStyle: Theme.of(context).textTheme.displayLarge,
-                    // border: OutlineInputBorder(
-                    //   borderSide: BorderSide(),
-                    // ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                          color: Colors.transparent), // No underline
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: IntlPhoneField(
+                    decoration: InputDecoration(
+                      hintText: 'Phone Number',
+                      // labelText: 'Phone Number',
+                      hintStyle: Theme.of(context).textTheme.displayLarge,
+                      // labelStyle: Theme.of(context).textTheme.displayLarge,
+                      // border: OutlineInputBorder(
+                      //   borderSide: BorderSide(),
+                      // ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(
+                            color: Colors.transparent), // No underline
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(
+                            color: Colors
+                                .transparent), // No underline when focused
+                      ),
                     ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                          color:
-                              Colors.transparent), // No underline when focused
-                    ),
+                    initialCountryCode: 'TH', // Set the initial country code
+                    disableLengthCheck: true,
+                    inputFormatters: [
+                      FilteringTextInputFormatter
+                          .digitsOnly, // Allow digits only
+
+                      LengthLimitingTextInputFormatter(
+                          10), // Limit input to 10 characters
+                    ],
+
+                    onChanged: (phone) {
+                      setState(() {
+                        _phoneNumber =
+                            "${phone.countryCode}/${phone.number}"; // Store the full phone number with country code
+                        print(_phoneNumber);
+                      });
+                    },
                   ),
-                  initialCountryCode: 'TH', // Set the initial country code
-                  disableLengthCheck: true,
-                  inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly, // Allow digits only
-
-                    LengthLimitingTextInputFormatter(
-                        10), // Limit input to 10 characters
-                  ],
-
-                  onChanged: (phone) {
-                    setState(() {
-                      _phoneNumber =
-                          "${phone.countryCode}/${phone.number}"; // Store the full phone number with country code
-                      print(_phoneNumber);
-                    });
-                  },
                 ),
               ),
             ),

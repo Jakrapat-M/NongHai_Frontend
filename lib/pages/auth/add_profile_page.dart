@@ -1,5 +1,5 @@
 // ignore_for_file: avoid_print, library_prefixes, use_build_context_synchronously
-import 'package:file_picker/file_picker.dart';
+// import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nonghai/components/custom_button.dart';
@@ -37,6 +37,7 @@ class _AddProfilePageState extends State<AddProfilePage> {
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
   }
 
+  final ImagePicker _picker = ImagePicker();
   Future<void> _pickImage() async {
     showDialog(
       context: context,
@@ -55,7 +56,12 @@ class _AddProfilePageState extends State<AddProfilePage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     TextButton(
-                      child: const Text('Camera'),
+                      style: TextButton.styleFrom(
+                          backgroundColor: const Color(0xffffffff),
+                          padding: const EdgeInsets.symmetric(horizontal: 18),
+                          elevation: 1,
+                          shadowColor:
+                              const Color.fromARGB(110, 220, 219, 219)),
                       onPressed: () async {
                         Navigator.of(context).pop();
 
@@ -81,38 +87,27 @@ class _AddProfilePageState extends State<AddProfilePage> {
                           );
                         }
                       },
+                      child: const Text('Camera'),
                     ),
                     const SizedBox(width: 20),
                     TextButton(
+                      style: TextButton.styleFrom(
+                          backgroundColor: const Color(0xffffffff),
+                          padding: const EdgeInsets.symmetric(horizontal: 18),
+                          elevation: 1,
+                          shadowColor:
+                              const Color.fromARGB(110, 220, 219, 219)),
                       child: const Text('Gallery'),
                       onPressed: () async {
                         Navigator.of(context).pop();
-
-                        // Check and request storage/gallery permission
-                        var galleryStatus = await Permission.storage.status;
-                        if (!galleryStatus.isGranted) {
-                          galleryStatus = await Permission.storage.request();
-                        }
-
-                        if (galleryStatus.isGranted) {
-                          FilePickerResult? result =
-                              await FilePicker.platform.pickFiles(
-                            type: FileType.image,
-                            allowMultiple: false,
-                          );
-
-                          if (result != null && result.files.isNotEmpty) {
-                            String path = result.files.single.path!;
-                            setState(() {
-                              _image = XFile(path);
-                            });
-                          } else {
-                            _showMessage('No file selected.');
-                          }
+                        final XFile? result = await _picker.pickImage(
+                            source: ImageSource.gallery);
+                        if (result != null) {
+                          setState(() {
+                            _image = result;
+                          });
                         } else {
-                          _showMessage(
-                            'Storage permission denied. Please allow permission in settings.',
-                          );
+                          _showMessage('No file selected.');
                         }
                       },
                     ),
@@ -211,21 +206,27 @@ class _AddProfilePageState extends State<AddProfilePage> {
                   style: TextButton.styleFrom(
                     backgroundColor: const Color.fromARGB(
                         175, 224, 223, 223), // Background color
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 100), // Padding
+                    // padding:
+                    //     const EdgeInsets.symmetric(horizontal: 100), // Padding
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(
                           50), // Optional: Adjust radius for rounded corners
                     ),
                   ),
-                  child: const Text(
-                    "Skip",
-                    style: TextStyle(
-                      color: Color(0xffC8A48A),
-                      fontFamily: "Fredoka",
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                    ),
+                  child: const Row(
+                    children: [
+                      Spacer(),
+                      Text(
+                        "Skip",
+                        style: TextStyle(
+                          color: Color(0xffC8A48A),
+                          fontFamily: "Fredoka",
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      Spacer(),
+                    ],
                   ),
                 ),
               ),

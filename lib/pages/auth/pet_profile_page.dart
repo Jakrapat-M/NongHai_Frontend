@@ -168,10 +168,9 @@ class _PetProfilePageState extends State<PetProfilePage> {
   }
 
   Future<void> _rescuerPhoneCall() async {
-    final Uri launchUri = Uri(
-      scheme: 'tel',
-      path: '086 602 3482',
-    );
+    final Uri launchUri = Uri(scheme: 'tel', path: '0635599992'
+        // path: '086 602 3482',
+        );
     await launchUrl(launchUri);
   }
 
