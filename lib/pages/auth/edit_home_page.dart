@@ -359,7 +359,7 @@ class _EditHomePageState extends State<EditHomePage> {
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(35, 85, 35, 0),
+          padding: const EdgeInsets.fromLTRB(35, 85, 35, 10),
           child: Column(
             children: [
               // Profile Image with Icon Overlay

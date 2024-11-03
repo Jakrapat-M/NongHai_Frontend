@@ -189,7 +189,10 @@ class AuthService {
           builder: (context) {
             TextEditingController passwordController = TextEditingController();
             return AlertDialog(
-              title: const Text('Enter your password'),
+              title: const Text(
+                'Please enter password of the account you just registered then go to register again',
+                style: TextStyle(fontSize: 20),
+              ),
               content: TextField(
                 controller: passwordController,
                 obscureText: true,

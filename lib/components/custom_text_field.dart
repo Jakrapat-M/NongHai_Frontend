@@ -18,6 +18,7 @@ class CustomTextField extends StatelessWidget {
     final curvedborder = BorderRadius.circular(90);
     return TextField(
       controller: controller,
+      textAlign: TextAlign.center,
       decoration: InputDecoration(
         border: OutlineInputBorder(
           borderRadius: curvedborder,

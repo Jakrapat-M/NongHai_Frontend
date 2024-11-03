@@ -486,15 +486,20 @@ class _EditPetPageState extends State<EditPetPage> {
                               // const Spacer(),
                               Expanded(
                                 child: TextFormField(
+                                  textAlignVertical: TextAlignVertical.center,
+                                  maxLines:
+                                      1, // Keeps it as a single line field
+                                  minLines: 1,
                                   controller: nameController,
                                   style: Theme.of(context).textTheme.titleLarge,
                                   decoration: const InputDecoration(
-                                    border: InputBorder.none,
-                                    contentPadding: EdgeInsets.symmetric(
-                                      vertical: 13,
-                                    ),
-                                    // hintText: 'Enter username',
-                                  ),
+                                      border: InputBorder.none,
+                                      contentPadding: EdgeInsets.symmetric(
+                                        vertical: 0,
+                                      ),
+                                      isCollapsed: true
+                                      // hintText: 'Enter username',
+                                      ),
                                   keyboardType: TextInputType.name,
                                   onChanged: (value) {
                                     setState(() {
@@ -616,8 +621,9 @@ class _EditPetPageState extends State<EditPetPage> {
                                       border: InputBorder.none,
                                       contentPadding:
                                           const EdgeInsets.symmetric(
-                                        vertical: 11,
+                                        vertical: 0,
                                       ), // Adjust vertical padding
+                                      isCollapsed: true,
                                       hintText:
                                           'Enter breed', // Optional: Add hint text
                                       hintStyle: Theme.of(context)
@@ -941,6 +947,7 @@ class _EditPetPageState extends State<EditPetPage> {
                                       ),
                                       decoration: const InputDecoration(
                                         border: InputBorder.none,
+                                        isCollapsed: true,
                                         // contentPadding: EdgeInsets.symmetric(
                                         //   vertical: 11,
                                         // ), // Adjust vertical padding

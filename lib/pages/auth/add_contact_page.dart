@@ -71,6 +71,7 @@ class _AddContactPageState extends State<AddContactPage> {
         if (userData?['image'] != null && userData!['image'].isNotEmpty) {
           userData = await SaveProfile();
         }
+        print(userData);
 
         // Call the createUser API with updated userData
         final response = await Caller.dio.post(
@@ -196,6 +197,8 @@ class _AddContactPageState extends State<AddContactPage> {
             if (resp.statusCode == 200) {
               setState(() {
                 _addr = resp.data['data'];
+                userData!['latitude'] = value.latitude;
+                userData!['longitude'] = value.longitude;
                 isLoading = false;
               });
             }

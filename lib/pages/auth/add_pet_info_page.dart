@@ -274,18 +274,24 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
                     height: 40, // Set the desired height for each field
                     child: DropdownButtonFormField<String>(
                       value: _selectedAnimalType,
-                      hint: Text(
-                        'Animal',
-                        style: Theme.of(context).textTheme.displayLarge,
+                      isExpanded: true,
+                      hint: Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          'Animal',
+                          style: Theme.of(context).textTheme.displayLarge,
+                        ),
                       ),
                       items: const [
                         DropdownMenuItem(
                           value: 'Dog',
-                          child: Text('Dog'),
+                          child: Align(
+                              alignment: Alignment.center, child: Text('Dog')),
                         ),
                         DropdownMenuItem(
                           value: 'Cat',
-                          child: Text('Cat'),
+                          child: Align(
+                              alignment: Alignment.center, child: Text('Cat')),
                         ),
                       ],
                       onChanged: (String? newValue) {
@@ -341,6 +347,7 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
                     height: 40, // Set the desired height for each field
                     child: TextFormField(
                       controller: dobController,
+                      textAlign: TextAlign.center,
                       decoration: InputDecoration(
                         hintText: 'Date of birth',
                         filled: true,
@@ -388,18 +395,24 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
                     height: 40, // Set the desired height for each field
                     child: DropdownButtonFormField<String>(
                       value: _selectedSex,
-                      hint: Text(
-                        'Sex',
-                        style: Theme.of(context).textTheme.displayLarge,
+                      isExpanded: true,
+                      hint: Align(
+                        alignment: Alignment.center,
+                        child: Text('Sex',
+                            style: Theme.of(context).textTheme.displayLarge,
+                            textAlign: TextAlign.center),
                       ),
                       items: const [
                         DropdownMenuItem(
                           value: 'Male',
-                          child: Text('Male'),
+                          child: Align(
+                              alignment: Alignment.center, child: Text('Male')),
                         ),
                         DropdownMenuItem(
                           value: 'Female',
-                          child: Text('Female'),
+                          child: Align(
+                              alignment: Alignment.center,
+                              child: Text('Female')),
                         ),
                       ],
                       onChanged: (String? newValue) {
@@ -440,6 +453,7 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
                       height: 40, // Set the desired height for each field
                       child: TextField(
                         controller: weightController,
+                        textAlign: TextAlign.center,
                         decoration: InputDecoration(
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(90),
@@ -500,6 +514,7 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
                   child: SizedBox(
                       height: 40, // Set the desired height for each field
                       child: TextField(
+                        textAlign: TextAlign.center,
                         controller: bloodController,
                         decoration: InputDecoration(
                           border: OutlineInputBorder(
