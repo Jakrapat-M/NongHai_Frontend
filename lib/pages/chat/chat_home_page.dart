@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:nonghai/components/custom_appbar.dart';
 import 'package:nonghai/components/user_tile.dart';
 import 'package:nonghai/services/auth/auth_service.dart';
@@ -62,7 +61,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
         }
 
         if (chatRoomSnapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: SpinKitFadingCube(color: Theme.of(context).colorScheme.primary));
+          return const Center(child: CircularProgressIndicator());
         }
 
         if (chatRoomSnapshot.data == null) {
@@ -90,7 +89,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
             }
 
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: SpinKitFadingCube(color: Theme.of(context).colorScheme.primary));
+              return const Center(child: CircularProgressIndicator());
             }
 
             // Filter the list of users
