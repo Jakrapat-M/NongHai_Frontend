@@ -4,6 +4,7 @@ import 'package:nonghai/components/custom_appbar.dart';
 import 'package:nonghai/components/notification_tile.dart';
 import 'package:nonghai/services/auth/auth_service.dart';
 import 'package:nonghai/services/caller.dart';
+import 'package:nonghai/types/noti_object_data.dart';
 
 class NotificationPage extends StatefulWidget {
   const NotificationPage({super.key});
@@ -15,7 +16,7 @@ class NotificationPage extends StatefulWidget {
 class _NotificationPageState extends State<NotificationPage> {
   final authService = AuthService();
   final currentUserId = AuthService().getCurrentUser()!.uid;
-  List<dynamic>? notifications;
+  List<NotificationObject>? notifications;
 
   getNotification() async {
     try {
@@ -24,7 +25,8 @@ class _NotificationPageState extends State<NotificationPage> {
       );
       if (resp.statusCode == 200) {
         setState(() {
-          notifications = resp.data['data'];
+          notifications =
+              (resp.data['data'] as List).map((e) => NotificationObject.fromJson(e)).toList();
         });
       }
     } catch (e) {
@@ -61,8 +63,9 @@ class _NotificationPageState extends State<NotificationPage> {
       itemCount: notifications!.length,
       itemBuilder: (context, index) {
         final notification = notifications![index];
+        print('Notification: ${notification.id}');
         return NotificationTile(
-          notiId: notification['id'],
+          notiObject: notification,
         );
       },
     );

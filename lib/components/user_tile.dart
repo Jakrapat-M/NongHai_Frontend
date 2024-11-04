@@ -253,10 +253,7 @@ class _UserTileState extends State<UserTile> {
             borderRadius: BorderRadius.circular(90), // Apply the border radius to the blur effect
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 2.0, sigmaY: 2.0), // Apply blur effect
-              child: Container(
-                color: Colors.transparent,
-                child: const CircularProgressIndicator()
-              ),
+              child: Container(color: Colors.transparent, child: const SizedBox()),
             ),
           ),
         ),

@@ -8,11 +8,10 @@ import 'package:nonghai/types/noti_object_data.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class NotificationTile extends StatefulWidget {
-  final String notiId;
-
+  final NotificationObject notiObject;
   const NotificationTile({
     super.key,
-    required this.notiId,
+    required this.notiObject,
   });
 
   @override
@@ -21,66 +20,42 @@ class NotificationTile extends StatefulWidget {
 
 class _NotificationTileState extends State<NotificationTile> {
   TrackingNotiInfo? trackerNotiInfo;
-  NotificationObject? notiObject;
-  bool isLoading1 = true;
-  bool isLoading2 = true;
-
-  getNotiData() async {
-    // print('getNotiData for notiId: ${widget.notiId}');
-    try {
-      final response =
-          await Caller.dio.get('/notification/getNotification?notiID=${widget.notiId}');
-
-      if (response.statusCode == 200) {
-        setState(() {
-          notiObject = NotificationObject.fromJson(response.data['data']);
-          isLoading1 = false;
-        });
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('Network error occurred: $e');
-      }
-    }
-  }
+  bool isLoading = true;
 
   getNotificationData() async {
-    // print('getNotificationData for notiId: ${widget.notiId}');
     try {
       final resp = await Caller.dio.get(
-        '/tracking/getTrackingById?trackingId=${notiObject?.trackingId}',
+        '/tracking/getTrackingById?trackingId=${widget.notiObject.trackingId}',
       );
 
       if (resp.statusCode == 200) {
         setState(() {
           trackerNotiInfo = TrackingNotiInfo.fromJson(resp.data['data']);
-          isLoading2 = false;
+          isLoading = false;
         });
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Network error occurred on get noti data for: ${notiObject?.trackingId} $e');
+        print('Network error occurred on get noti data for: ${widget.notiObject.trackingId} $e');
       }
     }
   }
 
   handleTap() async {
-    SendNotiService().readNotification(widget.notiId);
-    debugPrint('Navigate to TrackingPage with petId: ${notiObject!.petId}');
+    SendNotiService().readNotification(widget.notiObject.id!);
+    debugPrint('Navigate to TrackingPage with petId: ${widget.notiObject.petId}');
     MaterialPageRoute materialPageRoute = MaterialPageRoute(
       builder: (context) => TrackingPage(
-        petId: notiObject!.petId,
+        petId: widget.notiObject.petId,
       ),
     );
     Navigator.of(context).push(materialPageRoute).then((value) {
       // Refresh data when returning from TrackingPage
       setState(() {
-        isLoading1 = true; // Reset loading states
-        isLoading2 = true;
+        isLoading = true;
       });
-      getNotiData().then((_) {
-        getNotificationData();
-      });
+
+      getNotificationData();
     });
   }
 
@@ -89,9 +64,7 @@ class _NotificationTileState extends State<NotificationTile> {
     super.initState();
 
     Future.delayed(Duration.zero, () {
-      getNotiData().then((value) {
-        getNotificationData();
-      });
+      getNotificationData();
     });
   }
 
@@ -102,14 +75,9 @@ class _NotificationTileState extends State<NotificationTile> {
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading1 || isLoading2) {
-      return Center(
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height * 0.1,
-          width: 50,
-          child: const CircularProgressIndicator(),
-        ),
-      );
+    final notiObject = widget.notiObject;
+    if (isLoading) {
+      return const SizedBox();
     }
 
     final address = trackerNotiInfo?.address ?? 'Unknown';
@@ -132,8 +100,8 @@ class _NotificationTileState extends State<NotificationTile> {
             CircleAvatar(
               backgroundColor: Theme.of(context).colorScheme.secondary,
               radius: 30,
-              backgroundImage: notiObject?.image != null && notiObject!.image!.isNotEmpty
-                  ? NetworkImage(notiObject!.image!)
+              backgroundImage: notiObject.image != null && notiObject.image!.isNotEmpty
+                  ? NetworkImage(notiObject.image!)
                   : const AssetImage("assets/images/default_profile.png") as ImageProvider,
             ),
             const SizedBox(width: 16.0),
@@ -167,7 +135,7 @@ class _NotificationTileState extends State<NotificationTile> {
             const SizedBox(width: 8.0),
             Icon(
               Icons.circle,
-              color: notiObject!.isRead ? Colors.grey[200] : Colors.pink[200],
+              color: notiObject.isRead ? Colors.grey[200] : Colors.pink[200],
               size: 11,
             ),
           ],
