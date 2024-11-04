@@ -53,6 +53,7 @@ class _NotificationTileState extends State<NotificationTile> {
       // Refresh data when returning from TrackingPage
       setState(() {
         isLoading = true;
+        widget.notiObject.isRead = true;
       });
 
       getNotificationData();
