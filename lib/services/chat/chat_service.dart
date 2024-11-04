@@ -62,13 +62,17 @@ class ChatService {
       // Call the server to set unread status
 
       // print('Setting unread status' + chatRoomID + " " + currentUserID);
-      await Caller.dio.post(
-        '/chat/setUnread',
-        data: {
-          'chat_id': chatRoomID,
-          'sender_id': currentUserID,
-        },
-      );
+      try {
+        await Caller.dio.post(
+          '/chat/setUnread',
+          data: {
+            'chat_id': chatRoomID,
+            'sender_id': currentUserID,
+          },
+        );
+      } on Exception catch (e) {
+        debugPrint('Error setting unread status: $e');
+      }
       try {
         sendChatNoti(currentUserID, receiverID, message);
       } catch (e) {
