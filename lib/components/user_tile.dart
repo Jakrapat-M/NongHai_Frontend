@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:nonghai/pages/chat/chat_room_page.dart';
 import 'package:nonghai/services/auth/auth_service.dart';
 import 'package:nonghai/services/caller.dart';
@@ -256,10 +255,7 @@ class _UserTileState extends State<UserTile> {
               filter: ImageFilter.blur(sigmaX: 2.0, sigmaY: 2.0), // Apply blur effect
               child: Container(
                 color: Colors.transparent,
-                child: SpinKitPulse(
-                  color: Theme.of(context).colorScheme.primary,
-                  size: 50.0,
-                ), // Slightly darken the blur overlay
+                child: const CircularProgressIndicator()
               ),
             ),
           ),
