@@ -182,7 +182,7 @@ class _EditHomePageState extends State<EditHomePage> {
 
         // Update the state with the new image URL
         // setState(() {
-        // _image = imgUrl!; // Update the local image URL with the new one
+        //   _image = imgUrl!; // Update the local image URL with the new one
         // });
         print(_image);
 
@@ -919,7 +919,7 @@ class _EditHomePageState extends State<EditHomePage> {
 
   Future<void> _saveChanges() async {
     bool isValid = true;
-    String updateAddr;
+    String updateAddr, updateImg;
     await SaveProfile();
 
     if (_username == '' || _username.isEmpty) {
@@ -947,9 +947,16 @@ class _EditHomePageState extends State<EditHomePage> {
       updateAddr = _newAddress;
     }
 
+    if (imgUrl == '' || imgUrl == null) {
+      updateImg = _image;
+    } else {
+      updateImg = imgUrl!;
+    }
+
     print('Updated username: $_username');
     print('Updated address: $updateAddr');
     print('Updated phone: $_phone');
+    print('Updated img: $updateImg');
 
     // Delete all pets in the deleted list
     for (String petId in _deletedPetIds) {
@@ -978,7 +985,7 @@ class _EditHomePageState extends State<EditHomePage> {
           "username": _username,
           "address": updateAddr,
           "phone": _phone,
-          "image": imgUrl,
+          "image": updateImg,
         },
       );
 

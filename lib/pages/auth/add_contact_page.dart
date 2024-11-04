@@ -50,7 +50,8 @@ class _AddContactPageState extends State<AddContactPage> {
   }
 
   Future<void> _createUser(BuildContext context) async {
-    if (_phoneNumber == null || _phoneNumber!.length < 9) {
+    if (_phoneNumber == null || _phoneNumber!.length < 13) {
+      // 13 = 9+4(+66/)
       // Show a message if the phone number has fewer than 9 digits
       _showMessage("Phone number must be 9 or 10 digits.");
       return;
