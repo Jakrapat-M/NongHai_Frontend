@@ -197,7 +197,9 @@ class TrackingObject extends StatelessWidget {
                           radius: 17,
                           backgroundColor: Colors.white,
                           child: IconButton(
-                            icon: const Icon(Icons.location_pin),
+                            icon: const Icon(
+                              Icons.location_on_outlined,
+                            ),
                             onPressed: _launchMap,
                             color: Theme.of(context).colorScheme.secondaryFixed,
                             iconSize: 18,

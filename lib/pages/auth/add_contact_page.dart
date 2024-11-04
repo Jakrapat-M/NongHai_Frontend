@@ -191,7 +191,7 @@ class _AddContactPageState extends State<AddContactPage> {
           print('Location: ${value.latitude}, ${value.longitude}');
           try {
             final resp =
-                await Caller.dio.get('/tracking/getAddressByLatLng', data: {
+                await Caller.dio.post('/tracking/getAddressByLatLng', data: {
               'lat': value.latitude,
               'lng': value.longitude,
             });
