@@ -109,6 +109,7 @@ class _NfcPageState extends State<NfcPage> {
           setState(() {
             isWriting = false; // Stop progress indicator
           });
+          _showErrorDialog(context, 'Tag is not ndef writable');
         }
         return;
       }
@@ -120,14 +121,14 @@ class _NfcPageState extends State<NfcPage> {
             .stopSession(); // Stop the session to prevent immediate reading
 
         if (mounted) {
-          _showDialog(context, 'Write Success');
+          _showSuccessDialog(context, 'Write Success');
         }
       } catch (e) {
         result.value = e;
         NfcManager.instance.stopSession(errorMessage: result.value.toString());
 
         if (mounted) {
-          _showDialog(context, 'Error: $e');
+          _showErrorDialog(context, 'Error please try again');
         }
       } finally {
         if (mounted) {
@@ -138,28 +139,60 @@ class _NfcPageState extends State<NfcPage> {
       }
     });
   }
-}
 
-// Method to show success dialog
-void _showDialog(BuildContext context, String message) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Center(
-            child: Text(message,
-                style: Theme.of(context).textTheme.headlineMedium)),
-        actions: [
-          TextButton(
-            child: Center(
-                child:
-                    Text('OK', style: Theme.of(context).textTheme.labelMedium)),
-            onPressed: () {
-              Navigator.of(context).pop(); // Close the dialog
-            },
-          ),
-        ],
-      );
-    },
-  );
+  // Method to show success dialog
+  void _showSuccessDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          title: Center(
+              child: Text(message,
+                  style: Theme.of(context).textTheme.headlineMedium)),
+          actions: [
+            TextButton(
+              style: TextButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+              ),
+              child: const Center(
+                  child: Text('OK',
+                      style: TextStyle(color: Colors.white, fontSize: 16))),
+              onPressed: () {
+                Navigator.of(context).popAndPushNamed('/');
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Method to show error dialog
+  void _showErrorDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          title: Center(
+              child: Text(message,
+                  style: Theme.of(context).textTheme.headlineMedium)),
+          actions: [
+            TextButton(
+              style: TextButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+              ),
+              child: const Center(
+                  child: Text('OK',
+                      style: TextStyle(color: Colors.white, fontSize: 16))),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the error dialog only
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
