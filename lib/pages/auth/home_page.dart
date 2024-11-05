@@ -142,11 +142,22 @@ class _HomePageState extends State<HomePage> {
       context: dialogContext,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('An Error Occurred'),
-          content: Text(message),
+          title: Text(
+            'An Error Occurred',
+            style: Theme.of(context)
+                .textTheme
+                .headlineMedium
+                ?.copyWith(color: const Color(0xff333333)),
+          ),
+          content: Text(
+            message,
+            style: Theme.of(context).textTheme.titleSmall,
+          ),
           actions: [
             if (uid == null)
-              TextButton(
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.primary),
                 onPressed: () async {
                   Navigator.of(dialogContext).pop(); // Close the dialog
                   await FirebaseAuth.instance.signOut();
@@ -154,10 +165,25 @@ class _HomePageState extends State<HomePage> {
                     Navigator.pushReplacementNamed(dialogContext, '/');
                   }
                 },
-                child: const Text('Go back to login'),
+                child: const Row(
+                  children: [
+                    Spacer(),
+                    Text(
+                      'Go back to login',
+                      style: TextStyle(
+                          fontSize: 20,
+                          color: Color(0xffFFFFFF),
+                          fontFamily: 'Fredoka',
+                          fontWeight: FontWeight.w500),
+                    ),
+                    Spacer(),
+                  ],
+                ),
               ),
             if (uid != null)
-              TextButton(
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.primary),
                 onPressed: () async {
                   // Close the dialog
                   Navigator.of(dialogContext).pop();
@@ -167,7 +193,20 @@ class _HomePageState extends State<HomePage> {
                     _deleteUser(context);
                   }
                 },
-                child: const Text('Go to register'),
+                child: const Row(
+                  children: [
+                    Spacer(),
+                    Text(
+                      'Go to register',
+                      style: TextStyle(
+                          fontSize: 20,
+                          color: Color(0xffFFFFFF),
+                          fontFamily: 'Fredoka',
+                          fontWeight: FontWeight.w500),
+                    ),
+                    Spacer(),
+                  ],
+                ),
               ),
           ],
         );

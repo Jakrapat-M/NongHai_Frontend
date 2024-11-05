@@ -54,52 +54,105 @@ class _LoginPageState extends State<LoginPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Reset Password'),
+          title: Text(
+            'Reset Password',
+            style: Theme.of(context)
+                .textTheme
+                .headlineMedium
+                ?.copyWith(color: const Color(0xff333333)),
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text('Enter your email to receive a password reset link:'),
+              Text(
+                'Enter your email to receive a password reset link:',
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
               TextField(
                 controller: emailController,
-                decoration: const InputDecoration(labelText: 'Email'),
+                decoration: InputDecoration(
+                  labelText: 'Email',
+                  labelStyle:
+                      TextStyle(color: Theme.of(context).colorScheme.primary),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .primary), // Border color when not focused
+                  ),
+                ),
+                style: Theme.of(context)
+                    .textTheme
+                    .labelMedium
+                    ?.copyWith(fontSize: 16),
               ),
             ],
           ),
           actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () async {
-                String email = emailController.text.trim();
-                if (email.isNotEmpty) {
-                  try {
-                    await FirebaseAuth.instance
-                        .sendPasswordResetEmail(email: email);
-                    // Show success message
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text(
-                              'Password reset email sent! Check your inbox.')),
-                    );
-                  } catch (e) {
-                    // Show error message
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Error: ${e.toString()}')),
-                    );
-                  }
-                  Navigator.of(context).pop(); // Close the dialog
-                } else {
-                  // Show a message if the email is empty
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Please enter your email.')),
-                  );
-                }
-              },
-              child: const Text('Send Reset Link'),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    style:
+                        ElevatedButton.styleFrom(backgroundColor: Colors.white),
+                    child: Text(
+                      'Cancel',
+                      style: TextStyle(
+                          fontSize: 20,
+                          color: Theme.of(context).colorScheme.primary,
+                          fontFamily: 'Fredoka',
+                          fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  width: 15,
+                ),
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.primary),
+                    onPressed: () async {
+                      String email = emailController.text.trim();
+                      if (email.isNotEmpty) {
+                        try {
+                          await FirebaseAuth.instance
+                              .sendPasswordResetEmail(email: email);
+                          // Show success message
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text(
+                                    'Password reset email sent! Check your inbox.')),
+                          );
+                        } catch (e) {
+                          // Show error message
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Error: ${e.toString()}')),
+                          );
+                        }
+                        Navigator.of(context).pop(); // Close the dialog
+                      } else {
+                        // Show a message if the email is empty
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('Please enter your email.')),
+                        );
+                      }
+                    },
+                    child: const Text(
+                      'Confirm',
+                      style: TextStyle(
+                          fontSize: 20,
+                          color: Color(0xffFFFFFF),
+                          fontFamily: 'Fredoka',
+                          fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         );
