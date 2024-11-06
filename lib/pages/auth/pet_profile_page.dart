@@ -75,7 +75,7 @@ class _PetProfilePageState extends State<PetProfilePage> {
           if (!isOwner) {
             fetchOwnerData(petDetails['user_id']);
           }
-          //อย่าลืมลบออก
+          //เอาไว้เช็ค
           // fetchOwnerData(petDetails['user_id']);
           // print(ownerData['phone']);
 
@@ -687,13 +687,19 @@ class _PetProfilePageState extends State<PetProfilePage> {
                                 fontSize: 20,
                                 fontWeight: FontWeight.w500),
                           ),
-                          Text(
-                            ownerData['username'] ?? 'Unknown',
-                            style: const TextStyle(
-                                color: Color(0xff2C3F50),
-                                fontFamily: 'Fredoka',
-                                fontSize: 20,
-                                fontWeight: FontWeight.w700),
+                          Container(
+                            constraints: BoxConstraints(
+                                maxWidth:
+                                    MediaQuery.of(context).size.width * 0.57),
+                            child: Text(
+                              ownerData['username'] ?? 'Unknown',
+                              style: const TextStyle(
+                                  color: Color(0xff2C3F50),
+                                  fontFamily: 'Fredoka',
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w600),
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ],
                       ),
@@ -721,18 +727,24 @@ class _PetProfilePageState extends State<PetProfilePage> {
                                   style: TextStyle(
                                       fontFamily: 'Fredoka',
                                       fontSize: 13,
-                                      fontWeight: FontWeight.w500,
+                                      fontWeight: FontWeight.w400,
                                       color: Color(0xff5C5C5C)),
                                 ),
-                                Text(
-                                  ownerData['address'] ?? 'Unknown',
-                                  style: const TextStyle(
-                                    fontFamily: 'Fredoka',
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w500,
-                                    color: Color(0xff000000),
+                                Container(
+                                  constraints: BoxConstraints(
+                                      maxWidth:
+                                          MediaQuery.of(context).size.width *
+                                              0.47),
+                                  child: Text(
+                                    ownerData['address'] ?? 'Unknown',
+                                    style: const TextStyle(
+                                      fontFamily: 'Fredoka',
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w400,
+                                      color: Color(0xff000000),
+                                    ),
+                                    overflow: TextOverflow.clip,
                                   ),
-                                  overflow: TextOverflow.clip,
                                 ),
                                 const Padding(padding: EdgeInsets.all(4)),
                                 const Text(
@@ -740,7 +752,7 @@ class _PetProfilePageState extends State<PetProfilePage> {
                                   style: TextStyle(
                                       fontFamily: 'Fredoka',
                                       fontSize: 13,
-                                      fontWeight: FontWeight.w500,
+                                      fontWeight: FontWeight.w400,
                                       color: Color(0xff5C5C5C)),
                                 ),
                                 Text(
@@ -748,7 +760,7 @@ class _PetProfilePageState extends State<PetProfilePage> {
                                   style: const TextStyle(
                                     fontFamily: 'Fredoka',
                                     fontSize: 13,
-                                    fontWeight: FontWeight.w500,
+                                    fontWeight: FontWeight.w400,
                                     color: Color(0xff000000),
                                   ),
                                   overflow: TextOverflow.clip,

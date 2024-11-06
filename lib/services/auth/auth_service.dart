@@ -189,21 +189,62 @@ class AuthService {
           builder: (context) {
             TextEditingController passwordController = TextEditingController();
             return AlertDialog(
-              title: const Text(
-                'Please enter password of the account you just registered then go to register again',
-                style: TextStyle(fontSize: 20),
+              title: Text(
+                'Register failed',
+                style: Theme.of(context)
+                    .textTheme
+                    .headlineMedium
+                    ?.copyWith(color: const Color(0xff333333)),
               ),
-              content: TextField(
-                controller: passwordController,
-                obscureText: true,
-                decoration: const InputDecoration(labelText: 'Password'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Please enter password and register again.',
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
+                  TextField(
+                    controller: passwordController,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      labelText: 'Password',
+                      labelStyle: TextStyle(
+                          color: Theme.of(context).colorScheme.primary),
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .primary), // Border color when not focused
+                      ),
+                    ),
+                    style: Theme.of(context)
+                        .textTheme
+                        .labelMedium
+                        ?.copyWith(fontSize: 16),
+                  ),
+                ],
               ),
               actions: [
-                TextButton(
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xffC8A48A)),
                   onPressed: () {
                     Navigator.of(context).pop(passwordController.text);
                   },
-                  child: const Text('Submit'),
+                  child: const Row(
+                    children: [
+                      Spacer(),
+                      Text(
+                        'Submit',
+                        style: TextStyle(
+                            fontSize: 20,
+                            color: Color(0xffFFFFFF),
+                            fontFamily: 'Fredoka',
+                            fontWeight: FontWeight.w500),
+                      ),
+                      Spacer(),
+                    ],
+                  ),
                 ),
               ],
             );
@@ -217,11 +258,35 @@ class AuthService {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Error'),
-          content: Text(message),
+          title: Text(
+            'Error',
+            style: Theme.of(context)
+                .textTheme
+                .headlineMedium
+                ?.copyWith(color: const Color(0xff333333)),
+          ),
+          content: Text(
+            message,
+            style: Theme.of(context).textTheme.titleSmall,
+          ),
           actions: [
-            TextButton(
-              child: const Text('OK'),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.primary),
+              child: const Row(
+                children: [
+                  Spacer(),
+                  Text(
+                    'OK',
+                    style: TextStyle(
+                        fontSize: 20,
+                        color: Color(0xffFFFFFF),
+                        fontFamily: 'Fredoka',
+                        fontWeight: FontWeight.w500),
+                  ),
+                  Spacer(),
+                ],
+              ),
               onPressed: () {
                 Navigator.of(context).pop();
               },

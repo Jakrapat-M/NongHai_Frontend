@@ -19,9 +19,13 @@ class CustomButton1 extends StatelessWidget {
             backgroundColor:
                 WidgetStateProperty.all(Theme.of(context).colorScheme.primary),
             minimumSize:
-                WidgetStateProperty.all(const Size(double.infinity, 50)),
+                WidgetStateProperty.all(const Size(double.infinity, 40)),
           ),
-          child: Text(text, style: Theme.of(context).textTheme.labelSmall),
+          child: Text(text,
+              style: Theme.of(context)
+                  .textTheme
+                  .labelSmall
+                  ?.copyWith(fontSize: 16)),
         ));
   }
 }

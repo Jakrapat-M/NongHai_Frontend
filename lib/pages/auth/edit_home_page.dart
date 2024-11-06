@@ -6,10 +6,8 @@
 import 'dart:io';
 // import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nonghai/services/auth/add_profile.dart';
 import 'package:nonghai/services/caller.dart';
@@ -30,7 +28,7 @@ class _EditHomePageState extends State<EditHomePage> {
   bool _isLoading = true;
   late String _uid;
   late String _username;
-  late String _newAddress = '';
+  // late String _newAddress = '';
   String _address = '';
   late String _phone;
   late String _image = '';
@@ -84,78 +82,79 @@ class _EditHomePageState extends State<EditHomePage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text(
-            'Select Image Source',
-            textAlign: TextAlign.center,
-          ),
-          content: SizedBox(
-            height: 100,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    TextButton(
-                      style: TextButton.styleFrom(
-                          backgroundColor: const Color(0xffffffff),
-                          padding: const EdgeInsets.symmetric(horizontal: 18),
-                          elevation: 1,
-                          shadowColor:
-                              const Color.fromARGB(110, 220, 219, 219)),
-                      onPressed: () async {
-                        Navigator.of(context).pop();
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          title: Text('Select Image Source',
+              textAlign: TextAlign.center,
+              style: Theme.of(context)
+                  .textTheme
+                  .headlineMedium
+                  ?.copyWith(color: const Color(0xff333333))),
+          content: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xffC8A48A)),
+                onPressed: () async {
+                  Navigator.of(context).pop();
 
-                        // Check and request camera permission
-                        var cameraStatus = await Permission.camera.status;
-                        if (!cameraStatus.isGranted) {
-                          cameraStatus = await Permission.camera.request();
-                        }
+                  // Check and request camera permission
+                  var cameraStatus = await Permission.camera.status;
+                  if (!cameraStatus.isGranted) {
+                    cameraStatus = await Permission.camera.request();
+                  }
 
-                        if (cameraStatus.isGranted) {
-                          final ImagePicker picker = ImagePicker();
-                          final XFile? selectedImage = await picker.pickImage(
-                            source: ImageSource.camera,
-                          );
-                          if (selectedImage != null) {
-                            setState(() {
-                              _newImage = selectedImage;
-                            });
-                          }
-                        } else {
-                          _showMessage(
-                            'Camera permission denied. Please allow permission in settings.',
-                          );
-                        }
-                      },
-                      child: const Text('Camera'),
-                    ),
-                    const SizedBox(width: 20),
-                    TextButton(
-                      style: TextButton.styleFrom(
-                          backgroundColor: const Color(0xffffffff),
-                          padding: const EdgeInsets.symmetric(horizontal: 18),
-                          elevation: 1,
-                          shadowColor:
-                              const Color.fromARGB(110, 220, 219, 219)),
-                      child: const Text('Gallery'),
-                      onPressed: () async {
-                        Navigator.of(context).pop();
-                        final XFile? result = await _picker.pickImage(
-                            source: ImageSource.gallery);
-                        if (result != null) {
-                          setState(() {
-                            _newImage = result;
-                          });
-                        } else {
-                          _showMessage('No file selected.');
-                        }
-                      },
-                    ),
-                  ],
+                  if (cameraStatus.isGranted) {
+                    final ImagePicker picker = ImagePicker();
+                    final XFile? selectedImage = await picker.pickImage(
+                      source: ImageSource.camera,
+                    );
+                    if (selectedImage != null) {
+                      setState(() {
+                        _newImage = selectedImage;
+                      });
+                    }
+                  } else {
+                    _showMessage(
+                      'Camera permission denied. Please allow permission in settings.',
+                    );
+                  }
+                },
+                child: const Text(
+                  'Camera',
+                  style: TextStyle(
+                      fontSize: 20,
+                      color: Color(0xffFFFFFF),
+                      fontFamily: 'Fredoka',
+                      fontWeight: FontWeight.w500),
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(width: 15),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xffC8A48A)),
+                child: const Text(
+                  'Gallery',
+                  style: TextStyle(
+                      fontSize: 20,
+                      color: Color(0xffFFFFFF),
+                      fontFamily: 'Fredoka',
+                      fontWeight: FontWeight.w500),
+                ),
+                onPressed: () async {
+                  Navigator.of(context).pop();
+                  final XFile? result =
+                      await _picker.pickImage(source: ImageSource.gallery);
+                  if (result != null) {
+                    setState(() {
+                      _newImage = result;
+                    });
+                  } else {
+                    _showMessage('No file selected.');
+                  }
+                },
+              ),
+            ],
           ),
         );
       },
@@ -202,39 +201,64 @@ class _EditHomePageState extends State<EditHomePage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Delete Pet'),
-          content: const Text('Are you sure you want to delete this pet?'),
+          title: Text(
+            'Delete Pet',
+            style: Theme.of(context)
+                .textTheme
+                .headlineMedium
+                ?.copyWith(color: const Color(0xff333333)),
+          ),
+          content: Text(
+            'Are you sure you want to delete this pet ?',
+            style: Theme.of(context).textTheme.titleSmall,
+          ),
           actions: <Widget>[
-            TextButton(
-              style: TextButton.styleFrom(
-                  backgroundColor: const Color(0xffffffff),
-                  padding: const EdgeInsets.symmetric(horizontal: 18),
-                  elevation: 1,
-                  shadowColor: const Color.fromARGB(110, 220, 219, 219)),
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-              child: const Text(
-                'Cancel',
-                style: TextStyle(color: Colors.grey),
-              ),
-            ),
-            TextButton(
-              style: TextButton.styleFrom(
-                  backgroundColor: const Color(0xffffffff),
-                  // fixedSize: Size(80, 15),
-                  padding: const EdgeInsets.symmetric(horizontal: 18),
-                  elevation: 1,
-                  shadowColor: const Color.fromARGB(110, 220, 219, 219)),
-              onPressed: () {
-                _deletedPetIds.add(petId); // Add petId to deleted list
-                setState(() {
-                  _petDetails.removeWhere((pet) => pet['id'] == petId);
-                  _petCount = _petDetails.length;
-                });
-                Navigator.of(context).pop(); // Close the dialog after deletion
-              },
-              child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    style:
+                        ElevatedButton.styleFrom(backgroundColor: Colors.white),
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Close the dialog
+                    },
+                    child: Text(
+                      'Cancel',
+                      style: TextStyle(
+                          fontSize: 20,
+                          color: Theme.of(context).colorScheme.primary,
+                          fontFamily: 'Fredoka',
+                          fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  width: 15,
+                ),
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.primary),
+                    onPressed: () {
+                      _deletedPetIds.add(petId); // Add petId to deleted list
+                      setState(() {
+                        _petDetails.removeWhere((pet) => pet['id'] == petId);
+                        _petCount = _petDetails.length;
+                      });
+                      Navigator.of(context)
+                          .pop(); // Close the dialog after deletion
+                    },
+                    child: const Text(
+                      'Delete',
+                      style: TextStyle(
+                          fontSize: 20,
+                          color: Color(0xffFFFFFF),
+                          fontFamily: 'Fredoka',
+                          fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         );
@@ -247,38 +271,60 @@ class _EditHomePageState extends State<EditHomePage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Confirm Change Password'),
-          content: const Text(
-              'In order to change password, the password will be reset. A reset password email will be sent to your registered email address.'),
+          title: Text(
+            'Change Password ?',
+            style: Theme.of(context)
+                .textTheme
+                .headlineMedium
+                ?.copyWith(color: const Color(0xff333333)),
+          ),
+          content: Text(
+            'this process will reset your password, please check your registered email.',
+            style: Theme.of(context).textTheme.titleSmall,
+          ),
           actions: [
-            TextButton(
-              style: TextButton.styleFrom(
-                  backgroundColor: const Color(0xffffffff),
-                  elevation: 1,
-                  shadowColor: Colors.grey),
-              child: const Text(
-                'Cancel',
-                style: TextStyle(color: Colors.grey),
-              ),
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-            ),
-            TextButton(
-              style: TextButton.styleFrom(
-                  backgroundColor: const Color(0xffC8A48A),
-                  elevation: 1,
-                  shadowColor: Colors.grey),
-              child: const Text(
-                'Confirm',
-                style: TextStyle(color: Color(0xffffffff)),
-              ),
-              onPressed: () async {
-                Navigator.of(context)
-                    .pop(); // Close the dialog before sending the email
-                _sendPasswordResetEmail(context);
-              },
-            ),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    style:
+                        ElevatedButton.styleFrom(backgroundColor: Colors.white),
+                    child: Text(
+                      'Cancel',
+                      style: TextStyle(
+                          fontSize: 20,
+                          color: Theme.of(context).colorScheme.primary,
+                          fontFamily: 'Fredoka',
+                          fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  width: 15,
+                ),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      _sendPasswordResetEmail(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.primary),
+                    child: const Text(
+                      'Confirm',
+                      style: TextStyle(
+                          fontSize: 20,
+                          color: Color(0xffFFFFFF),
+                          fontFamily: 'Fredoka',
+                          fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                ),
+              ],
+            )
           ],
         );
       },
@@ -337,38 +383,38 @@ class _EditHomePageState extends State<EditHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    Future<void> getLocation() async {
-      setState(() {
-        isLoadingAddress = true;
-      });
-      Future<Position?> location = LocationService().getLocation();
-      location.then((value) async {
-        if (value != null) {
-          print('Location: ${value.latitude}, ${value.longitude}');
-          try {
-            final resp =
-                await Caller.dio.post('/tracking/getAddressByLatLng', data: {
-              'lat': value.latitude,
-              'lng': value.longitude,
-            });
-            if (resp.statusCode == 200) {
-              setState(() {
-                _newAddress = resp.data['data'];
-                print(_newAddress);
-                isLoadingAddress = false;
-              });
-            }
-          } catch (e) {
-            setState(() {
-              isLoadingAddress = false;
-            });
-            if (kDebugMode) {
-              print('Network error occurred: $e');
-            }
-          }
-        }
-      });
-    }
+    // Future<void> getLocation() async {
+    //   setState(() {
+    //     isLoadingAddress = true;
+    //   });
+    //   Future<Position?> location = LocationService().getLocation();
+    //   location.then((value) async {
+    //     if (value != null) {
+    //       print('Location: ${value.latitude}, ${value.longitude}');
+    //       try {
+    //         final resp =
+    //             await Caller.dio.post('/tracking/getAddressByLatLng', data: {
+    //           'lat': value.latitude,
+    //           'lng': value.longitude,
+    //         });
+    //         if (resp.statusCode == 200) {
+    //           setState(() {
+    //             _newAddress = resp.data['data'];
+    //             print(_newAddress);
+    //             isLoadingAddress = false;
+    //           });
+    //         }
+    //       } catch (e) {
+    //         setState(() {
+    //           isLoadingAddress = false;
+    //         });
+    //         if (kDebugMode) {
+    //           print('Network error occurred: $e');
+    //         }
+    //       }
+    //     }
+    //   });
+    // }
 
     if (_isLoading) {
       // Show a loading spinner while fetching data
@@ -481,7 +527,7 @@ class _EditHomePageState extends State<EditHomePage> {
 
               // Address field
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 3.0),
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16.0),
@@ -496,46 +542,79 @@ class _EditHomePageState extends State<EditHomePage> {
                 ),
                 child: Row(
                   children: [
+                    const Icon(
+                      Icons.home_outlined,
+                      color: Color(0xff333333),
+                      size: 24,
+                    ),
+                    const SizedBox(width: 20),
                     Expanded(
-                      child: TextButton(
-                        onPressed: getLocation,
-                        child: isLoadingAddress
-                            ? Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  CircularProgressIndicator(
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                  ),
-                                ],
-                              )
-                            : Row(
-                                children: [
-                                  const Icon(
-                                    Icons.location_on,
-                                    color: Color(0xffC8A48A),
-                                  ),
-                                  const SizedBox(width: 25),
-                                  Expanded(
-                                    child: Text(
-                                      _newAddress == ''
-                                          ? "Update location"
-                                          : _newAddress,
-                                      // Display address or default text
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        color: Color(0xffC8A48A),
-                                        fontFamily: 'Fredoka',
-                                        fontWeight: FontWeight.w400,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                      child: TextFormField(
+                        initialValue: _address,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Color(0xff1E1E1E),
+                          fontFamily: 'Fredoka',
+                          fontWeight: FontWeight.w400,
+                        ),
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          hintText: 'Enter address',
+                        ),
+                        keyboardType: TextInputType.streetAddress,
+                        onChanged: (value) {
+                          setState(() {
+                            _address = value;
+                          });
+                        },
                       ),
                     ),
                   ],
                 ),
+
+                // version get location button
+                // child: Row(
+                //   children: [
+                //     Expanded(
+                //       child: TextButton(
+                //         onPressed: getLocation,
+                //         child: isLoadingAddress
+                //             ? Row(
+                //                 mainAxisAlignment: MainAxisAlignment.center,
+                //                 children: [
+                //                   CircularProgressIndicator(
+                //                     color:
+                //                         Theme.of(context).colorScheme.primary,
+                //                   ),
+                //                 ],
+                //               )
+                //             : Row(
+                //                 children: [
+                //                   const Icon(
+                //                     Icons.location_on,
+                //                     color: Color(0xffC8A48A),
+                //                   ),
+                //                   const SizedBox(width: 25),
+                //                   Expanded(
+                //                     child: Text(
+                //                       _newAddress == ''
+                //                           ? "Update location"
+                //                           : _newAddress,
+                //                       // Display address or default text
+                //                       style: const TextStyle(
+                //                         fontSize: 16,
+                //                         color: Color(0xffC8A48A),
+                //                         fontFamily: 'Fredoka',
+                //                         fontWeight: FontWeight.w400,
+                //                       ),
+                //                     ),
+                //                   ),
+                //                 ],
+                //               ),
+                //       ),
+                //     ),
+                //   ],
+                // ),
               ),
               const SizedBox(height: 8),
 
@@ -869,11 +948,11 @@ class _EditHomePageState extends State<EditHomePage> {
                       },
                       style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white),
-                      child: const Text(
+                      child: Text(
                         'Cancel',
                         style: TextStyle(
                             fontSize: 20,
-                            color: Color(0xffBFBFBF),
+                            color: Theme.of(context).colorScheme.primary,
                             fontFamily: 'Fredoka',
                             fontWeight: FontWeight.w500),
                       ),
@@ -919,15 +998,17 @@ class _EditHomePageState extends State<EditHomePage> {
 
   Future<void> _saveChanges() async {
     bool isValid = true;
-    String updateAddr, updateImg;
+    LatLong? latLong;
+    // String updateAddr;
+    String updateImg;
     await SaveProfile();
 
     if (_username == '' || _username.isEmpty) {
       _showDialog("Username");
       isValid = false;
-      // } else if (_address == '' || _address.isEmpty) {
-      //   _showDialog("Address");
-      //   isValid = false;
+    } else if (_address == '' || _address.isEmpty) {
+      _showDialog("Address");
+      isValid = false;
     } else if (_phone == '' || _phone.isEmpty) {
       _showDialog("Phone number");
       isValid = false;
@@ -940,12 +1021,12 @@ class _EditHomePageState extends State<EditHomePage> {
     // If any of the fields are invalid, return early to avoid updating with empty values.
     if (!isValid) return;
 
-    if (_newAddress == '') {
-      updateAddr = _address;
-    } else {
-      print('newAddress updated');
-      updateAddr = _newAddress;
-    }
+    // if (_newAddress == '') {
+    //   updateAddr = _address;
+    // } else {
+    //   print('newAddress updated');
+    //   updateAddr = _newAddress;
+    // }
 
     if (imgUrl == '' || imgUrl == null) {
       updateImg = _image;
@@ -954,9 +1035,16 @@ class _EditHomePageState extends State<EditHomePage> {
     }
 
     print('Updated username: $_username');
-    print('Updated address: $updateAddr');
+    print('Updated address: $_address');
+    // print('Updated address: $updateAddr');
     print('Updated phone: $_phone');
     print('Updated img: $updateImg');
+
+    //get LatLong
+    latLong = await LocationService().getLatLong(_address);
+    if (latLong != null) {
+      print('lat: ${latLong.lat}, long: ${latLong.lng}');
+    }
 
     // Delete all pets in the deleted list
     for (String petId in _deletedPetIds) {
@@ -983,7 +1071,10 @@ class _EditHomePageState extends State<EditHomePage> {
         "/user/$_uid",
         data: {
           "username": _username,
-          "address": updateAddr,
+          // "address": updateAddr,
+          "address": _address,
+          "latitude": latLong?.lat,
+          "longitude": latLong?.lng,
           "phone": _phone,
           "image": updateImg,
         },
@@ -1016,14 +1107,38 @@ class _EditHomePageState extends State<EditHomePage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Invalid ' + show),
-          content: Text(show + ' should not be empty.'),
+          title: Text(
+            'Invalid ' + show,
+            style: Theme.of(context)
+                .textTheme
+                .headlineMedium
+                ?.copyWith(color: const Color(0xff333333)),
+          ),
+          content: Text(
+            show + ' should not be empty.',
+            style: Theme.of(context).textTheme.titleSmall,
+          ),
           actions: [
-            TextButton(
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xffC8A48A)),
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('OK'),
+              child: const Row(
+                children: [
+                  Spacer(),
+                  Text(
+                    'OK',
+                    style: TextStyle(
+                        fontSize: 20,
+                        color: Color(0xffFFFFFF),
+                        fontFamily: 'Fredoka',
+                        fontWeight: FontWeight.w500),
+                  ),
+                  Spacer()
+                ],
+              ),
             ),
           ],
         );
@@ -1037,14 +1152,38 @@ class _EditHomePageState extends State<EditHomePage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text('Error'),
-            content: Text(show),
+            title: Text(
+              'Error',
+              style: Theme.of(context)
+                  .textTheme
+                  .headlineMedium
+                  ?.copyWith(color: const Color(0xff333333)),
+            ),
+            content: Text(
+              show,
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
             actions: [
-              TextButton(
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xffC8A48A)),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: const Text('OK'),
+                child: const Row(
+                  children: [
+                    Spacer(),
+                    Text(
+                      'OK',
+                      style: TextStyle(
+                          fontSize: 20,
+                          color: Color(0xffFFFFFF),
+                          fontFamily: 'Fredoka',
+                          fontWeight: FontWeight.w500),
+                    ),
+                    Spacer()
+                  ],
+                ),
               ),
             ],
           );

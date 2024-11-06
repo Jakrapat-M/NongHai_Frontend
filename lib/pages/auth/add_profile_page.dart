@@ -43,78 +43,79 @@ class _AddProfilePageState extends State<AddProfilePage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text(
-            'Select Image Source',
-            textAlign: TextAlign.center,
-          ),
-          content: SizedBox(
-            height: 100,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    TextButton(
-                      style: TextButton.styleFrom(
-                          backgroundColor: const Color(0xffffffff),
-                          padding: const EdgeInsets.symmetric(horizontal: 18),
-                          elevation: 1,
-                          shadowColor:
-                              const Color.fromARGB(110, 220, 219, 219)),
-                      onPressed: () async {
-                        Navigator.of(context).pop();
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          title: Text('Select Image Source',
+              textAlign: TextAlign.center,
+              style: Theme.of(context)
+                  .textTheme
+                  .headlineMedium
+                  ?.copyWith(color: const Color(0xff333333))),
+          content: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xffC8A48A)),
+                onPressed: () async {
+                  Navigator.of(context).pop();
 
-                        // Check and request camera permission
-                        var cameraStatus = await Permission.camera.status;
-                        if (!cameraStatus.isGranted) {
-                          cameraStatus = await Permission.camera.request();
-                        }
+                  // Check and request camera permission
+                  var cameraStatus = await Permission.camera.status;
+                  if (!cameraStatus.isGranted) {
+                    cameraStatus = await Permission.camera.request();
+                  }
 
-                        if (cameraStatus.isGranted) {
-                          final ImagePicker picker = ImagePicker();
-                          final XFile? selectedImage = await picker.pickImage(
-                            source: ImageSource.camera,
-                          );
-                          if (selectedImage != null) {
-                            setState(() {
-                              _image = selectedImage;
-                            });
-                          }
-                        } else {
-                          _showMessage(
-                            'Camera permission denied. Please allow permission in settings.',
-                          );
-                        }
-                      },
-                      child: const Text('Camera'),
-                    ),
-                    const SizedBox(width: 20),
-                    TextButton(
-                      style: TextButton.styleFrom(
-                          backgroundColor: const Color(0xffffffff),
-                          padding: const EdgeInsets.symmetric(horizontal: 18),
-                          elevation: 1,
-                          shadowColor:
-                              const Color.fromARGB(110, 220, 219, 219)),
-                      child: const Text('Gallery'),
-                      onPressed: () async {
-                        Navigator.of(context).pop();
-                        final XFile? result = await _picker.pickImage(
-                            source: ImageSource.gallery);
-                        if (result != null) {
-                          setState(() {
-                            _image = result;
-                          });
-                        } else {
-                          _showMessage('No file selected.');
-                        }
-                      },
-                    ),
-                  ],
+                  if (cameraStatus.isGranted) {
+                    final ImagePicker picker = ImagePicker();
+                    final XFile? selectedImage = await picker.pickImage(
+                      source: ImageSource.camera,
+                    );
+                    if (selectedImage != null) {
+                      setState(() {
+                        _image = selectedImage;
+                      });
+                    }
+                  } else {
+                    _showMessage(
+                      'Camera permission denied. Please allow permission in settings.',
+                    );
+                  }
+                },
+                child: const Text(
+                  'Camera',
+                  style: TextStyle(
+                      fontSize: 20,
+                      color: Color(0xffFFFFFF),
+                      fontFamily: 'Fredoka',
+                      fontWeight: FontWeight.w500),
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(width: 15),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xffC8A48A)),
+                child: const Text(
+                  'Gallery',
+                  style: TextStyle(
+                      fontSize: 20,
+                      color: Color(0xffFFFFFF),
+                      fontFamily: 'Fredoka',
+                      fontWeight: FontWeight.w500),
+                ),
+                onPressed: () async {
+                  Navigator.of(context).pop();
+                  final XFile? result =
+                      await _picker.pickImage(source: ImageSource.gallery);
+                  if (result != null) {
+                    setState(() {
+                      _image = result;
+                    });
+                  } else {
+                    _showMessage('No file selected.');
+                  }
+                },
+              ),
+            ],
           ),
         );
       },
@@ -142,15 +143,40 @@ class _AddProfilePageState extends State<AddProfilePage> {
     if (mounted) {
       showDialog(
         context: context,
-        builder: (BuildContext dialogContext) {
+        builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text('No Image Selected'),
-            content:
-                const Text('Please select a profile image before proceeding.'),
+            title: Text(
+              'No Image Selected',
+              style: Theme.of(context)
+                  .textTheme
+                  .headlineMedium
+                  ?.copyWith(color: const Color(0xff333333)),
+            ),
+            content: Text(
+              'Please select a profile image before proceeding.',
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
             actions: [
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () => Navigator.of(dialogContext).pop(),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.primary),
+                child: const Row(
+                  children: [
+                    Spacer(),
+                    Text(
+                      'OK',
+                      style: TextStyle(
+                          fontSize: 20,
+                          color: Color(0xffFFFFFF),
+                          fontFamily: 'Fredoka',
+                          fontWeight: FontWeight.w500),
+                    ),
+                    Spacer()
+                  ],
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog
+                },
               ),
             ],
           );

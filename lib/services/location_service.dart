@@ -1,4 +1,13 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:nonghai/services/caller.dart';
+
+class LatLong {
+  final double lat;
+  final double lng;
+
+  LatLong({required this.lat, required this.lng});
+}
 
 class LocationService {
   Future<Position?> getLocation() async {
@@ -30,5 +39,29 @@ class LocationService {
     print("get location success");
 
     return await Geolocator.getCurrentPosition();
+  }
+
+  Future<LatLong?> getLatLong(String address) async {
+    //replace space with +
+    address = address.replaceAll(' ', '+');
+    print("address: $address");
+
+    String? key = dotenv.env['GOOGLE_API_KEY'];
+    print("ket: $key");
+
+    double lat = 0;
+    double lng = 0;
+    try {
+      final resp = await Caller.dio.get(
+          "https://maps.googleapis.com/maps/api/geocode/json?address=$address&key=$key");
+      if (resp.statusCode == 200) {
+        print("getLatLong success");
+        lat = resp.data['results'][0]['geometry']['location']['lat'];
+        lng = resp.data['results'][0]['geometry']['location']['lng'];
+      }
+    } catch (e) {
+      print("getLatLong error: $e");
+    }
+    return LatLong(lat: lat, lng: lng);
   }
 }
