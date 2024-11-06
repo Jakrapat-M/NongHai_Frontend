@@ -91,14 +91,6 @@ class _BottomNavPageState extends State<BottomNavPage> {
     });
   }
 
-  void _showCenteredSnackbar(String message) {
-    final snackBar = SnackBar(
-      content: Center(child: Text(message)),
-      behavior: SnackBarBehavior.floating,
-      margin: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-    );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
 
   Widget _buildIconWithBadge(IconData icon, bool showBadge) {
     return Stack(
