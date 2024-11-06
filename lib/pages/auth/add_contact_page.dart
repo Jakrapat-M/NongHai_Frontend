@@ -2,10 +2,8 @@
 
 import 'dart:io';
 // import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 // import 'package:nonghai/pages/auth/add_pet_info_page.dart';
 import 'package:nonghai/pages/auth/add_pet_profile_page.dart';
@@ -27,11 +25,11 @@ class AddContactPage extends StatefulWidget {
 
 class _AddContactPageState extends State<AddContactPage> {
   String? _phoneNumber;
-  String? _addr;
+  // String? _addr;
   Map<String, dynamic>? userData;
   final nameController = TextEditingController();
   final surnameController = TextEditingController();
-  // final addrController = TextEditingController();
+  final addrController = TextEditingController();
   bool isLoading = false;
 
   @override
@@ -50,24 +48,37 @@ class _AddContactPageState extends State<AddContactPage> {
   }
 
   Future<void> _createUser(BuildContext context) async {
+    LatLong? latLong;
     if (_phoneNumber == null || _phoneNumber!.length < 13) {
       // 13 = 9+4(+66/)
       // Show a message if the phone number has fewer than 9 digits
       _showMessage("Phone number must be 9 or 10 digits.");
       return;
-    } else if (_addr == null || _addr == "") {
-      _showMessage("Please get your current location.");
-      return;
+      // } else if (_addr == null || _addr == "") {
+      //   _showMessage("Please get your current location.");
+      //   return;
     }
 
-    if (nameController.text.isNotEmpty && surnameController.text.isNotEmpty) {
+    if (nameController.text.isNotEmpty &&
+        surnameController.text.isNotEmpty &&
+        addrController.text.isNotEmpty) {
       userData!['phone'] = _phoneNumber!;
       userData!['name'] = nameController.text;
       userData!['surname'] = surnameController.text;
-      userData!['address'] = _addr!;
+      userData!['address'] = addrController.text;
+      // userData!['address'] = _addr!;
 
       // final authService = AuthService();
       try {
+        //get latlong from addr
+        latLong = await LocationService().getLatLong(userData!['address']);
+        if (latLong != null) {
+          userData!['latitude'] = latLong.lat;
+          userData!['longitude'] = latLong.lng;
+          print(
+              'lat: ${userData!['latitude']}, long: ${userData!['longitude']}');
+        }
+
         // Call SaveProfile to upload the profile image and get the updated user data
         if (userData?['image'] != null && userData!['image'].isNotEmpty) {
           userData = await SaveProfile();
@@ -98,12 +109,36 @@ class _AddContactPageState extends State<AddContactPage> {
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
-              title: const Text('API Error'),
-              content: Text(response.data.toString()),
+              title: Text('API Error',
+                  style: Theme.of(context)
+                      .textTheme
+                      .headlineMedium
+                      ?.copyWith(color: const Color(0xff333333))),
+              content: Text(
+                response.data.toString(),
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
               actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('OK'),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.primary),
+                  child: const Row(
+                    children: [
+                      Spacer(),
+                      Text(
+                        'OK',
+                        style: TextStyle(
+                            fontSize: 20,
+                            color: Color(0xffFFFFFF),
+                            fontFamily: 'Fredoka',
+                            fontWeight: FontWeight.w500),
+                      ),
+                      Spacer(),
+                    ],
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
                 ),
               ],
             ),
@@ -114,12 +149,36 @@ class _AddContactPageState extends State<AddContactPage> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Error'),
-            content: Text('Error occurred: ${e.toString()}'),
+            title: Text('Error',
+                style: Theme.of(context)
+                    .textTheme
+                    .headlineMedium
+                    ?.copyWith(color: const Color(0xff333333))),
+            content: Text(
+              'Error occurred: ${e.toString()}',
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
             actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('OK'),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.primary),
+                child: const Row(
+                  children: [
+                    Spacer(),
+                    Text(
+                      'OK',
+                      style: TextStyle(
+                          fontSize: 20,
+                          color: Color(0xffFFFFFF),
+                          fontFamily: 'Fredoka',
+                          fontWeight: FontWeight.w500),
+                    ),
+                    Spacer(),
+                  ],
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
               ),
             ],
           ),
@@ -203,39 +262,39 @@ class _AddContactPageState extends State<AddContactPage> {
 
   @override
   Widget build(BuildContext context) {
-    Future<void> getLocation() async {
-      setState(() {
-        isLoading = true;
-      });
-      Future<Position?> location = LocationService().getLocation();
-      location.then((value) async {
-        if (value != null) {
-          print('Location: ${value.latitude}, ${value.longitude}');
-          try {
-            final resp =
-                await Caller.dio.post('/tracking/getAddressByLatLng', data: {
-              'lat': value.latitude,
-              'lng': value.longitude,
-            });
-            if (resp.statusCode == 200) {
-              setState(() {
-                _addr = resp.data['data'];
-                userData!['latitude'] = value.latitude;
-                userData!['longitude'] = value.longitude;
-                isLoading = false;
-              });
-            }
-          } catch (e) {
-            setState(() {
-              isLoading = false;
-            });
-            if (kDebugMode) {
-              print('Network error occurred: $e');
-            }
-          }
-        }
-      });
-    }
+    // Future<void> getLocation() async {
+    //   setState(() {
+    //     isLoading = true;
+    //   });
+    //   Future<Position?> location = LocationService().getLocation();
+    //   location.then((value) async {
+    //     if (value != null) {
+    //       print('Location: ${value.latitude}, ${value.longitude}');
+    //       try {
+    //         final resp =
+    //             await Caller.dio.post('/tracking/getAddressByLatLng', data: {
+    //           'lat': value.latitude,
+    //           'lng': value.longitude,
+    //         });
+    //         if (resp.statusCode == 200) {
+    //           setState(() {
+    //             _addr = resp.data['data'];
+    //             userData!['latitude'] = value.latitude;
+    //             userData!['longitude'] = value.longitude;
+    //             isLoading = false;
+    //           });
+    //         }
+    //       } catch (e) {
+    //         setState(() {
+    //           isLoading = false;
+    //         });
+    //         if (kDebugMode) {
+    //           print('Network error occurred: $e');
+    //         }
+    //       }
+    //     }
+    //   });
+    // }
 
     print(userData);
     return Scaffold(
@@ -267,69 +326,79 @@ class _AddContactPageState extends State<AddContactPage> {
                 hintStyle: Theme.of(context).textTheme.displayLarge,
               ),
             ),
-            TextButton(
-              style: TextButton.styleFrom(
-                backgroundColor: Colors.white,
-                padding:
-                    const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-              ),
-              onPressed: getLocation,
-              child: isLoading
-                  ? Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CircularProgressIndicator(
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ],
-                    )
-                  : Row(
-                      children: [
-                        Icon(
-                          Icons.location_on,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(right: 25),
-                            child: Text(
-                              _addr ??
-                                  "Get current location", // Display address or default text
-                              style: const TextStyle(
-                                  color: Color(0xffC8A48A),
-                                  fontFamily: "Fredoka",
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-            ),
             Padding(
               padding: const EdgeInsets.only(bottom: 12),
-              child: Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.80,
-                      child: const Text(
-                        "*if current location is not your home please edit later at the homepage",
-                        style: TextStyle(
-                            fontFamily: 'Fredoka',
-                            fontSize: 10,
-                            fontWeight: FontWeight.w400,
-                            color: Color(0xffC8A48A)),
-                        overflow: TextOverflow.clip,
-                      ),
-                    ),
-                  ),
-                ],
+              child: CustomTextField(
+                controller: addrController,
+                hintText: "Address",
+                obscureText: false,
+                hintStyle: Theme.of(context).textTheme.displayLarge,
               ),
             ),
+            // get latlong button version
+            // TextButton(
+            //   style: TextButton.styleFrom(
+            //     backgroundColor: Colors.white,
+            //     padding:
+            //         const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            //   ),
+            //   onPressed: getLocation,
+            //   child: isLoading
+            //       ? Row(
+            //           mainAxisAlignment: MainAxisAlignment.center,
+            //           children: [
+            //             CircularProgressIndicator(
+            //               color: Theme.of(context).colorScheme.primary,
+            //             ),
+            //           ],
+            //         )
+            //       : Row(
+            //           children: [
+            //             Icon(
+            //               Icons.location_on,
+            //               color: Theme.of(context).colorScheme.primary,
+            //             ),
+            //             const SizedBox(width: 8),
+            //             Expanded(
+            //               child: Padding(
+            //                 padding: const EdgeInsets.only(right: 25),
+            //                 child: Text(
+            //                   _addr ??
+            //                       "Get current location", // Display address or default text
+            //                   style: const TextStyle(
+            //                       color: Color(0xffC8A48A),
+            //                       fontFamily: "Fredoka",
+            //                       fontSize: 16,
+            //                       fontWeight: FontWeight.w500),
+            //                   textAlign: TextAlign.center,
+            //                 ),
+            //               ),
+            //             ),
+            //           ],
+            //         ),
+            // ),
+            // Padding(
+            //   padding: const EdgeInsets.only(bottom: 12),
+            //   child: Row(
+            //     children: [
+            //       Padding(
+            //         padding: const EdgeInsets.symmetric(horizontal: 10),
+            //         child: SizedBox(
+            //           width: MediaQuery.of(context).size.width * 0.80,
+            //           child: const Text(
+            //             "*if current location is not your home please edit later at the homepage",
+            //             style: TextStyle(
+            //                 fontFamily: 'Fredoka',
+            //                 fontSize: 10,
+            //                 fontWeight: FontWeight.w400,
+            //                 color: Color(0xffC8A48A)),
+            //             overflow: TextOverflow.clip,
+            //           ),
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            // ),
             Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: Container(

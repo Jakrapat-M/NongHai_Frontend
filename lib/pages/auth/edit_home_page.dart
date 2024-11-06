@@ -6,10 +6,8 @@
 import 'dart:io';
 // import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nonghai/services/auth/add_profile.dart';
 import 'package:nonghai/services/caller.dart';
@@ -30,7 +28,7 @@ class _EditHomePageState extends State<EditHomePage> {
   bool _isLoading = true;
   late String _uid;
   late String _username;
-  late String _newAddress = '';
+  // late String _newAddress = '';
   String _address = '';
   late String _phone;
   late String _image = '';
@@ -385,38 +383,38 @@ class _EditHomePageState extends State<EditHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    Future<void> getLocation() async {
-      setState(() {
-        isLoadingAddress = true;
-      });
-      Future<Position?> location = LocationService().getLocation();
-      location.then((value) async {
-        if (value != null) {
-          print('Location: ${value.latitude}, ${value.longitude}');
-          try {
-            final resp =
-                await Caller.dio.post('/tracking/getAddressByLatLng', data: {
-              'lat': value.latitude,
-              'lng': value.longitude,
-            });
-            if (resp.statusCode == 200) {
-              setState(() {
-                _newAddress = resp.data['data'];
-                print(_newAddress);
-                isLoadingAddress = false;
-              });
-            }
-          } catch (e) {
-            setState(() {
-              isLoadingAddress = false;
-            });
-            if (kDebugMode) {
-              print('Network error occurred: $e');
-            }
-          }
-        }
-      });
-    }
+    // Future<void> getLocation() async {
+    //   setState(() {
+    //     isLoadingAddress = true;
+    //   });
+    //   Future<Position?> location = LocationService().getLocation();
+    //   location.then((value) async {
+    //     if (value != null) {
+    //       print('Location: ${value.latitude}, ${value.longitude}');
+    //       try {
+    //         final resp =
+    //             await Caller.dio.post('/tracking/getAddressByLatLng', data: {
+    //           'lat': value.latitude,
+    //           'lng': value.longitude,
+    //         });
+    //         if (resp.statusCode == 200) {
+    //           setState(() {
+    //             _newAddress = resp.data['data'];
+    //             print(_newAddress);
+    //             isLoadingAddress = false;
+    //           });
+    //         }
+    //       } catch (e) {
+    //         setState(() {
+    //           isLoadingAddress = false;
+    //         });
+    //         if (kDebugMode) {
+    //           print('Network error occurred: $e');
+    //         }
+    //       }
+    //     }
+    //   });
+    // }
 
     if (_isLoading) {
       // Show a loading spinner while fetching data
@@ -529,7 +527,7 @@ class _EditHomePageState extends State<EditHomePage> {
 
               // Address field
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 3.0),
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16.0),
@@ -544,46 +542,79 @@ class _EditHomePageState extends State<EditHomePage> {
                 ),
                 child: Row(
                   children: [
+                    const Icon(
+                      Icons.home_outlined,
+                      color: Color(0xff333333),
+                      size: 24,
+                    ),
+                    const SizedBox(width: 20),
                     Expanded(
-                      child: TextButton(
-                        onPressed: getLocation,
-                        child: isLoadingAddress
-                            ? Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  CircularProgressIndicator(
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                  ),
-                                ],
-                              )
-                            : Row(
-                                children: [
-                                  const Icon(
-                                    Icons.location_on,
-                                    color: Color(0xffC8A48A),
-                                  ),
-                                  const SizedBox(width: 25),
-                                  Expanded(
-                                    child: Text(
-                                      _newAddress == ''
-                                          ? "Update location"
-                                          : _newAddress,
-                                      // Display address or default text
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        color: Color(0xffC8A48A),
-                                        fontFamily: 'Fredoka',
-                                        fontWeight: FontWeight.w400,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                      child: TextFormField(
+                        initialValue: _address,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Color(0xff1E1E1E),
+                          fontFamily: 'Fredoka',
+                          fontWeight: FontWeight.w400,
+                        ),
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          hintText: 'Enter address',
+                        ),
+                        keyboardType: TextInputType.streetAddress,
+                        onChanged: (value) {
+                          setState(() {
+                            _address = value;
+                          });
+                        },
                       ),
                     ),
                   ],
                 ),
+
+                // version get location button
+                // child: Row(
+                //   children: [
+                //     Expanded(
+                //       child: TextButton(
+                //         onPressed: getLocation,
+                //         child: isLoadingAddress
+                //             ? Row(
+                //                 mainAxisAlignment: MainAxisAlignment.center,
+                //                 children: [
+                //                   CircularProgressIndicator(
+                //                     color:
+                //                         Theme.of(context).colorScheme.primary,
+                //                   ),
+                //                 ],
+                //               )
+                //             : Row(
+                //                 children: [
+                //                   const Icon(
+                //                     Icons.location_on,
+                //                     color: Color(0xffC8A48A),
+                //                   ),
+                //                   const SizedBox(width: 25),
+                //                   Expanded(
+                //                     child: Text(
+                //                       _newAddress == ''
+                //                           ? "Update location"
+                //                           : _newAddress,
+                //                       // Display address or default text
+                //                       style: const TextStyle(
+                //                         fontSize: 16,
+                //                         color: Color(0xffC8A48A),
+                //                         fontFamily: 'Fredoka',
+                //                         fontWeight: FontWeight.w400,
+                //                       ),
+                //                     ),
+                //                   ),
+                //                 ],
+                //               ),
+                //       ),
+                //     ),
+                //   ],
+                // ),
               ),
               const SizedBox(height: 8),
 
@@ -967,15 +998,17 @@ class _EditHomePageState extends State<EditHomePage> {
 
   Future<void> _saveChanges() async {
     bool isValid = true;
-    String updateAddr, updateImg;
+    LatLong? latLong;
+    // String updateAddr;
+    String updateImg;
     await SaveProfile();
 
     if (_username == '' || _username.isEmpty) {
       _showDialog("Username");
       isValid = false;
-      // } else if (_address == '' || _address.isEmpty) {
-      //   _showDialog("Address");
-      //   isValid = false;
+    } else if (_address == '' || _address.isEmpty) {
+      _showDialog("Address");
+      isValid = false;
     } else if (_phone == '' || _phone.isEmpty) {
       _showDialog("Phone number");
       isValid = false;
@@ -988,12 +1021,12 @@ class _EditHomePageState extends State<EditHomePage> {
     // If any of the fields are invalid, return early to avoid updating with empty values.
     if (!isValid) return;
 
-    if (_newAddress == '') {
-      updateAddr = _address;
-    } else {
-      print('newAddress updated');
-      updateAddr = _newAddress;
-    }
+    // if (_newAddress == '') {
+    //   updateAddr = _address;
+    // } else {
+    //   print('newAddress updated');
+    //   updateAddr = _newAddress;
+    // }
 
     if (imgUrl == '' || imgUrl == null) {
       updateImg = _image;
@@ -1002,9 +1035,16 @@ class _EditHomePageState extends State<EditHomePage> {
     }
 
     print('Updated username: $_username');
-    print('Updated address: $updateAddr');
+    print('Updated address: $_address');
+    // print('Updated address: $updateAddr');
     print('Updated phone: $_phone');
     print('Updated img: $updateImg');
+
+    //get LatLong
+    latLong = await LocationService().getLatLong(_address);
+    if (latLong != null) {
+      print('lat: ${latLong.lat}, long: ${latLong.lng}');
+    }
 
     // Delete all pets in the deleted list
     for (String petId in _deletedPetIds) {
@@ -1031,7 +1071,10 @@ class _EditHomePageState extends State<EditHomePage> {
         "/user/$_uid",
         data: {
           "username": _username,
-          "address": updateAddr,
+          // "address": updateAddr,
+          "address": _address,
+          "latitude": latLong?.lat,
+          "longitude": latLong?.lng,
           "phone": _phone,
           "image": updateImg,
         },
