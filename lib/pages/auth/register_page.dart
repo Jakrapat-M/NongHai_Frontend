@@ -117,12 +117,38 @@ class _RegisterPageState extends State<RegisterPage> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Error'),
-            content: Text(errorMessage),
+            title: Text(
+              'Error',
+              style: Theme.of(context)
+                  .textTheme
+                  .headlineMedium
+                  ?.copyWith(color: const Color(0xff333333)),
+            ),
+            content: Text(
+              errorMessage,
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
             actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('OK'),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xffC8A48A)),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Row(
+                  children: [
+                    Spacer(),
+                    Text(
+                      'OK',
+                      style: TextStyle(
+                          fontSize: 20,
+                          color: Color(0xffFFFFFF),
+                          fontFamily: 'Fredoka',
+                          fontWeight: FontWeight.w500),
+                    ),
+                    Spacer()
+                  ],
+                ),
               ),
             ],
           ),

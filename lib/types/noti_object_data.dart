@@ -23,7 +23,7 @@ class NotificationObject {
   final String trackingId;
 
   @JsonKey(name: 'is_read')
-  final bool isRead;
+  bool isRead;
 
   @JsonKey(name: 'image')
   String? image;

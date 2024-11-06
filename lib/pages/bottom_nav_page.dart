@@ -23,6 +23,8 @@ class _BottomNavPageState extends State<BottomNavPage> {
   bool hasUnreadNotifications = false;
   int _selectedPageIndex = 0;
   Timer? _refreshTimer;
+  StreamSubscription<RemoteMessage>? _onMessageSubscription;
+  StreamSubscription<RemoteMessage>? _onMessageOpenedAppSubscription;
 
   @override
   void initState() {
@@ -44,6 +46,8 @@ class _BottomNavPageState extends State<BottomNavPage> {
   @override
   void dispose() {
     _refreshTimer?.cancel(); // Cancel the timer to prevent memory leaks
+    _onMessageSubscription?.cancel(); // Cancel the Firebase onMessage listener
+    _onMessageOpenedAppSubscription?.cancel(); // Cancel the Firebase onMessageOpenedApp listener
     super.dispose();
   }
 
@@ -77,14 +81,23 @@ class _BottomNavPageState extends State<BottomNavPage> {
   }
 
   void _setupFirebaseListeners() {
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+    _onMessageSubscription = FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       await checkAllReadChat();
       await checkAllReadNotification();
     });
 
-    FirebaseMessaging.onMessageOpenedApp.listen((message) {
+    _onMessageOpenedAppSubscription = FirebaseMessaging.onMessageOpenedApp.listen((message) {
       NotificationService(navigatorKey: navigatorKey).handleMessage(message);
     });
+  }
+
+  void _showCenteredSnackbar(String message) {
+    final snackBar = SnackBar(
+      content: Center(child: Text(message)),
+      behavior: SnackBarBehavior.floating,
+      margin: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   Widget _buildIconWithBadge(IconData icon, bool showBadge) {

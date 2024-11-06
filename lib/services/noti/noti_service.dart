@@ -88,47 +88,66 @@ class NotificationService {
       final snackbar = SnackBar(
         backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(90),
         ),
         content: TextButton(
           onPressed: () {
             handleMessage(message);
           },
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.center, // Center all content horizontally
             children: [
-              Text(
-                '${message.notification!.title!}: ',
-                style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors
-                        .black), // Optional: Change text color for better visibility
+              Image.asset(
+                'assets/images/Logo.png',
+                width: 60,
+                height: 60,
               ),
-              const SizedBox(width: 8),
-              Text(
-                overflow: TextOverflow.clip,
-                maxLines: 1,
-                message.notification!.body!,
-                style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors
-                        .black), // Optional: Change text color for better visibility
+              const SizedBox(width: 8), // Space between image and text
+              Expanded(
+                child: Align(
+                  alignment: Alignment.centerLeft, // Center text content within Expanded
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start, // Center text in Column
+                    mainAxisSize: MainAxisSize.min, // Prevent Column from taking full height
+                    children: [
+                      Text(
+                        message.notification!.title!,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xffC8A48A),
+                        ),
+                      ),
+                      Text(
+                        message.notification!.body!,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),
         ),
         behavior: SnackBarBehavior.floating,
+        padding: const EdgeInsets.symmetric(
+          vertical: 0,
+          horizontal: 0,
+        ),
         margin: EdgeInsets.only(
-          top: 16.0,
           left: 16.0,
           right: 16.0,
-          bottom:
-              MediaQuery.of(_navigatorKey.currentContext!).size.height - 100,
+          bottom: MediaQuery.of(_navigatorKey.currentContext!).size.height -
+              (MediaQuery.of(_navigatorKey.currentContext!).size.height * 0.12),
         ),
-        duration: const Duration(seconds: 3),
+        duration: const Duration(seconds: 10),
       );
 
-      ScaffoldMessenger.of(_navigatorKey.currentContext!)
-          .showSnackBar(snackbar);
+      ScaffoldMessenger.of(_navigatorKey.currentContext!).showSnackBar(snackbar);
     }
   }
 }

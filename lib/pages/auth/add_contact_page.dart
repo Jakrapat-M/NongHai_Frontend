@@ -135,11 +135,33 @@ class _AddContactPageState extends State<AddContactPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Invalid Input'),
-          content: const Text('The field cannot be empty.'),
+          title: Text('Invalid Input',
+              style: Theme.of(context)
+                  .textTheme
+                  .headlineMedium
+                  ?.copyWith(color: const Color(0xff333333))),
+          content: Text(
+            'The field cannot be empty.',
+            style: Theme.of(context).textTheme.titleSmall,
+          ),
           actions: [
-            TextButton(
-              child: const Text('OK'),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.primary),
+              child: const Row(
+                children: [
+                  Spacer(),
+                  Text(
+                    'OK',
+                    style: TextStyle(
+                        fontSize: 20,
+                        color: Color(0xffFFFFFF),
+                        fontFamily: 'Fredoka',
+                        fontWeight: FontWeight.w500),
+                  ),
+                  Spacer(),
+                ],
+              ),
               onPressed: () {
                 Navigator.of(context).pop();
               },

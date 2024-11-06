@@ -260,7 +260,7 @@ class _MyAppState extends State<MyApp> {
           ),
           appBarTheme: const AppBarTheme(
             titleTextStyle: TextStyle(
-                fontSize: 36,
+                fontSize: 32,
                 fontWeight: FontWeight.w500,
                 color: Color(0xff2C3F50),
                 fontFamily: 'Fredoka'),
