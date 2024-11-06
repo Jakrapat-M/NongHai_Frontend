@@ -1,8 +1,13 @@
+import 'dart:async';
+
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:nonghai/components/custom_appbar.dart';
 import 'package:nonghai/components/tracking_object.dart';
+import 'package:nonghai/main.dart';
 import 'package:nonghai/services/caller.dart';
+import 'package:nonghai/services/noti/noti_service.dart';
 import 'package:nonghai/types/tracking_info.dart';
 
 // ignore: must_be_immutable
@@ -21,6 +26,8 @@ class _TrackingPageState extends State<TrackingPage> {
   String loadName = '';
   String loadImage = '';
   List<TrackingInfo> trackingInfo = [];
+  StreamSubscription<RemoteMessage>? _onMessageSubscription;
+  StreamSubscription<RemoteMessage>? _onMessageOpenedAppSubscription;
   void getTracking() async {
     try {
       final resp = await Caller.dio.get(
@@ -62,6 +69,11 @@ class _TrackingPageState extends State<TrackingPage> {
   @override
   void initState() {
     super.initState();
+
+    // Initialize notification service and setup listeners
+    NotificationService(navigatorKey: navigatorKey).initialize();
+    _setupFirebaseListeners();
+
     if (widget.petName == null ||
         widget.petImage == null ||
         widget.petName!.isEmpty ||
@@ -73,7 +85,23 @@ class _TrackingPageState extends State<TrackingPage> {
 
   @override
   void dispose() {
+    _onMessageSubscription?.cancel();
+    _onMessageOpenedAppSubscription?.cancel();
     super.dispose();
+  }
+
+  void _setupFirebaseListeners() {
+    _onMessageSubscription =
+        FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+      if (message.data['navigate_to'] == 'tracking') {
+        getTracking();
+      }
+    });
+
+    _onMessageOpenedAppSubscription =
+        FirebaseMessaging.onMessageOpenedApp.listen((message) {
+      NotificationService(navigatorKey: navigatorKey).handleMessage(message);
+    });
   }
 
   ImageProvider getImage() {
