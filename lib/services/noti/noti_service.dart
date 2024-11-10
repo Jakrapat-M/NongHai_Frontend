@@ -86,6 +86,7 @@ class NotificationService {
 
     if (message.notification != null && !hideNoti) {
       final snackbar = SnackBar(
+        elevation: 2,
         backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(90),
