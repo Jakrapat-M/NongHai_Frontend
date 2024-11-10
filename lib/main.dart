@@ -204,6 +204,7 @@ class _MyAppState extends State<MyApp> {
     return AuthServiceInherited(
       authService: authService,
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         navigatorKey: widget.navigatorKey,
         title: 'Nonghai',
         theme: ThemeData(
