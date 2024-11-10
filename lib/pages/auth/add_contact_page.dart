@@ -36,8 +36,7 @@ class _AddContactPageState extends State<AddContactPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     // Retrieve the userData passed from the RegisterPage
-    userData =
-        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    userData = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
   }
 
   void _showMessage(String message) {
@@ -75,8 +74,7 @@ class _AddContactPageState extends State<AddContactPage> {
         if (latLong != null) {
           userData!['latitude'] = latLong.lat;
           userData!['longitude'] = latLong.lng;
-          print(
-              'lat: ${userData!['latitude']}, long: ${userData!['longitude']}');
+          print('lat: ${userData!['latitude']}, long: ${userData!['longitude']}');
         }
 
         // Call SaveProfile to upload the profile image and get the updated user data
@@ -101,14 +99,14 @@ class _AddContactPageState extends State<AddContactPage> {
                   // userId: userData!['id'], // Pass your userData if needed
                   ),
             ),
-            (Route<dynamic> route) =>
-                false, // This ensures no previous routes remain
+            (Route<dynamic> route) => false, // This ensures no previous routes remain
           );
         } else {
           // Handle error from API
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
+              backgroundColor: Theme.of(context).colorScheme.surface,
               title: Text('API Error',
                   style: Theme.of(context)
                       .textTheme
@@ -149,6 +147,7 @@ class _AddContactPageState extends State<AddContactPage> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
+             backgroundColor: Theme.of(context).colorScheme.surface,
             title: Text('Error',
                 style: Theme.of(context)
                     .textTheme
@@ -194,6 +193,7 @@ class _AddContactPageState extends State<AddContactPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+           backgroundColor: Theme.of(context).colorScheme.surface,
           title: Text('Invalid Input',
               style: Theme.of(context)
                   .textTheme
@@ -205,8 +205,8 @@ class _AddContactPageState extends State<AddContactPage> {
           ),
           actions: [
             ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.primary),
+              style:
+                  ElevatedButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.primary),
               child: const Row(
                 children: [
                   Spacer(),
@@ -244,8 +244,8 @@ class _AddContactPageState extends State<AddContactPage> {
       String folderPath = 'profileImage/$userId.jpg'; // Save as userId.jpg
 
       // Save the profile image and pass the userId and folderPath
-      String imgUrl = await StoreProfile()
-          .saveData(userId: userId, file: imageFile, folderPath: folderPath);
+      String imgUrl =
+          await StoreProfile().saveData(userId: userId, file: imageFile, folderPath: folderPath);
 
       // Set userData['image'] with the URL
       userData!['image'] = imgUrl;
@@ -298,11 +298,10 @@ class _AddContactPageState extends State<AddContactPage> {
 
     print(userData);
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Your Contact",
-            style: Theme.of(context).bannerTheme.contentTextStyle),
-      ),
       backgroundColor: Theme.of(context).colorScheme.surface,
+      appBar: AppBar(
+        title: Text("Your Contact", style: Theme.of(context).bannerTheme.contentTextStyle),
+      ),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(25, 0, 25, 8),
         child: Column(
@@ -419,24 +418,20 @@ class _AddContactPageState extends State<AddContactPage> {
                       // ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
-                            color: Colors.transparent), // No underline
+                        borderSide: const BorderSide(color: Colors.transparent), // No underline
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: const BorderSide(
-                            color: Colors
-                                .transparent), // No underline when focused
+                            color: Colors.transparent), // No underline when focused
                       ),
                     ),
                     initialCountryCode: 'TH', // Set the initial country code
                     disableLengthCheck: true,
                     inputFormatters: [
-                      FilteringTextInputFormatter
-                          .digitsOnly, // Allow digits only
+                      FilteringTextInputFormatter.digitsOnly, // Allow digits only
 
-                      LengthLimitingTextInputFormatter(
-                          10), // Limit input to 10 characters
+                      LengthLimitingTextInputFormatter(10), // Limit input to 10 characters
                     ],
 
                     onChanged: (phone) {

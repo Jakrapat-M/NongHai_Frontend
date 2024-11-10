@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nonghai/pages/bottom_nav_page.dart';
 
-class CustomAppBarToHome extends StatelessWidget
-    implements PreferredSizeWidget {
+class CustomAppBarToHome extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final bool? noBackButton;
 
@@ -12,12 +11,13 @@ class CustomAppBarToHome extends StatelessWidget
   Widget build(BuildContext context) {
     if (noBackButton == null || noBackButton == false) {
       return AppBar(
+        scrolledUnderElevation: 0.0,
         title: Text(
           title,
           style: Theme.of(context).appBarTheme.titleTextStyle,
         ),
         centerTitle: Theme.of(context).appBarTheme.centerTitle,
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+        backgroundColor: Colors.transparent,
         elevation: Theme.of(context).appBarTheme.elevation,
         iconTheme: Theme.of(context).appBarTheme.iconTheme,
         leadingWidth: MediaQuery.of(context).size.width * 0.2,
@@ -49,9 +49,10 @@ class CustomAppBarToHome extends StatelessWidget
       return AppBar(
         title: Text(title, style: Theme.of(context).appBarTheme.titleTextStyle),
         centerTitle: Theme.of(context).appBarTheme.centerTitle,
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+        backgroundColor: Colors.transparent,
         elevation: Theme.of(context).appBarTheme.elevation,
         iconTheme: Theme.of(context).appBarTheme.iconTheme,
+        scrolledUnderElevation: 0.0,
       );
     }
   }

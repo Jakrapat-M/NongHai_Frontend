@@ -35,10 +35,7 @@ class _RegisterPageState extends State<RegisterPage> {
     final password = passwordController.text;
     final confirmPassword = confirmPasswordController.text;
 
-    if (email.isEmpty ||
-        username.isEmpty ||
-        password.isEmpty ||
-        confirmPassword.isEmpty) {
+    if (email.isEmpty || username.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
       // Show error message if any field is empty
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill out all fields.')),
@@ -65,8 +62,7 @@ class _RegisterPageState extends State<RegisterPage> {
     if (password.length < 6) {
       // Show error if password is less than 6 characters
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Password must be at least 6 characters long.')),
+        const SnackBar(content: Text('Password must be at least 6 characters long.')),
       );
       return;
     }
@@ -101,14 +97,12 @@ class _RegisterPageState extends State<RegisterPage> {
       // Navigate to Add Profile Image page and pass userData
       if (mounted) {
         // Navigator.of(context).popUntil((route) => route.isFirst);
-        Navigator.pushReplacementNamed(context, '/addProfileImage',
-            arguments: userData);
+        Navigator.pushReplacementNamed(context, '/addProfileImage', arguments: userData);
       }
     } on FirebaseAuthException catch (e) {
       String errorMessage;
       if (e.code == 'email-already-in-use') {
-        errorMessage =
-            'The provided email is already registered. Please use a different email.';
+        errorMessage = 'The provided email is already registered. Please use a different email.';
       } else {
         errorMessage = e.message ?? 'An error occurred. Please try again.';
       }
@@ -117,6 +111,7 @@ class _RegisterPageState extends State<RegisterPage> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
+            backgroundColor: Theme.of(context).colorScheme.surface,
             title: Text(
               'Error',
               style: Theme.of(context)
@@ -130,8 +125,7 @@ class _RegisterPageState extends State<RegisterPage> {
             ),
             actions: [
               ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xffC8A48A)),
+                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xffC8A48A)),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -159,8 +153,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   bool isValidEmail(String email) {
     // Regular expression for validating email format
-    final emailRegex =
-        RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+    final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
     return emailRegex.hasMatch(email);
   }
 
@@ -173,6 +166,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         backgroundColor: const Color(0xfff2f2f2),
         title: const Text(
@@ -184,7 +178,6 @@ class _RegisterPageState extends State<RegisterPage> {
               color: Color(0xff57677C)),
         ),
       ),
-      backgroundColor: Theme.of(context).colorScheme.surface,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(40, 65, 40, 0),

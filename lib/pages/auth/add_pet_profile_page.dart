@@ -61,6 +61,7 @@ class _AddPetProfilePageState extends State<AddPetProfilePage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Theme.of(context).colorScheme.surface,
           title: Text('Select Image Source',
               textAlign: TextAlign.center,
               style: Theme.of(context)
@@ -71,8 +72,7 @@ class _AddPetProfilePageState extends State<AddPetProfilePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xffC8A48A)),
+                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xffC8A48A)),
                 onPressed: () async {
                   Navigator.of(context).pop();
 
@@ -109,8 +109,7 @@ class _AddPetProfilePageState extends State<AddPetProfilePage> {
               ),
               const SizedBox(width: 15),
               ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xffC8A48A)),
+                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xffC8A48A)),
                 child: const Text(
                   'Gallery',
                   style: TextStyle(
@@ -121,8 +120,7 @@ class _AddPetProfilePageState extends State<AddPetProfilePage> {
                 ),
                 onPressed: () async {
                   Navigator.of(context).pop();
-                  final XFile? result =
-                      await _picker.pickImage(source: ImageSource.gallery);
+                  final XFile? result = await _picker.pickImage(source: ImageSource.gallery);
                   if (result != null) {
                     setState(() {
                       _image = result;
@@ -159,6 +157,7 @@ class _AddPetProfilePageState extends State<AddPetProfilePage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
+            backgroundColor: Theme.of(context).colorScheme.surface,
             title: Text(
               'No Image Selected',
               style: Theme.of(context)
@@ -208,11 +207,10 @@ class _AddPetProfilePageState extends State<AddPetProfilePage> {
   Widget build(BuildContext context) {
     print(petData);
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Pet Profile",
-            style: Theme.of(context).bannerTheme.contentTextStyle),
-      ),
       backgroundColor: Theme.of(context).colorScheme.surface,
+      appBar: AppBar(
+        title: Text("Pet Profile", style: Theme.of(context).bannerTheme.contentTextStyle),
+      ),
       body: Center(
         child: SingleChildScrollView(
           child: Column(
@@ -221,8 +219,7 @@ class _AddPetProfilePageState extends State<AddPetProfilePage> {
               CircleAvatar(
                 radius: 150,
                 backgroundColor: const Color(0xffd9d9d9),
-                backgroundImage:
-                    _image != null ? FileImage(File(_image!.path)) : null,
+                backgroundImage: _image != null ? FileImage(File(_image!.path)) : null,
               ),
               SizedBox(height: 16),
               GestureDetector(
@@ -249,13 +246,12 @@ class _AddPetProfilePageState extends State<AddPetProfilePage> {
                 child: TextButton(
                   onPressed: () => _skip(),
                   style: TextButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(
-                        175, 224, 223, 223), // Background color
+                    backgroundColor: const Color.fromARGB(175, 224, 223, 223), // Background color
                     // padding:
                     //     const EdgeInsets.symmetric(horizontal: 100), // Padding
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                          50), // Optional: Adjust radius for rounded corners
+                      borderRadius:
+                          BorderRadius.circular(50), // Optional: Adjust radius for rounded corners
                     ),
                   ),
                   child: Row(

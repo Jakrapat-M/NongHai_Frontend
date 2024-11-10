@@ -44,6 +44,7 @@ class _AdditionalNotePageState extends State<AdditionalNotePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         title: const Text("Additional Note"),
       ),
@@ -64,15 +65,13 @@ class _AdditionalNotePageState extends State<AdditionalNotePage> {
                   enabledBorder: OutlineInputBorder(
                     borderRadius: const BorderRadius.all(Radius.circular(8)),
                     borderSide: BorderSide(
-                      color: Colors
-                          .transparent, // Transparent border when not focused
+                      color: Colors.transparent, // Transparent border when not focused
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: const BorderRadius.all(Radius.circular(10)),
                     borderSide: BorderSide(
-                      color:
-                          Colors.transparent, // Transparent border when focused
+                      color: Colors.transparent, // Transparent border when focused
                     ),
                   ),
                 ),

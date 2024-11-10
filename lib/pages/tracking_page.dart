@@ -91,15 +91,13 @@ class _TrackingPageState extends State<TrackingPage> {
   }
 
   void _setupFirebaseListeners() {
-    _onMessageSubscription =
-        FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+    _onMessageSubscription = FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       if (message.data['navigate_to'] == 'tracking') {
         getTracking();
       }
     });
 
-    _onMessageOpenedAppSubscription =
-        FirebaseMessaging.onMessageOpenedApp.listen((message) {
+    _onMessageOpenedAppSubscription = FirebaseMessaging.onMessageOpenedApp.listen((message) {
       NotificationService(navigatorKey: navigatorKey).handleMessage(message);
     });
   }
@@ -124,8 +122,7 @@ class _TrackingPageState extends State<TrackingPage> {
               const SizedBox(height: 20),
               CircleAvatar(
                 radius: 50,
-                backgroundColor:
-                    Theme.of(context).colorScheme.secondaryContainer,
+                backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
                 foregroundImage: getImage(),
               ),
               const SizedBox(height: 15),

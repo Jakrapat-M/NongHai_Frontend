@@ -152,6 +152,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
 
     String receiverName = userData?.username ?? '';
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: CustomAppBar(title: receiverName),
       body: SafeArea(
         child: Column(

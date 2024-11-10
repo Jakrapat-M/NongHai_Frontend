@@ -144,22 +144,16 @@ class _EditPetPageState extends State<EditPetPage> {
     });
     await SaveProfile();
     String name = nameController.text.isEmpty ? '-' : nameController.text;
-    String breed =
-        breedController.text.isEmpty ? 'Unknown' : breedController.text;
+    String breed = breedController.text.isEmpty ? 'Unknown' : breedController.text;
 
     // Prepare the data for the API call
     final petData = {
       "name": name,
       "animal_type": _animalType,
       "breed": breed,
-      "date_of_birth": _dob
-          .toLocal()
-          .toIso8601String()
-          .split('T')
-          .first, // Correct date format
+      "date_of_birth": _dob.toLocal().toIso8601String().split('T').first, // Correct date format
       "sex": _selectedGender,
-      "weight": double.tryParse(weightController.text) ??
-          0.0, // Ensure to send as double
+      "weight": double.tryParse(weightController.text) ?? 0.0, // Ensure to send as double
       "hair_color": hairController.text,
       "blood_type": bloodController.text,
       "eyes": eyeController.text,
@@ -230,8 +224,7 @@ class _EditPetPageState extends State<EditPetPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xffC8A48A)),
+                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xffC8A48A)),
                 onPressed: () async {
                   Navigator.of(context).pop();
 
@@ -268,8 +261,7 @@ class _EditPetPageState extends State<EditPetPage> {
               ),
               const SizedBox(width: 15),
               ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xffC8A48A)),
+                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xffC8A48A)),
                 child: const Text(
                   'Gallery',
                   style: TextStyle(
@@ -280,8 +272,7 @@ class _EditPetPageState extends State<EditPetPage> {
                 ),
                 onPressed: () async {
                   Navigator.of(context).pop();
-                  final XFile? result =
-                      await _picker.pickImage(source: ImageSource.gallery);
+                  final XFile? result = await _picker.pickImage(source: ImageSource.gallery);
                   if (result != null) {
                     setState(() {
                       _newImage = result;
@@ -343,6 +334,7 @@ class _EditPetPageState extends State<EditPetPage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
+            backgroundColor: Theme.of(context).colorScheme.surface,
             title: Text(
               'Error',
               style: Theme.of(context)
@@ -410,6 +402,7 @@ class _EditPetPageState extends State<EditPetPage> {
       return Center(child: Text(_errorMessage));
     }
     return Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.surface,
         appBar: AppBar(
           // title: Text(petDetails['name'] ?? 'Pet Details'),
           title: Padding(
@@ -417,17 +410,14 @@ class _EditPetPageState extends State<EditPetPage> {
             child: Row(
               children: [
                 Icon(
-                  isSafe
-                      ? Icons.check_circle_outline_rounded
-                      : Icons.error_outline_rounded,
+                  isSafe ? Icons.check_circle_outline_rounded : Icons.error_outline_rounded,
                   color: isSafe ? Colors.green : Colors.red,
                   size: 30,
                 ),
                 const Padding(padding: EdgeInsets.all(8)),
                 Text(
                   isSafe ? 'SAFE' : 'LOST',
-                  style: TextStyle(
-                      color: isSafe ? Colors.green : Colors.red, fontSize: 30),
+                  style: TextStyle(color: isSafe ? Colors.green : Colors.red, fontSize: 30),
                 ),
                 const Spacer(),
               ],
@@ -435,498 +425,391 @@ class _EditPetPageState extends State<EditPetPage> {
           ),
           backgroundColor: const Color(0xfff2f2f2),
         ),
-        backgroundColor: Theme.of(context).colorScheme.surface,
         body: SingleChildScrollView(
             child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Center(
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(0, 0, 0, 15),
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              Opacity(
-                                opacity: 0.55,
-                                child: CircleAvatar(
-                                  backgroundColor: Colors.grey.shade300,
-                                  radius: 125,
-                                  backgroundImage: (_newImage !=
-                                          null) // Check if a new image is selected
-                                      ? FileImage(File(_newImage!
-                                          .path)) // Load image from the newly selected XFile
-                                      : (image != '' && image.isNotEmpty)
-                                          ? NetworkImage(
-                                              image) // Load image from URL if no new image is selected
-                                          : null,
-                                ),
-                              ),
-                              // Icon on top of the CircleAvatar
-                              GestureDetector(
-                                onTap: () {
-                                  // Handle image selection here (e.g., open image picker)
-                                  _pickImage();
-                                },
-                                child: const Icon(
-                                  Icons.photo_library_outlined,
-                                  size: 28,
-                                  color: Colors.black87, // Icon color
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 18, 0, 5),
-                        child: Container(
-                          height: 40,
-                          padding: const EdgeInsets.symmetric(horizontal: 30.0),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(32.0),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              const Padding(
-                                padding: EdgeInsets.only(right: 60),
-                                child: Text(
-                                  'Name',
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      color: Color(0xff5c5c5c),
-                                      fontFamily: 'Frodoka',
-                                      fontWeight: FontWeight.w400),
-                                ),
-                              ),
-                              // const Spacer(),
-                              Expanded(
-                                child: TextFormField(
-                                  textAlignVertical: TextAlignVertical.center,
-                                  maxLines:
-                                      1, // Keeps it as a single line field
-                                  minLines: 1,
-                                  controller: nameController,
-                                  style: Theme.of(context).textTheme.titleLarge,
-                                  decoration: const InputDecoration(
-                                      border: InputBorder.none,
-                                      contentPadding: EdgeInsets.symmetric(
-                                        vertical: 0,
-                                      ),
-                                      isCollapsed: true
-                                      // hintText: 'Enter username',
-                                      ),
-                                  keyboardType: TextInputType.name,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _name = value;
-                                    });
-                                  },
-                                ),
-                              ),
-                              // const Spacer()
-                            ],
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
-                        child: Container(
-                          height: 40,
-                          padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(32.0),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              const Padding(
-                                padding: EdgeInsets.only(right: 25),
-                                child: Text(
-                                  'Animals',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Color(0xff5c5c5c),
-                                    fontFamily: 'Frodoka',
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                child: DropdownButtonFormField<String>(
-                                  value: petDetails[
-                                      'animal_type'], // Initialize with petDetails['animal_type']
-                                  items: const [
-                                    DropdownMenuItem(
-                                      value: 'Cat',
-                                      child: Text('Cat'),
-                                    ),
-                                    DropdownMenuItem(
-                                      value: 'Dog',
-                                      child: Text('Dog'),
-                                    ),
-                                  ],
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _animalType = value!;
-                                    });
-                                  },
-                                  style: Theme.of(context).textTheme.titleLarge,
-                                  decoration: InputDecoration(
-                                    filled: true,
-                                    fillColor: Colors.white,
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 20, vertical: 8),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(32.0),
-                                      borderSide: const BorderSide(
-                                        color: Colors.transparent,
-                                      ),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(32.0),
-                                      borderSide: const BorderSide(
-                                        color: Colors.transparent,
-                                      ),
-                                    ),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(32.0),
-                                      borderSide: const BorderSide(
-                                        color: Colors.transparent,
-                                      ),
-                                    ),
-                                  ),
-                                  dropdownColor: Colors
-                                      .white, // Dropdown list background color
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 5, 0, 10),
-                        child: Container(
-                          height: 40,
-                          padding: const EdgeInsets.symmetric(horizontal: 30.0),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(32.0),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              const Padding(
-                                padding: EdgeInsets.only(right: 62),
-                                child: Text(
-                                  'Breed',
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      color: Color(0xff5c5c5c),
-                                      fontFamily: 'Frodoka',
-                                      fontWeight: FontWeight.w400),
-                                ),
-                              ),
-                              // const Spacer(),
-                              Expanded(
-                                child: TextFormField(
-                                  controller: breedController,
-                                  style: Theme.of(context).textTheme.titleLarge,
-                                  decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
-                                        vertical: 0,
-                                      ), // Adjust vertical padding
-                                      isCollapsed: true,
-                                      hintText:
-                                          'Enter breed', // Optional: Add hint text
-                                      hintStyle: Theme.of(context)
-                                          .textTheme
-                                          .titleLarge),
-                                  keyboardType: TextInputType.name,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _breed = value;
-                                    });
-                                  },
-                                ),
-                              ),
-
-                              // const Spacer()
-                            ],
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(70, 5, 70, 12),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Container(
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  color: _selectedGender == 'Female'
-                                      ? containerColor
-                                      : Theme.of(context).colorScheme.tertiary,
-                                  border: Border.all(color: Colors.transparent),
-                                  borderRadius: const BorderRadius.horizontal(
-                                      left: Radius.circular(25)),
-                                ),
-                                child: TextButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      _selectedGender = 'Female';
-                                    });
-                                    print('Female selected');
-                                  },
-                                  style: TextButton.styleFrom(
-                                    padding: EdgeInsets
-                                        .zero, // Remove default padding
-                                    alignment:
-                                        Alignment.center, // Center the content
-                                  ),
-                                  child: Text(
-                                    'Female',
-                                    style: TextStyle(
-                                        color: _selectedGender == 'Female'
-                                            ? Theme.of(context)
-                                                .colorScheme
-                                                .tertiary
-                                            : Theme.of(context)
-                                                .textTheme
-                                                .titleLarge
-                                                ?.color,
-                                        fontFamily: "Fredoka",
-                                        fontSize: 20,
-                                        fontWeight:
-                                            FontWeight.w500), // Text color
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              child: Container(
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  color: _selectedGender == 'Male'
-                                      ? containerColor
-                                      : Theme.of(context).colorScheme.tertiary,
-                                  border: Border.all(color: Colors.transparent),
-                                  borderRadius: const BorderRadius.horizontal(
-                                      right: Radius.circular(25)),
-                                ),
-                                child: TextButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      _selectedGender = 'Male';
-                                    });
-                                    print('Male selected');
-                                  },
-                                  style: TextButton.styleFrom(
-                                    padding: EdgeInsets
-                                        .zero, // Remove default padding
-                                    alignment:
-                                        Alignment.center, // Center the content
-                                  ),
-                                  child: Text(
-                                    'Male',
-                                    style: TextStyle(
-                                        color: _selectedGender == 'Male'
-                                            ? Theme.of(context)
-                                                .colorScheme
-                                                .tertiary
-                                            : Theme.of(context)
-                                                .textTheme
-                                                .titleLarge
-                                                ?.color,
-                                        fontFamily: "Fredoka",
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w500),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 0, 0, 15),
+                      child: Stack(
+                        alignment: Alignment.center,
                         children: [
-                          Text(
-                            "Age calculated from birthdate, can't be modified*",
-                            style: TextStyle(
-                                color: Color(0xff5c5c5c),
-                                fontSize: 11,
-                                fontWeight: FontWeight.w400),
-                          )
+                          Opacity(
+                            opacity: 0.55,
+                            child: CircleAvatar(
+                              backgroundColor: Colors.grey.shade300,
+                              radius: 125,
+                              backgroundImage: (_newImage !=
+                                      null) // Check if a new image is selected
+                                  ? FileImage(File(
+                                      _newImage!.path)) // Load image from the newly selected XFile
+                                  : (image != '' && image.isNotEmpty)
+                                      ? NetworkImage(
+                                          image) // Load image from URL if no new image is selected
+                                      : null,
+                            ),
+                          ),
+                          // Icon on top of the CircleAvatar
+                          GestureDetector(
+                            onTap: () {
+                              // Handle image selection here (e.g., open image picker)
+                              _pickImage();
+                            },
+                            child: const Icon(
+                              Icons.photo_library_outlined,
+                              size: 28,
+                              color: Colors.black87, // Icon color
+                            ),
+                          ),
                         ],
                       ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 3, 0, 20),
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(18),
-                                      color: Colors.white,
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 10),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            'age',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .titleSmall,
-                                          ),
-                                          Text(
-                                            _age,
-                                            style: const TextStyle(
-                                              color: Color(0xff333333),
-                                              fontSize: 20,
-                                              fontFamily: 'Fredoka',
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 18, 0, 5),
+                    child: Container(
+                      height: 40,
+                      padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(32.0),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.only(right: 60),
+                            child: Text(
+                              'Name',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: Color(0xff5c5c5c),
+                                  fontFamily: 'Frodoka',
+                                  fontWeight: FontWeight.w400),
+                            ),
+                          ),
+                          // const Spacer(),
+                          Expanded(
+                            child: TextFormField(
+                              textAlignVertical: TextAlignVertical.center,
+                              maxLines: 1, // Keeps it as a single line field
+                              minLines: 1,
+                              controller: nameController,
+                              style: Theme.of(context).textTheme.titleLarge,
+                              decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  contentPadding: EdgeInsets.symmetric(
+                                    vertical: 0,
                                   ),
+                                  isCollapsed: true
+                                  // hintText: 'Enter username',
+                                  ),
+                              keyboardType: TextInputType.name,
+                              onChanged: (value) {
+                                setState(() {
+                                  _name = value;
+                                });
+                              },
+                            ),
+                          ),
+                          // const Spacer()
+                        ],
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+                    child: Container(
+                      height: 40,
+                      padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(32.0),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.only(right: 25),
+                            child: Text(
+                              'Animals',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Color(0xff5c5c5c),
+                                fontFamily: 'Frodoka',
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: DropdownButtonFormField<String>(
+                              value: petDetails[
+                                  'animal_type'], // Initialize with petDetails['animal_type']
+                              items: const [
+                                DropdownMenuItem(
+                                  value: 'Cat',
+                                  child: Text('Cat'),
                                 ),
-                                const Padding(padding: EdgeInsets.all(5)),
-                                Expanded(
-                                  child: Container(
-                                    // height: 80,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(18),
-                                      color: Colors.white,
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 8),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        mainAxisSize: MainAxisSize
-                                            .min, // Ensures the column doesn't expand infinitely
-                                        children: [
-                                          Text(
-                                            'weight (kg)', // Fixed capitalization for consistency
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .titleSmall,
-                                          ),
-                                          // const SizedBox(
-                                          //     height:
-                                          //         8), // Add some spacing between the label and the field
-                                          SizedBox(
-                                            height: 35,
-                                            child: TextFormField(
-                                              controller: weightController,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleLarge,
-                                              decoration: InputDecoration(
-                                                  border: InputBorder.none,
-                                                  // contentPadding: EdgeInsets.symmetric(
-                                                  //     vertical:
-                                                  //         10), // Adjust vertical padding
-                                                  hintText:
-                                                      'Enter weight', // Adjusted placeholder text
-                                                  hintStyle: Theme.of(context)
-                                                      .textTheme
-                                                      .titleLarge),
-                                              keyboardType: TextInputType
-                                                  .number, // Number input for weight
-                                              inputFormatters: [
-                                                FilteringTextInputFormatter
-                                                    .allow(
-                                                        RegExp(r'^\d*\.?\d*'))
-                                              ],
-                                              textAlign: TextAlign.center,
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  _weight = value;
-                                                });
-                                              },
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
+                                DropdownMenuItem(
+                                  value: 'Dog',
+                                  child: Text('Dog'),
                                 ),
                               ],
+                              onChanged: (value) {
+                                setState(() {
+                                  _animalType = value!;
+                                });
+                              },
+                              style: Theme.of(context).textTheme.titleLarge,
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: Colors.white,
+                                contentPadding:
+                                    const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(32.0),
+                                  borderSide: const BorderSide(
+                                    color: Colors.transparent,
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(32.0),
+                                  borderSide: const BorderSide(
+                                    color: Colors.transparent,
+                                  ),
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(32.0),
+                                  borderSide: const BorderSide(
+                                    color: Colors.transparent,
+                                  ),
+                                ),
+                              ),
+                              dropdownColor: Colors.white, // Dropdown list background color
                             ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 10),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 5, 0, 10),
+                    child: Container(
+                      height: 40,
+                      padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(32.0),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.only(right: 62),
+                            child: Text(
+                              'Breed',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: Color(0xff5c5c5c),
+                                  fontFamily: 'Frodoka',
+                                  fontWeight: FontWeight.w400),
+                            ),
+                          ),
+                          // const Spacer(),
+                          Expanded(
+                            child: TextFormField(
+                              controller: breedController,
+                              style: Theme.of(context).textTheme.titleLarge,
+                              decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 0,
+                                  ), // Adjust vertical padding
+                                  isCollapsed: true,
+                                  hintText: 'Enter breed', // Optional: Add hint text
+                                  hintStyle: Theme.of(context).textTheme.titleLarge),
+                              keyboardType: TextInputType.name,
+                              onChanged: (value) {
+                                setState(() {
+                                  _breed = value;
+                                });
+                              },
+                            ),
+                          ),
+
+                          // const Spacer()
+                        ],
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(70, 5, 70, 12),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: _selectedGender == 'Female'
+                                  ? containerColor
+                                  : Theme.of(context).colorScheme.tertiary,
+                              border: Border.all(color: Colors.transparent),
+                              borderRadius:
+                                  const BorderRadius.horizontal(left: Radius.circular(25)),
+                            ),
+                            child: TextButton(
+                              onPressed: () {
+                                setState(() {
+                                  _selectedGender = 'Female';
+                                });
+                                print('Female selected');
+                              },
+                              style: TextButton.styleFrom(
+                                padding: EdgeInsets.zero, // Remove default padding
+                                alignment: Alignment.center, // Center the content
+                              ),
+                              child: Text(
+                                'Female',
+                                style: TextStyle(
+                                    color: _selectedGender == 'Female'
+                                        ? Theme.of(context).colorScheme.tertiary
+                                        : Theme.of(context).textTheme.titleLarge?.color,
+                                    fontFamily: "Fredoka",
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w500), // Text color
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Container(
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: _selectedGender == 'Male'
+                                  ? containerColor
+                                  : Theme.of(context).colorScheme.tertiary,
+                              border: Border.all(color: Colors.transparent),
+                              borderRadius:
+                                  const BorderRadius.horizontal(right: Radius.circular(25)),
+                            ),
+                            child: TextButton(
+                              onPressed: () {
+                                setState(() {
+                                  _selectedGender = 'Male';
+                                });
+                                print('Male selected');
+                              },
+                              style: TextButton.styleFrom(
+                                padding: EdgeInsets.zero, // Remove default padding
+                                alignment: Alignment.center, // Center the content
+                              ),
+                              child: Text(
+                                'Male',
+                                style: TextStyle(
+                                    color: _selectedGender == 'Male'
+                                        ? Theme.of(context).colorScheme.tertiary
+                                        : Theme.of(context).textTheme.titleLarge?.color,
+                                    fontFamily: "Fredoka",
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w500),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Age calculated from birthdate, can't be modified*",
+                        style: TextStyle(
+                            color: Color(0xff5c5c5c), fontSize: 11, fontWeight: FontWeight.w400),
+                      )
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 3, 0, 20),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
                               child: Container(
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(50),
+                                  borderRadius: BorderRadius.circular(18),
                                   color: Colors.white,
                                 ),
                                 child: Padding(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(22, 5, 0, 5),
-                                  child: Row(
+                                  padding: const EdgeInsets.symmetric(vertical: 10),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
-                                      Expanded(
-                                        child: Text(
-                                          'Date of birth',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .titleSmall,
-                                        ),
+                                      Text(
+                                        'age',
+                                        style: Theme.of(context).textTheme.titleSmall,
                                       ),
-                                      Expanded(
-                                        child: Center(
-                                          child: GestureDetector(
-                                            onTap: () async {
-                                              DateTime? selectedDate =
-                                                  await showDatePicker(
-                                                context: context,
-                                                initialDate: DateTime.now(),
-                                                firstDate: DateTime(1900),
-                                                lastDate: DateTime.now(),
-                                              );
-
-                                              if (selectedDate != null) {
-                                                setState(() {
-                                                  // Update date of birth in petDetails
-                                                  _dob = selectedDate;
-
-                                                  // Calculate and update age in petDetails
-                                                  _age =
-                                                      calculateAge(selectedDate)
-                                                          .toString();
-                                                });
-                                              }
-                                            },
-                                            child: Text(
-                                              formatDateOfBirth(
-                                                  _dob.toString()),
-                                              style: const TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w500,
-                                                color: Color(0xffbfbfbf),
-                                                fontFamily: 'Fredoka',
-                                              ),
-                                              textAlign: TextAlign.center,
-                                            ),
-                                          ),
+                                      Text(
+                                        _age,
+                                        style: const TextStyle(
+                                          color: Color(0xff333333),
+                                          fontSize: 20,
+                                          fontFamily: 'Fredoka',
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const Padding(padding: EdgeInsets.all(5)),
+                            Expanded(
+                              child: Container(
+                                // height: 80,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(18),
+                                  color: Colors.white,
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 8),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisSize: MainAxisSize
+                                        .min, // Ensures the column doesn't expand infinitely
+                                    children: [
+                                      Text(
+                                        'weight (kg)', // Fixed capitalization for consistency
+                                        style: Theme.of(context).textTheme.titleSmall,
+                                      ),
+                                      // const SizedBox(
+                                      //     height:
+                                      //         8), // Add some spacing between the label and the field
+                                      SizedBox(
+                                        height: 35,
+                                        child: TextFormField(
+                                          controller: weightController,
+                                          style: Theme.of(context).textTheme.titleLarge,
+                                          decoration: InputDecoration(
+                                              border: InputBorder.none,
+                                              // contentPadding: EdgeInsets.symmetric(
+                                              //     vertical:
+                                              //         10), // Adjust vertical padding
+                                              hintText: 'Enter weight', // Adjusted placeholder text
+                                              hintStyle: Theme.of(context).textTheme.titleLarge),
+                                          keyboardType:
+                                              TextInputType.number, // Number input for weight
+                                          inputFormatters: [
+                                            FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*'))
+                                          ],
+                                          textAlign: TextAlign.center,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              _weight = value;
+                                            });
+                                          },
                                         ),
                                       ),
                                     ],
@@ -934,358 +817,379 @@ class _EditPetPageState extends State<EditPetPage> {
                                 ),
                               ),
                             ),
-                            Container(
-                              height: 32,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 23.0),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(32.0),
-                              ),
+                          ],
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(50),
+                              color: Colors.white,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(22, 5, 0, 5),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(right: 62),
+                                  Expanded(
                                     child: Text(
-                                      'Hair Color',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleSmall,
+                                      'Date of birth',
+                                      style: Theme.of(context).textTheme.titleSmall,
                                     ),
                                   ),
-                                  // const Spacer(),
                                   Expanded(
-                                    child: TextFormField(
-                                      textAlign: TextAlign.end,
-                                      controller: hairController,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500,
-                                        color: Color(0xffbfbfbf),
-                                        fontFamily: 'Fredoka',
-                                      ),
-                                      decoration: const InputDecoration(
-                                        border: InputBorder.none,
-                                        isCollapsed: true,
-                                        // contentPadding: EdgeInsets.symmetric(
-                                        //   vertical: 11,
-                                        // ), // Adjust vertical padding
-                                        hintText:
-                                            'Enter hair color', // Optional: Add hint text
-                                        hintStyle: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                          color: Color(0xffbfbfbf),
-                                          fontFamily: 'Fredoka',
-                                        ),
-                                      ),
-                                      keyboardType: TextInputType.text,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          _hair = value;
-                                        });
-                                      },
-                                    ),
-                                  ),
+                                    child: Center(
+                                      child: GestureDetector(
+                                        onTap: () async {
+                                          DateTime? selectedDate = await showDatePicker(
+                                            context: context,
+                                            initialDate: DateTime.now(),
+                                            firstDate: DateTime(1900),
+                                            lastDate: DateTime.now(),
+                                          );
 
-                                  // const Spacer()
-                                ],
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(50),
-                                        color: Colors.white,
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            20, 5, 20, 5),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment
-                                              .spaceBetween, // Aligns the text and TextFormField
-                                          children: [
-                                            Text(
-                                              'Eyes',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleSmall,
-                                            ),
-                                            SizedBox(
-                                              height: 24,
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.2, // Optional: Limit the width of the TextFormField
-                                              child: TextFormField(
-                                                textAlign: TextAlign
-                                                    .end, // Align text inside the TextFormField to the right
-                                                controller: eyeController,
-                                                style: const TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Color(0xffbfbfbf),
-                                                  fontFamily: 'Fredoka',
-                                                ),
-                                                decoration:
-                                                    const InputDecoration(
-                                                  border: InputBorder.none,
-                                                  hintText:
-                                                      'Eyes color', // Optional: Add hint text
-                                                  hintStyle: TextStyle(
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.w500,
-                                                    color: Color(0xffbfbfbf),
-                                                    fontFamily: 'Fredoka',
-                                                  ),
-                                                  isDense:
-                                                      true, // Reduces the height of the TextFormField
-                                                  contentPadding:
-                                                      EdgeInsets.symmetric(
-                                                          vertical:
-                                                              0), // Adjust vertical padding
-                                                ),
-                                                keyboardType:
-                                                    TextInputType.text,
-                                                onChanged: (value) {
-                                                  setState(() {
-                                                    _eye = value;
-                                                  });
-                                                },
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  const Padding(padding: EdgeInsets.all(3)),
-                                  Expanded(
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(50),
-                                        color: Colors.white,
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            10, 5, 8, 5),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment
-                                              .spaceBetween, // Aligns the text and TextFormField
-                                          children: [
-                                            Text(
-                                              'Blood Type',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleSmall,
-                                            ),
-                                            SizedBox(
-                                              height: 24,
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.15, // Optional: Limit the width of the TextFormField
-                                              child: TextFormField(
-                                                textAlign: TextAlign
-                                                    .end, // Align text inside the TextFormField to the right
-                                                controller: bloodController,
-                                                style: const TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Color(0xffbfbfbf),
-                                                  fontFamily: 'Fredoka',
-                                                ),
-                                                decoration:
-                                                    const InputDecoration(
-                                                  border: InputBorder.none,
-                                                  // hintText:
-                                                  //     'Eyes color', // Optional: Add hint text
-                                                  isDense:
-                                                      true, // Reduces the height of the TextFormField
-                                                  contentPadding:
-                                                      EdgeInsets.symmetric(
-                                                          vertical:
-                                                              0), // Adjust vertical padding
-                                                ),
-                                                inputFormatters: [
-                                                  LengthLimitingTextInputFormatter(
-                                                      6), // Limit to 6 characters
-                                                ],
-                                                keyboardType:
-                                                    TextInputType.text,
-                                                onChanged: (value) {
-                                                  setState(() {
-                                                    _blood = value;
-                                                  });
-                                                },
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Column(
-                              children: [
-                                IntrinsicWidth(
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(50),
-                                        color: Colors.white),
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 22, vertical: 0),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Switch(
-                                            value: isSafe,
-                                            onChanged: (value) {
-                                              setState(() {
-                                                isSafe = value;
-                                              });
-                                              _updatePetStatus(isSafe);
-                                              // You might want to send this updated status to your backend here.
-                                            },
-                                            activeColor: Colors.green,
-                                            inactiveThumbColor: Colors.red,
+                                          if (selectedDate != null) {
+                                            setState(() {
+                                              // Update date of birth in petDetails
+                                              _dob = selectedDate;
+
+                                              // Calculate and update age in petDetails
+                                              _age = calculateAge(selectedDate).toString();
+                                            });
+                                          }
+                                        },
+                                        child: Text(
+                                          formatDateOfBirth(_dob.toString()),
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w500,
+                                            color: Color(0xffbfbfbf),
+                                            fontFamily: 'Fredoka',
                                           ),
-                                          const Padding(
-                                              padding: EdgeInsets.all(5)),
-                                          Text(
-                                            isSafe ? 'SAFE' : 'LOST',
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        Container(
+                          height: 32,
+                          padding: const EdgeInsets.symmetric(horizontal: 23.0),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(32.0),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(right: 62),
+                                child: Text(
+                                  'Hair Color',
+                                  style: Theme.of(context).textTheme.titleSmall,
+                                ),
+                              ),
+                              // const Spacer(),
+                              Expanded(
+                                child: TextFormField(
+                                  textAlign: TextAlign.end,
+                                  controller: hairController,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                    color: Color(0xffbfbfbf),
+                                    fontFamily: 'Fredoka',
+                                  ),
+                                  decoration: const InputDecoration(
+                                    border: InputBorder.none,
+                                    isCollapsed: true,
+                                    // contentPadding: EdgeInsets.symmetric(
+                                    //   vertical: 11,
+                                    // ), // Adjust vertical padding
+                                    hintText: 'Enter hair color', // Optional: Add hint text
+                                    hintStyle: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: Color(0xffbfbfbf),
+                                      fontFamily: 'Fredoka',
+                                    ),
+                                  ),
+                                  keyboardType: TextInputType.text,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _hair = value;
+                                    });
+                                  },
+                                ),
+                              ),
+
+                              // const Spacer()
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(50),
+                                    color: Colors.white,
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.fromLTRB(20, 5, 20, 5),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment
+                                          .spaceBetween, // Aligns the text and TextFormField
+                                      children: [
+                                        Text(
+                                          'Eyes',
+                                          style: Theme.of(context).textTheme.titleSmall,
+                                        ),
+                                        SizedBox(
+                                          height: 24,
+                                          width: MediaQuery.of(context).size.width *
+                                              0.2, // Optional: Limit the width of the TextFormField
+                                          child: TextFormField(
+                                            textAlign: TextAlign
+                                                .end, // Align text inside the TextFormField to the right
+                                            controller: eyeController,
                                             style: const TextStyle(
                                               fontSize: 16,
-                                              fontWeight: FontWeight.w600,
-                                              color: Color(0xff333333),
+                                              fontWeight: FontWeight.w500,
+                                              color: Color(0xffbfbfbf),
+                                              fontFamily: 'Fredoka',
                                             ),
+                                            decoration: const InputDecoration(
+                                              border: InputBorder.none,
+                                              hintText: 'Eyes color', // Optional: Add hint text
+                                              hintStyle: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w500,
+                                                color: Color(0xffbfbfbf),
+                                                fontFamily: 'Fredoka',
+                                              ),
+                                              isDense:
+                                                  true, // Reduces the height of the TextFormField
+                                              contentPadding: EdgeInsets.symmetric(
+                                                  vertical: 0), // Adjust vertical padding
+                                            ),
+                                            keyboardType: TextInputType.text,
+                                            onChanged: (value) {
+                                              setState(() {
+                                                _eye = value;
+                                              });
+                                            },
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
-                                const Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      "Report pet lost status*",
-                                      style: TextStyle(
-                                          color: Color(0xff5C5C5C),
-                                          fontFamily: 'Fredoka',
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w500),
-                                    )
-                                  ],
-                                )
-                              ],
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(0, 16, 0, 10),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Text("Additional note",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headlineSmall),
-                                  const Padding(padding: EdgeInsets.all(3)),
-                                  Container(
-                                    padding: const EdgeInsets.all(20),
-                                    height: 200,
-                                    width: double.infinity,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(15),
-                                        color: Colors.white),
-                                    child: SingleChildScrollView(
-                                      child: TextFormField(
-                                        controller: noteController,
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                          color: Color(0xffbfbfbf),
-                                          fontFamily: 'Fredoka',
+                              ),
+                              const Padding(padding: EdgeInsets.all(3)),
+                              Expanded(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(50),
+                                    color: Colors.white,
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.fromLTRB(10, 5, 8, 5),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment
+                                          .spaceBetween, // Aligns the text and TextFormField
+                                      children: [
+                                        Text(
+                                          'Blood Type',
+                                          style: Theme.of(context).textTheme.titleSmall,
                                         ),
-                                        decoration: const InputDecoration(
-                                          border: InputBorder.none,
-                                          // hintText:
-                                          //     'Eyes color', // Optional: Add hint text
-                                          isDense:
-                                              true, // Reduces the height of the TextFormField
-                                          contentPadding: EdgeInsets.symmetric(
-                                              vertical:
-                                                  0), // Adjust vertical padding
+                                        SizedBox(
+                                          height: 24,
+                                          width: MediaQuery.of(context).size.width *
+                                              0.15, // Optional: Limit the width of the TextFormField
+                                          child: TextFormField(
+                                            textAlign: TextAlign
+                                                .end, // Align text inside the TextFormField to the right
+                                            controller: bloodController,
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w500,
+                                              color: Color(0xffbfbfbf),
+                                              fontFamily: 'Fredoka',
+                                            ),
+                                            decoration: const InputDecoration(
+                                              border: InputBorder.none,
+                                              // hintText:
+                                              //     'Eyes color', // Optional: Add hint text
+                                              isDense:
+                                                  true, // Reduces the height of the TextFormField
+                                              contentPadding: EdgeInsets.symmetric(
+                                                  vertical: 0), // Adjust vertical padding
+                                            ),
+                                            inputFormatters: [
+                                              LengthLimitingTextInputFormatter(
+                                                  6), // Limit to 6 characters
+                                            ],
+                                            keyboardType: TextInputType.text,
+                                            onChanged: (value) {
+                                              setState(() {
+                                                _blood = value;
+                                              });
+                                            },
+                                          ),
                                         ),
-                                        maxLines: 10,
-                                        keyboardType: TextInputType.text,
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Column(
+                          children: [
+                            IntrinsicWidth(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(50), color: Colors.white),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 0),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Switch(
+                                        value: isSafe,
                                         onChanged: (value) {
                                           setState(() {
-                                            _note = value;
+                                            isSafe = value;
                                           });
+                                          _updatePetStatus(isSafe);
+                                          // You might want to send this updated status to your backend here.
                                         },
+                                        activeColor: Colors.green,
+                                        inactiveThumbColor: Colors.red,
                                       ),
-                                    ),
-                                  )
-                                ],
+                                      const Padding(padding: EdgeInsets.all(5)),
+                                      Text(
+                                        isSafe ? 'SAFE' : 'LOST',
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                          color: Color(0xff333333),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
                             ),
-                            Row(
+                            const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Expanded(
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      Navigator.pop(context, true);
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.white),
-                                    child: Text(
-                                      'Cancel',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleLarge
-                                          ?.copyWith(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .primary),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(
-                                  width: 15,
-                                ),
-                                Expanded(
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      // Handle save logic, such as updating the user data in the backend
-                                      _saveChanges();
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                        backgroundColor:
-                                            const Color(0xffC8A48A)),
-                                    child: const Text(
-                                      'Confirm',
-                                      style: TextStyle(
-                                          fontSize: 20,
-                                          color: Color(0xffFFFFFF),
-                                          fontFamily: 'Fredoka',
-                                          fontWeight: FontWeight.w500),
-                                    ),
-                                  ),
-                                ),
+                                Text(
+                                  "Report pet lost status*",
+                                  style: TextStyle(
+                                      color: Color(0xff5C5C5C),
+                                      fontFamily: 'Fredoka',
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w500),
+                                )
                               ],
+                            )
+                          ],
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 16, 0, 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text("Additional note",
+                                  style: Theme.of(context).textTheme.headlineSmall),
+                              const Padding(padding: EdgeInsets.all(3)),
+                              Container(
+                                padding: const EdgeInsets.all(20),
+                                height: 200,
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(15), color: Colors.white),
+                                child: SingleChildScrollView(
+                                  child: TextFormField(
+                                    controller: noteController,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: Color(0xffbfbfbf),
+                                      fontFamily: 'Fredoka',
+                                    ),
+                                    decoration: const InputDecoration(
+                                      border: InputBorder.none,
+                                      // hintText:
+                                      //     'Eyes color', // Optional: Add hint text
+                                      isDense: true, // Reduces the height of the TextFormField
+                                      contentPadding: EdgeInsets.symmetric(
+                                          vertical: 0), // Adjust vertical padding
+                                    ),
+                                    maxLines: 10,
+                                    keyboardType: TextInputType.text,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _note = value;
+                                      });
+                                    },
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.pop(context, true);
+                                },
+                                style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
+                                child: Text(
+                                  'Cancel',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleLarge
+                                      ?.copyWith(color: Theme.of(context).colorScheme.primary),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 15,
+                            ),
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  // Handle save logic, such as updating the user data in the backend
+                                  _saveChanges();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xffC8A48A)),
+                                child: const Text(
+                                  'Confirm',
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      color: Color(0xffFFFFFF),
+                                      fontFamily: 'Fredoka',
+                                      fontWeight: FontWeight.w500),
+                                ),
+                              ),
                             ),
                           ],
                         ),
-                      ),
-                    ]))));
+                      ],
+                    ),
+                  ),
+                ]))));
   }
 }

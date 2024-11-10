@@ -45,6 +45,7 @@ class _NotificationPageState extends State<NotificationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: const CustomAppBar(title: 'Notification', noBackButton: true),
       body: SafeArea(child: _buildNotificationList()),
     );

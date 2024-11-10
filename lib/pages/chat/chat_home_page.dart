@@ -44,6 +44,7 @@ class _ChatHomePageState extends State<ChatHomePage> {
       print("current user id: $currentUserId");
     }
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: const CustomAppBar(
         title: 'Chat',
         noBackButton: true,

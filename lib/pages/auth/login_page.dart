@@ -33,8 +33,7 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     final authService = AuthService();
-    bool success =
-        await authService.signInWithEmailAndPassword(email, password);
+    bool success = await authService.signInWithEmailAndPassword(email, password);
 
     if (success) {
       // Handle successful sign-in (e.g., navigate to the next screen)
@@ -54,6 +53,7 @@ class _LoginPageState extends State<LoginPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Theme.of(context).colorScheme.surface,
           title: Text(
             'Reset Password',
             style: Theme.of(context)
@@ -72,19 +72,14 @@ class _LoginPageState extends State<LoginPage> {
                 controller: emailController,
                 decoration: InputDecoration(
                   labelText: 'Email',
-                  labelStyle:
-                      TextStyle(color: Theme.of(context).colorScheme.primary),
+                  labelStyle: TextStyle(color: Theme.of(context).colorScheme.primary),
                   enabledBorder: UnderlineInputBorder(
                     borderSide: BorderSide(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .primary), // Border color when not focused
+                        color:
+                            Theme.of(context).colorScheme.primary), // Border color when not focused
                   ),
                 ),
-                style: Theme.of(context)
-                    .textTheme
-                    .labelMedium
-                    ?.copyWith(fontSize: 16),
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(fontSize: 16),
               ),
             ],
           ),
@@ -96,8 +91,7 @@ class _LoginPageState extends State<LoginPage> {
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
-                    style:
-                        ElevatedButton.styleFrom(backgroundColor: Colors.white),
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
                     child: Text(
                       'Cancel',
                       style: TextStyle(
@@ -119,13 +113,11 @@ class _LoginPageState extends State<LoginPage> {
                       String email = emailController.text.trim();
                       if (email.isNotEmpty) {
                         try {
-                          await FirebaseAuth.instance
-                              .sendPasswordResetEmail(email: email);
+                          await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
                           // Show success message
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                                content: Text(
-                                    'Password reset email sent! Check your inbox.')),
+                                content: Text('Password reset email sent! Check your inbox.')),
                           );
                         } catch (e) {
                           // Show error message
@@ -137,8 +129,7 @@ class _LoginPageState extends State<LoginPage> {
                       } else {
                         // Show a message if the email is empty
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('Please enter your email.')),
+                          const SnackBar(content: Text('Please enter your email.')),
                         );
                       }
                     },

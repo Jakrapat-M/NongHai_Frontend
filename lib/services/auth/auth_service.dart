@@ -17,13 +17,14 @@ class AuthService {
   Future<bool> signInWithEmailAndPassword(String email, String password) async {
     try {
       // Sign in
-      UserCredential userCredential = await _firebaseAuth
-          .signInWithEmailAndPassword(email: email, password: password);
+      UserCredential userCredential =
+          await _firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
 
       //add a new document for the user in users collection if it doens not already exist
-      _firestore.collection('users').doc(userCredential.user!.uid).set(
-          {'uid': userCredential.user!.uid, 'email': email},
-          SetOptions(merge: true));
+      _firestore
+          .collection('users')
+          .doc(userCredential.user!.uid)
+          .set({'uid': userCredential.user!.uid, 'email': email}, SetOptions(merge: true));
 
       //create a device token for the user
       TokenService().createUserToken(userCredential.user!.uid);
@@ -44,11 +45,10 @@ class AuthService {
     }
   }
 
-  Future<UserCredential> signUpWithEmailAndPassword(
-      String email, String password) async {
+  Future<UserCredential> signUpWithEmailAndPassword(String email, String password) async {
     try {
-      UserCredential userCredential = await _firebaseAuth
-          .createUserWithEmailAndPassword(email: email, password: password);
+      UserCredential userCredential =
+          await _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
       await _firestore
           .collection('users')
           .doc(userCredential.user!.uid)
@@ -88,8 +88,8 @@ class AuthService {
 
   Future<String> fetchCustomToken(String uid) async {
     try {
-      final response = await Caller.dio
-          .post("/user/$uid/token"); // Adjust the request type if necessary
+      final response =
+          await Caller.dio.post("/user/$uid/token"); // Adjust the request type if necessary
 
       // Print the response data for debugging
       print('Response data: ${response.data}');
@@ -99,8 +99,7 @@ class AuthService {
       if (response.statusCode == 200) {
         // If response.data is a Map, directly access the customToken
         if (response.data is Map<String, dynamic>) {
-          final customToken =
-              response.data['customToken']; // Access the customToken
+          final customToken = response.data['customToken']; // Access the customToken
 
           if (customToken is String) {
             print(customToken);
@@ -112,8 +111,7 @@ class AuthService {
           throw Exception('Unexpected response format. Expected a Map.');
         }
       } else {
-        throw Exception(
-            'Failed to load custom token, status code: ${response.statusCode}');
+        throw Exception('Failed to load custom token, status code: ${response.statusCode}');
       }
     } catch (e) {
       throw Exception('Error fetching custom token: ${e.toString()}');
@@ -121,8 +119,7 @@ class AuthService {
   }
 
   void _showMessage(String message) {
-    print(
-        message); // Example, consider using SnackBar or AlertDialog for better UX
+    print(message); // Example, consider using SnackBar or AlertDialog for better UX
   }
 
   Future<void> deleteUser(BuildContext context) async {
@@ -145,8 +142,7 @@ class AuthService {
 
     try {
       // Re-authenticate with the provided password
-      final credential =
-          EmailAuthProvider.credential(email: user.email!, password: password);
+      final credential = EmailAuthProvider.credential(email: user.email!, password: password);
       await user.reauthenticateWithCredential(credential);
 
       // Delete the user from FirebaseAuth and Firestore
@@ -157,23 +153,20 @@ class AuthService {
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
-            builder: (context) =>
-                const LoginOrRegistoer()), // Replace with your RegisterPage
+            builder: (context) => const LoginOrRegistoer()), // Replace with your RegisterPage
         (route) => false,
       );
     } on FirebaseAuthException catch (e) {
       // Show a specific error based on FirebaseAuthException codes
       switch (e.code) {
         case 'requires-recent-login':
-          _showErrorDialog(
-              context, 'Please sign in again to delete your account.');
+          _showErrorDialog(context, 'Please sign in again to delete your account.');
           break;
         case 'user-not-found':
           _showErrorDialog(context, 'User not found. Please sign in again.');
           break;
         default:
-          _showErrorDialog(context,
-              'An error occurred: Please check if your password is correct.');
+          _showErrorDialog(context, 'An error occurred: Please check if your password is correct.');
           break;
       }
     } catch (e) {
@@ -189,6 +182,7 @@ class AuthService {
           builder: (context) {
             TextEditingController passwordController = TextEditingController();
             return AlertDialog(
+              backgroundColor: Theme.of(context).colorScheme.surface,
               title: Text(
                 'Register failed',
                 style: Theme.of(context)
@@ -208,8 +202,7 @@ class AuthService {
                     obscureText: true,
                     decoration: InputDecoration(
                       labelText: 'Password',
-                      labelStyle: TextStyle(
-                          color: Theme.of(context).colorScheme.primary),
+                      labelStyle: TextStyle(color: Theme.of(context).colorScheme.primary),
                       enabledBorder: UnderlineInputBorder(
                         borderSide: BorderSide(
                             color: Theme.of(context)
@@ -217,17 +210,13 @@ class AuthService {
                                 .primary), // Border color when not focused
                       ),
                     ),
-                    style: Theme.of(context)
-                        .textTheme
-                        .labelMedium
-                        ?.copyWith(fontSize: 16),
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(fontSize: 16),
                   ),
                 ],
               ),
               actions: [
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xffC8A48A)),
+                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xffC8A48A)),
                   onPressed: () {
                     Navigator.of(context).pop(passwordController.text);
                   },
@@ -258,6 +247,7 @@ class AuthService {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Theme.of(context).colorScheme.surface,
           title: Text(
             'Error',
             style: Theme.of(context)
@@ -271,8 +261,8 @@ class AuthService {
           ),
           actions: [
             ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.primary),
+              style:
+                  ElevatedButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.primary),
               child: const Row(
                 children: [
                   Spacer(),

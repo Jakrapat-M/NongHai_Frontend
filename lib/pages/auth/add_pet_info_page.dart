@@ -74,8 +74,7 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => const BottomNavPage(page: 1)),
-      (Route<dynamic> route) =>
-          false, // This will remove all the previous routes
+      (Route<dynamic> route) => false, // This will remove all the previous routes
     );
   }
 
@@ -104,8 +103,7 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
       );
 
       if (response.statusCode == 201) {
-        petId = response.data['data']
-            .toString(); // Extract the petId from the response
+        petId = response.data['data'].toString(); // Extract the petId from the response
 
         // Use the petId in SaveProfile function
         if (petData?['image'] != null && petData!['image'].isNotEmpty) {
@@ -159,6 +157,7 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+           backgroundColor: Theme.of(context).colorScheme.surface,
           title: Text(
             'Creation Failed',
             style: Theme.of(context)
@@ -172,8 +171,7 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
           ),
           actions: [
             ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xffC8A48A)),
+              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xffC8A48A)),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -203,6 +201,7 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+           backgroundColor: Theme.of(context).colorScheme.surface,
           title: Text('Invalid Input',
               style: Theme.of(context)
                   .textTheme
@@ -214,8 +213,8 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
           ),
           actions: [
             ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.primary),
+              style:
+                  ElevatedButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.primary),
               child: const Row(
                 children: [
                   Spacer(),
@@ -249,8 +248,8 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
       Uint8List imageFile = await File(imagePath).readAsBytes();
       String folderPath = 'petProfileImage/$petId.jpg'; // Save as petId.jpg
 
-      String imgUrl = await StoreProfile()
-          .saveData(userId: petId, file: imageFile, folderPath: folderPath);
+      String imgUrl =
+          await StoreProfile().saveData(userId: petId, file: imageFile, folderPath: folderPath);
 
       petData!['image'] = imgUrl;
       await _updatePetWithImage(petId, imgUrl);
@@ -282,11 +281,11 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
   Widget build(BuildContext context) {
     print(petData);
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Your Pet info",
-            style: Theme.of(context).bannerTheme.contentTextStyle),
-      ),
       backgroundColor: Theme.of(context).colorScheme.surface,
+      appBar: AppBar(
+        title: Text("Your Pet info", style: Theme.of(context).bannerTheme.contentTextStyle),
+      ),
+
       body: Padding(
         padding: const EdgeInsets.fromLTRB(55, 0, 55, 8),
         child: Center(
@@ -324,13 +323,11 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
                       items: const [
                         DropdownMenuItem(
                           value: 'Dog',
-                          child: Align(
-                              alignment: Alignment.center, child: Text('Dog')),
+                          child: Align(alignment: Alignment.center, child: Text('Dog')),
                         ),
                         DropdownMenuItem(
                           value: 'Cat',
-                          child: Align(
-                              alignment: Alignment.center, child: Text('Cat')),
+                          child: Align(alignment: Alignment.center, child: Text('Cat')),
                         ),
                       ],
                       onChanged: (String? newValue) {
@@ -342,8 +339,7 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
                       decoration: InputDecoration(
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(50),
-                          borderSide:
-                              const BorderSide(color: Colors.transparent),
+                          borderSide: const BorderSide(color: Colors.transparent),
                         ),
                         filled: true,
                         fillColor: Colors.white,
@@ -355,9 +351,7 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
                           ),
                         ),
                         contentPadding: const EdgeInsets.symmetric(
-                            vertical: 0,
-                            horizontal:
-                                20), // Adjust vertical padding to fit height
+                            vertical: 0, horizontal: 20), // Adjust vertical padding to fit height
                         hintStyle: Theme.of(context).textTheme.displayLarge,
                       ),
                       style: Theme.of(context).textTheme.displayLarge,
@@ -393,16 +387,13 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
                         fillColor: Colors.white,
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(50),
-                          borderSide:
-                              const BorderSide(color: Colors.transparent),
+                          borderSide: const BorderSide(color: Colors.transparent),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(50),
-                          borderSide:
-                              const BorderSide(color: Colors.transparent),
+                          borderSide: const BorderSide(color: Colors.transparent),
                         ),
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 0, horizontal: 20),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
                         hintStyle: Theme.of(context).textTheme.displayLarge,
                       ),
                       keyboardType: TextInputType.datetime,
@@ -444,14 +435,11 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
                       items: const [
                         DropdownMenuItem(
                           value: 'Male',
-                          child: Align(
-                              alignment: Alignment.center, child: Text('Male')),
+                          child: Align(alignment: Alignment.center, child: Text('Male')),
                         ),
                         DropdownMenuItem(
                           value: 'Female',
-                          child: Align(
-                              alignment: Alignment.center,
-                              child: Text('Female')),
+                          child: Align(alignment: Alignment.center, child: Text('Female')),
                         ),
                       ],
                       onChanged: (String? newValue) {
@@ -463,8 +451,7 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
                       decoration: InputDecoration(
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(50),
-                          borderSide:
-                              const BorderSide(color: Colors.transparent),
+                          borderSide: const BorderSide(color: Colors.transparent),
                         ),
                         filled: true,
                         fillColor: Colors.white,
@@ -475,8 +462,7 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
                             width: 2,
                           ),
                         ),
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 0, horizontal: 20),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
                         hintStyle: Theme.of(context).textTheme.displayLarge,
                       ),
                       style: Theme.of(context).textTheme.displayLarge,
@@ -515,12 +501,8 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
                           hintStyle: Theme.of(context).textTheme.displayLarge,
                         ),
                         obscureText: false,
-                        keyboardType:
-                            TextInputType.number, // Use the number keyboard
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(
-                              RegExp(r'^\d*\.?\d*'))
-                        ],
+                        keyboardType: TextInputType.number, // Use the number keyboard
+                        inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*'))],
                       )),
                 ),
 
@@ -592,8 +574,7 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
                     child: Container(
                       width: double.infinity,
                       height: 40, // Set the desired height for the note button
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 0, horizontal: 10),
+                      padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(50),
@@ -621,8 +602,7 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
                   child: TextButton(
                     onPressed: () => _skip(),
                     style: TextButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(
-                          175, 224, 223, 223), // Background color
+                      backgroundColor: const Color.fromARGB(175, 224, 223, 223), // Background color
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(
                             50), // Optional: Adjust radius for rounded corners

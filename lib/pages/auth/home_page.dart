@@ -74,17 +74,14 @@ class _HomePageState extends State<HomePage> {
             userData['data']['username'] == null ||
             userData['data']['phone'] == null ||
             userData['data']['address'] == null) {
-          throw Exception(
-              "Required user data (username, phone, or address) is missing.");
+          throw Exception("Required user data (username, phone, or address) is missing.");
         }
 
         setState(() {
           _username = userData['data']['username'];
           _address = userData['data']['address'];
           String fetchedPhone = userData['data']['phone'];
-          _phone = fetchedPhone.contains('/')
-              ? fetchedPhone.split('/').last
-              : fetchedPhone;
+          _phone = fetchedPhone.contains('/') ? fetchedPhone.split('/').last : fetchedPhone;
           _pets = userData['data']['pets'] ?? [];
           _petCount = _pets.length;
           _petDetails = _pets.map((pet) {
@@ -112,8 +109,7 @@ class _HomePageState extends State<HomePage> {
       print("error: $e");
       if (uid == null) {
         if (mounted) {
-          _errorMessage =
-              'Error occurred while logging in, Please try again later.';
+          _errorMessage = 'Error occurred while logging in, Please try again later.';
           // Use the context passed to this method for the dialog
           _showErrorDialog(context, _errorMessage);
           setState(() {
@@ -124,8 +120,7 @@ class _HomePageState extends State<HomePage> {
         if (mounted) {
           setState(() {
             _isLoading = false;
-            _errorMessage =
-                'Error occurred while registering, Please register again.';
+            _errorMessage = 'Error occurred while registering, Please register again.';
             _hasError = true; // Set error state to true
           });
 
@@ -142,6 +137,7 @@ class _HomePageState extends State<HomePage> {
       context: dialogContext,
       builder: (dialogContext) {
         return AlertDialog(
+          backgroundColor: Theme.of(context).colorScheme.surface,
           title: Text(
             'An Error Occurred',
             style: Theme.of(context)
@@ -241,6 +237,7 @@ class _HomePageState extends State<HomePage> {
     }
     if (_hasError) {
       return Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.surface,
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -265,6 +262,7 @@ class _HomePageState extends State<HomePage> {
     }
     if (_errorMessage.isNotEmpty) {
       return Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.surface,
         body: Center(
           child: Text(
             _errorMessage,
@@ -306,8 +304,7 @@ class _HomePageState extends State<HomePage> {
             ),
             if (_showOptions)
               Positioned(
-                top:
-                    110, // Adjust this to position the icons below the first button
+                top: 110, // Adjust this to position the icons below the first button
                 right: 28,
                 child: Column(
                   children: [
@@ -399,8 +396,7 @@ class _HomePageState extends State<HomePage> {
                         radius: 47,
                         backgroundImage: (_image != null && _image != '')
                             ? NetworkImage(_image) // Load image from URL
-                            : const AssetImage(
-                                    'assets/images/default_profile.png')
+                            : const AssetImage('assets/images/default_profile.png')
                                 as ImageProvider, // Fallback to a placeholder if _image is empty
                         // backgroundImage: AssetImage('assets/images/meme1.jpg'),
                       ),
@@ -411,8 +407,7 @@ class _HomePageState extends State<HomePage> {
                           children: [
                             Container(
                               constraints: BoxConstraints(
-                                  maxWidth:
-                                      MediaQuery.of(context).size.width * 0.58),
+                                  maxWidth: MediaQuery.of(context).size.width * 0.58),
                               child: Text(
                                 '$_username ',
                                 style: const TextStyle(
@@ -424,8 +419,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                             const Text(
                               "'s family",
-                              style: TextStyle(
-                                  fontSize: 20, fontFamily: 'Fredoka'),
+                              style: TextStyle(fontSize: 20, fontFamily: 'Fredoka'),
                             ),
                           ],
                         ),
@@ -492,10 +486,7 @@ class _HomePageState extends State<HomePage> {
                           const Padding(
                             padding: EdgeInsets.fromLTRB(0, 15, 0, 12),
                             child: Row(
-                              children: [
-                                Text('Your Family',
-                                    style: TextStyle(fontSize: 16))
-                              ],
+                              children: [Text('Your Family', style: TextStyle(fontSize: 16))],
                             ),
                           ),
                           SizedBox(
@@ -505,14 +496,11 @@ class _HomePageState extends State<HomePage> {
                               padding: EdgeInsets.zero,
                               itemCount: _petCount +
                                   1, // Total number of items (n regular cards + 1 button card)
-                              gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 2, // 2 cards per row
                                 mainAxisSpacing: 15.0, // Spacing between rows
-                                crossAxisSpacing:
-                                    12.0, // Spacing between columns
-                                childAspectRatio:
-                                    2.05 / 2.6, // Aspect ratio of the cards
+                                crossAxisSpacing: 12.0, // Spacing between columns
+                                childAspectRatio: 2.05 / 2.6, // Aspect ratio of the cards
                               ),
                               itemBuilder: (context, index) {
                                 // Check if it's the last index (index n) to place the button card
@@ -529,14 +517,12 @@ class _HomePageState extends State<HomePage> {
                                           // Define your add button action here
                                         },
                                         borderRadius: BorderRadius.circular(8),
-                                        splashColor: Colors
-                                            .transparent, // Remove ripple effect
-                                        highlightColor: const Color.fromRGBO(0,
-                                            0, 0, 0), // Remove highlight effect
+                                        splashColor: Colors.transparent, // Remove ripple effect
+                                        highlightColor: const Color.fromRGBO(
+                                            0, 0, 0, 0), // Remove highlight effect
                                         child: GestureDetector(
                                           onTap: () {
-                                            Navigator.pushNamed(
-                                                context, '/addPetProfileImage');
+                                            Navigator.pushNamed(context, '/addPetProfileImage');
                                           },
                                           child: Center(
                                             child: Container(
@@ -557,9 +543,7 @@ class _HomePageState extends State<HomePage> {
                                               child: Icon(
                                                 Icons.add,
                                                 size: 23,
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .onSurface,
+                                                color: Theme.of(context).colorScheme.onSurface,
                                               ),
                                             ),
                                           ),
@@ -570,10 +554,8 @@ class _HomePageState extends State<HomePage> {
                                   final pet = _petDetails[index];
                                   // Regular cards for indices 0 to n-1
                                   return Card(
-                                    color:
-                                        Theme.of(context).colorScheme.tertiary,
-                                    margin:
-                                        const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                    color: Theme.of(context).colorScheme.tertiary,
+                                    margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
                                     elevation: 1,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
@@ -585,8 +567,7 @@ class _HomePageState extends State<HomePage> {
 
                                         // Check if the widget is still mounted before navigation
                                         if (mounted) {
-                                          await Navigator.pushNamed(
-                                              context, '/petProfile',
+                                          await Navigator.pushNamed(context, '/petProfile',
                                               arguments: petId);
 
                                           // Check if the widget is still mounted before navigating again
@@ -594,8 +575,7 @@ class _HomePageState extends State<HomePage> {
                                             Navigator.pushReplacement(
                                               context,
                                               MaterialPageRoute(
-                                                builder: (context) =>
-                                                    const BottomNavPage(
+                                                builder: (context) => const BottomNavPage(
                                                   page: 1,
                                                 ),
                                               ),
@@ -607,25 +587,18 @@ class _HomePageState extends State<HomePage> {
                                         children: [
                                           SizedBox(
                                             width: double.infinity,
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.18,
+                                            height: MediaQuery.of(context).size.height * 0.18,
                                             child: ClipRRect(
-                                              borderRadius:
-                                                  const BorderRadius.vertical(
+                                              borderRadius: const BorderRadius.vertical(
                                                 top: Radius.circular(8),
                                               ),
                                               child: Container(
-                                                color: const Color.fromARGB(
-                                                    255, 227, 225, 225),
-                                                child: pet['img'] != '' &&
-                                                        pet['img'] != null
+                                                color: const Color.fromARGB(255, 227, 225, 225),
+                                                child: pet['img'] != '' && pet['img'] != null
                                                     ? Image.network(
                                                         pet['img'],
                                                         fit: BoxFit.cover,
-                                                        errorBuilder: (context,
-                                                            error, stackTrace) {
+                                                        errorBuilder: (context, error, stackTrace) {
                                                           return const Center(
                                                             child: Text(
                                                               'No preview image',
@@ -652,31 +625,24 @@ class _HomePageState extends State<HomePage> {
                                             ),
                                           ),
                                           Padding(
-                                            padding: const EdgeInsets.fromLTRB(
-                                                8, 5, 8, 5),
+                                            padding: const EdgeInsets.fromLTRB(8, 5, 8, 5),
                                             child: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.end,
+                                                mainAxisAlignment: MainAxisAlignment.end,
                                                 children: [
                                                   Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.start,
+                                                    mainAxisAlignment: MainAxisAlignment.start,
                                                     children: [
                                                       Container(
                                                         constraints: BoxConstraints(
-                                                            maxWidth: MediaQuery.of(
-                                                                        context)
-                                                                    .size
-                                                                    .width *
-                                                                0.35),
+                                                            maxWidth:
+                                                                MediaQuery.of(context).size.width *
+                                                                    0.35),
                                                         child: Text(
                                                           pet['name'],
-                                                          style:
-                                                              Theme.of(context)
-                                                                  .textTheme
-                                                                  .labelLarge,
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
+                                                          style: Theme.of(context)
+                                                              .textTheme
+                                                              .labelLarge,
+                                                          overflow: TextOverflow.ellipsis,
                                                         ),
                                                       ),
                                                     ],
@@ -686,50 +652,32 @@ class _HomePageState extends State<HomePage> {
                                                   ),
                                                   // ค่อยมาเปลี่ยนเป็น data1-data2 (sex-year)
                                                   Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.start,
+                                                    mainAxisAlignment: MainAxisAlignment.start,
                                                     children: [
                                                       Text(
-                                                        pet['sex'] +
-                                                            ' - ' +
-                                                            pet['age'],
+                                                        pet['sex'] + ' - ' + pet['age'],
                                                         style: Theme.of(context)
                                                             .textTheme
                                                             .displayMedium,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
+                                                        overflow: TextOverflow.ellipsis,
                                                       ),
                                                       const Spacer(),
                                                       //add logic if status=safe then green
-                                                      if (pet['status'] !=
-                                                              null &&
+                                                      if (pet['status'] != null &&
                                                           pet['status'] != "")
                                                         Container(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .symmetric(
-                                                                  horizontal:
-                                                                      11,
-                                                                  vertical:
-                                                                      1.5),
+                                                          padding: const EdgeInsets.symmetric(
+                                                              horizontal: 11, vertical: 1.5),
                                                           decoration: BoxDecoration(
-                                                              color:
-                                                                  pet['status'] ==
-                                                                          'Lost'
-                                                                      ? Colors
-                                                                          .red
-                                                                      : Colors
-                                                                          .green,
-                                                              shape: BoxShape
-                                                                  .rectangle,
+                                                              color: pet['status'] == 'Lost'
+                                                                  ? Colors.red
+                                                                  : Colors.green,
+                                                              shape: BoxShape.rectangle,
                                                               borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          8)),
+                                                                  BorderRadius.circular(8)),
                                                           child: Text(
                                                             pet['status'],
-                                                            style: Theme.of(
-                                                                    context)
+                                                            style: Theme.of(context)
                                                                 .textTheme
                                                                 .displaySmall,
                                                           ),

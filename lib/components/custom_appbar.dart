@@ -17,6 +17,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         centerTitle: Theme.of(context).appBarTheme.centerTitle,
         backgroundColor: Colors.transparent,
         elevation: Theme.of(context).appBarTheme.elevation,
+        scrolledUnderElevation: 0.0,
         iconTheme: Theme.of(context).appBarTheme.iconTheme,
         leadingWidth: MediaQuery.of(context).size.width * 0.2,
         leading: GestureDetector(
@@ -49,6 +50,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         centerTitle: Theme.of(context).appBarTheme.centerTitle,
         backgroundColor: Colors.transparent,
         elevation: Theme.of(context).appBarTheme.elevation,
+        scrolledUnderElevation: 0.0,
         iconTheme: Theme.of(context).appBarTheme.iconTheme,
       );
     }

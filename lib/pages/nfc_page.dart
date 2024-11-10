@@ -21,8 +21,7 @@ class _NfcPageState extends State<NfcPage> {
   void initState() {
     super.initState();
     message = NdefMessage([
-      NdefRecord.createUri(
-          Uri.parse('${dotenv.get('NFC_URL')}/tracking#${widget.petId}')),
+      NdefRecord.createUri(Uri.parse('${dotenv.get('NFC_URL')}/tracking#${widget.petId}')),
     ]);
     print('NFC URL: ${dotenv.get('NFC_URL')}/tracking#${widget.petId}');
   }
@@ -30,6 +29,7 @@ class _NfcPageState extends State<NfcPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: const CustomAppBarToHome(title: 'Scan NFC'),
       body: SafeArea(
         child: FutureBuilder(
@@ -117,8 +117,7 @@ class _NfcPageState extends State<NfcPage> {
       try {
         await ndef.write(message);
         result.value = 'Success to "Ndef Write"';
-        NfcManager.instance
-            .stopSession(); // Stop the session to prevent immediate reading
+        NfcManager.instance.stopSession(); // Stop the session to prevent immediate reading
 
         if (mounted) {
           _showSuccessDialog(context, 'Write Success');
@@ -147,17 +146,14 @@ class _NfcPageState extends State<NfcPage> {
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: Theme.of(context).colorScheme.surface,
-          title: Center(
-              child: Text(message,
-                  style: Theme.of(context).textTheme.headlineMedium)),
+          title: Center(child: Text(message, style: Theme.of(context).textTheme.headlineMedium)),
           actions: [
             TextButton(
               style: TextButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.primary,
               ),
               child: const Center(
-                  child: Text('OK',
-                      style: TextStyle(color: Colors.white, fontSize: 16))),
+                  child: Text('OK', style: TextStyle(color: Colors.white, fontSize: 16))),
               onPressed: () {
                 Navigator.of(context).popAndPushNamed('/');
               },
@@ -175,17 +171,14 @@ class _NfcPageState extends State<NfcPage> {
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: Theme.of(context).colorScheme.surface,
-          title: Center(
-              child: Text(message,
-                  style: Theme.of(context).textTheme.headlineMedium)),
+          title: Center(child: Text(message, style: Theme.of(context).textTheme.headlineMedium)),
           actions: [
             TextButton(
               style: TextButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.primary,
               ),
               child: const Center(
-                  child: Text('OK',
-                      style: TextStyle(color: Colors.white, fontSize: 16))),
+                  child: Text('OK', style: TextStyle(color: Colors.white, fontSize: 16))),
               onPressed: () {
                 Navigator.of(context).pop(); // Close the error dialog only
               },

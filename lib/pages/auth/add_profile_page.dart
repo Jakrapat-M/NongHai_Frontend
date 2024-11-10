@@ -33,8 +33,7 @@ class _AddProfilePageState extends State<AddProfilePage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     // Retrieve the userData passed from the RegisterPage
-    userData =
-        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    userData = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
   }
 
   final ImagePicker _picker = ImagePicker();
@@ -54,8 +53,7 @@ class _AddProfilePageState extends State<AddProfilePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xffC8A48A)),
+                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xffC8A48A)),
                 onPressed: () async {
                   Navigator.of(context).pop();
 
@@ -92,8 +90,7 @@ class _AddProfilePageState extends State<AddProfilePage> {
               ),
               const SizedBox(width: 15),
               ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xffC8A48A)),
+                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xffC8A48A)),
                 child: const Text(
                   'Gallery',
                   style: TextStyle(
@@ -104,8 +101,7 @@ class _AddProfilePageState extends State<AddProfilePage> {
                 ),
                 onPressed: () async {
                   Navigator.of(context).pop();
-                  final XFile? result =
-                      await _picker.pickImage(source: ImageSource.gallery);
+                  final XFile? result = await _picker.pickImage(source: ImageSource.gallery);
                   if (result != null) {
                     setState(() {
                       _image = result;
@@ -145,6 +141,7 @@ class _AddProfilePageState extends State<AddProfilePage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
+            backgroundColor: Theme.of(context).colorScheme.surface,
             title: Text(
               'No Image Selected',
               style: Theme.of(context)
@@ -194,11 +191,11 @@ class _AddProfilePageState extends State<AddProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         backgroundColor: const Color(0xfff2f2f2),
         title: const Text('Your Profile'),
       ),
-      backgroundColor: Theme.of(context).colorScheme.surface,
       body: Center(
         child: SingleChildScrollView(
           child: Column(
@@ -230,13 +227,12 @@ class _AddProfilePageState extends State<AddProfilePage> {
                 child: TextButton(
                   onPressed: () => _skip(),
                   style: TextButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(
-                        175, 224, 223, 223), // Background color
+                    backgroundColor: const Color.fromARGB(175, 224, 223, 223), // Background color
                     // padding:
                     //     const EdgeInsets.symmetric(horizontal: 100), // Padding
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                          50), // Optional: Adjust radius for rounded corners
+                      borderRadius:
+                          BorderRadius.circular(50), // Optional: Adjust radius for rounded corners
                     ),
                   ),
                   child: const Row(
