@@ -2,6 +2,7 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:nonghai/components/custom_appbar.dart';
 import 'package:nonghai/components/custom_button.dart';
 import 'package:nonghai/components/custom_text_field.dart';
 import 'package:nonghai/components/validate_text_field.dart';
@@ -167,17 +168,7 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(
-        backgroundColor: const Color(0xfff2f2f2),
-        title: const Text(
-          "Create an account",
-          style: TextStyle(
-              fontFamily: "Fredoka",
-              fontSize: 32,
-              fontWeight: FontWeight.w500,
-              color: Color(0xff57677C)),
-        ),
-      ),
+      appBar: const CustomAppBar(title: "Create an account"),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(40, 65, 40, 0),

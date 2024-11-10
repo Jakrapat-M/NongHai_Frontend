@@ -2,6 +2,7 @@
 // import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:nonghai/components/custom_appbar.dart';
 import 'package:nonghai/components/custom_button.dart';
 import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
@@ -192,10 +193,7 @@ class _AddProfilePageState extends State<AddProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(
-        backgroundColor: const Color(0xfff2f2f2),
-        title: const Text('Your Profile'),
-      ),
+      appBar: const CustomAppBar(title: "Your Profile"),
       body: Center(
         child: SingleChildScrollView(
           child: Column(

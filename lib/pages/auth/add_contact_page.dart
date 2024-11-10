@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:nonghai/components/custom_appbar.dart';
 // import 'package:nonghai/pages/auth/add_pet_info_page.dart';
 import 'package:nonghai/pages/auth/add_pet_profile_page.dart';
 import 'package:nonghai/services/auth/add_profile.dart';
@@ -147,7 +148,7 @@ class _AddContactPageState extends State<AddContactPage> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-             backgroundColor: Theme.of(context).colorScheme.surface,
+            backgroundColor: Theme.of(context).colorScheme.surface,
             title: Text('Error',
                 style: Theme.of(context)
                     .textTheme
@@ -193,7 +194,7 @@ class _AddContactPageState extends State<AddContactPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-           backgroundColor: Theme.of(context).colorScheme.surface,
+          backgroundColor: Theme.of(context).colorScheme.surface,
           title: Text('Invalid Input',
               style: Theme.of(context)
                   .textTheme
@@ -299,9 +300,7 @@ class _AddContactPageState extends State<AddContactPage> {
     print(userData);
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(
-        title: Text("Your Contact", style: Theme.of(context).bannerTheme.contentTextStyle),
-      ),
+      appBar: const CustomAppBar(title: "Your Contact"),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(25, 0, 25, 8),
         child: Column(

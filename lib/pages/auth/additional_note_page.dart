@@ -1,6 +1,7 @@
 // ignore_for_file: unused_field, unused_import, prefer_const_constructors, avoid_print, must_be_immutable, prefer_typing_uninitialized_variables
 
 import 'package:flutter/material.dart';
+import 'package:nonghai/components/custom_appbar.dart';
 
 import '../../components/custom_button.dart';
 
@@ -45,9 +46,7 @@ class _AdditionalNotePageState extends State<AdditionalNotePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(
-        title: const Text("Additional Note"),
-      ),
+      appBar: CustomAppBar(title: "Additional Note"),
       body: Padding(
         padding: const EdgeInsets.all(30.0),
         child: Center(

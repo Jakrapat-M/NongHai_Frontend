@@ -4,6 +4,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:nonghai/components/custom_appbar.dart';
 import 'package:nonghai/components/custom_button.dart';
 import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
@@ -208,8 +209,8 @@ class _AddPetProfilePageState extends State<AddPetProfilePage> {
     print(petData);
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(
-        title: Text("Pet Profile", style: Theme.of(context).bannerTheme.contentTextStyle),
+      appBar: CustomAppBar(
+        title: "Pet Profile",
       ),
       body: Center(
         child: SingleChildScrollView(

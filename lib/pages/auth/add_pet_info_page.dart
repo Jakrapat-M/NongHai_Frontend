@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:nonghai/components/custom_appbar.dart';
 import 'package:nonghai/components/custom_button.dart';
 import 'package:nonghai/components/custom_text_field.dart';
 import 'package:nonghai/components/validate_text_field.dart';
@@ -157,7 +158,7 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-           backgroundColor: Theme.of(context).colorScheme.surface,
+          backgroundColor: Theme.of(context).colorScheme.surface,
           title: Text(
             'Creation Failed',
             style: Theme.of(context)
@@ -201,7 +202,7 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-           backgroundColor: Theme.of(context).colorScheme.surface,
+          backgroundColor: Theme.of(context).colorScheme.surface,
           title: Text('Invalid Input',
               style: Theme.of(context)
                   .textTheme
@@ -282,10 +283,7 @@ class _AddPetInfoPageState extends State<AddPetInfoPage> {
     print(petData);
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(
-        title: Text("Your Pet info", style: Theme.of(context).bannerTheme.contentTextStyle),
-      ),
-
+      appBar: const CustomAppBar(title: "Your Pet info"),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(55, 0, 55, 8),
         child: Center(
