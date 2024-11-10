@@ -40,7 +40,7 @@ class _BottomNavPageState extends State<BottomNavPage> {
     checkAllReadNotification();
 
     // Start periodic refresh every X seconds
-    _startAutoRefresh(const Duration(seconds: 10)); // Adjust the duration as needed
+    // _startAutoRefresh(const Duration(seconds: 10)); // Adjust the duration as needed
   }
 
   @override
@@ -51,12 +51,12 @@ class _BottomNavPageState extends State<BottomNavPage> {
     super.dispose();
   }
 
-  void _startAutoRefresh(Duration interval) {
-    _refreshTimer = Timer.periodic(interval, (timer) {
-      checkAllReadChat();
-      checkAllReadNotification();
-    });
-  }
+  // void _startAutoRefresh(Duration interval) {
+  //   _refreshTimer = Timer.periodic(interval, (timer) {
+  //     checkAllReadChat();
+  //     checkAllReadNotification();
+  //   });
+  // }
 
   Future<void> checkAllReadChat() async {
     try {
@@ -151,8 +151,14 @@ class _BottomNavPageState extends State<BottomNavPage> {
             onTap: (index) {
               setState(() {
                 _selectedPageIndex = index;
-                if (index == 0) hasUnreadMessages = false;
-                if (index == 2) hasUnreadNotifications = false;
+                if (index == 0) {
+                  hasUnreadMessages = false;
+                  checkAllReadNotification();
+                }
+                if (index == 2) {
+                  hasUnreadNotifications = false;
+                  checkAllReadChat();
+                }
               });
             },
             selectedIconTheme: Theme.of(context).appBarTheme.iconTheme,
@@ -178,6 +184,8 @@ class _BottomNavPageState extends State<BottomNavPage> {
                     onPressed: () {
                       setState(() {
                         _selectedPageIndex = 1; // Navigate to Home page
+                        checkAllReadChat();
+                        checkAllReadNotification();
                       });
                     },
                     child: const Image(
