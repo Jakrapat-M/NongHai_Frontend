@@ -5,19 +5,24 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:nonghai/pages/auth/edit_home_page.dart';
 import 'package:nonghai/pages/auth/edit_pet_page.dart';
+import 'package:nonghai/pages/chat/chat_room_page.dart';
 import 'package:nonghai/pages/nfc_page.dart';
+import 'package:nonghai/pages/tracking_page.dart';
 import 'package:nonghai/services/auth/auth_service.dart';
 import 'package:nonghai/services/auth/auth_service_inherited.dart';
 import 'package:nonghai/services/auth/login_or_registoer.dart';
 import 'package:nonghai/firebase_options.dart';
 import 'package:nonghai/pages/auth/home_page.dart';
 import 'package:nonghai/services/auth/auth_gate.dart';
+import 'package:nonghai/services/chat/chat_service.dart';
 import 'package:nonghai/services/location_service.dart';
 import 'package:nonghai/services/noti/noti_service.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:nonghai/services/caller.dart';
+import 'package:nonghai/services/noti/show_or_hide_noti.dart';
 import 'pages/auth/add_contact_page.dart';
 import 'pages/auth/add_pet_info_page.dart';
 import 'pages/auth/add_pet_profile_page.dart';
@@ -26,8 +31,53 @@ import 'pages/auth/additional_note_page.dart';
 import 'pages/auth/pet_profile_page.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
+final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
+
+  const initializationSettings = InitializationSettings(
+    android: initializationSettingsAndroid,
+  );
+
+  await flutterLocalNotificationsPlugin.initialize(
+    initializationSettings,
+    onDidReceiveNotificationResponse: (NotificationResponse notificationResponse) async {
+      final int? id = notificationResponse.id;
+      final String? payload = notificationResponse.payload;
+      switch (id) {
+        case 1:
+          navigatorKey.currentState?.push(MaterialPageRoute(
+            builder: (context) {
+              return TrackingPage(
+                petId: payload!,
+              );
+            },
+          ));
+          break;
+        case 2:
+          MaterialPageRoute materialPageRoute = MaterialPageRoute(
+            builder: (context) => ChatRoomPage(
+              receiverID: payload!,
+            ),
+          );
+
+          // Use the global navigator key to push the route
+          navigatorKey.currentState?.push(materialPageRoute).then((value) {
+            ShowOrHideNoti().resetChatting();
+            // mark chat as read where navigate back from chat room
+            ChatService().setRead(
+              payload!,
+            );
+          });
+          break;
+        default:
+          break;
+      }
+    },
+  );
   await dotenv.load(fileName: '.env');
 
   await Firebase.initializeApp(

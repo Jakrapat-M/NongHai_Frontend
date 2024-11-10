@@ -210,7 +210,11 @@ class _PetProfilePageState extends State<PetProfilePage> {
         leadingWidth: MediaQuery.of(context).size.width * 0.2,
         leading: GestureDetector(
           onTap: () {
-            Navigator.pop(context);
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context);
+            } else {
+              Navigator.pushNamed(context, '/');
+            }
           },
           child: Row(
             children: [

@@ -1,5 +1,7 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:nonghai/main.dart';
 import 'package:nonghai/pages/chat/chat_room_page.dart';
 import 'package:nonghai/pages/tracking_page.dart';
 import 'package:nonghai/services/chat/chat_service.dart';
@@ -85,70 +87,65 @@ class NotificationService {
     }
 
     if (message.notification != null && !hideNoti) {
-      final snackbar = SnackBar(
-        elevation: 2,
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(90),
-        ),
-        content: TextButton(
-          onPressed: () {
-            handleMessage(message);
-          },
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center, // Center all content horizontally
-            children: [
-              Image.asset(
-                'assets/images/Logo.png',
-                width: 60,
-                height: 60,
-              ),
-              const SizedBox(width: 8), // Space between image and text
-              Expanded(
-                child: Align(
-                  alignment: Alignment.centerLeft, // Center text content within Expanded
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start, // Center text in Column
-                    mainAxisSize: MainAxisSize.min, // Prevent Column from taking full height
-                    children: [
-                      Text(
-                        message.notification!.title!,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xffC8A48A),
-                        ),
-                      ),
-                      Text(
-                        message.notification!.body!,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        behavior: SnackBarBehavior.floating,
-        padding: const EdgeInsets.symmetric(
-          vertical: 0,
-          horizontal: 0,
-        ),
-        margin: EdgeInsets.only(
-          left: 16.0,
-          right: 16.0,
-          bottom: MediaQuery.of(_navigatorKey.currentContext!).size.height -
-              (MediaQuery.of(_navigatorKey.currentContext!).size.height * 0.12),
-        ),
-        duration: const Duration(seconds: 3),
-      );
 
-      ScaffoldMessenger.of(_navigatorKey.currentContext!).showSnackBar(snackbar);
+      showCustomNotification(
+        message.data['navigate_to'],
+        message.notification!.title!,
+        message.notification!.body!,
+        payload: message.data['identifer'],
+      );
+    }
+  }
+
+  Future<void> showCustomNotification(String navTo, String title, String body,
+      {required String payload}) async {
+    AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      'custom_channel_id',
+      'Custom Notifications',
+      channelDescription: 'Channel for custom-styled notifications',
+      importance: Importance.high,
+      priority: Priority.high,
+      playSound: false,
+      styleInformation: BigTextStyleInformation(
+        body,
+        contentTitle: title,
+        htmlFormatContent: true,
+        htmlFormatContentTitle: true,
+      ),
+      color: const Color(0xffC8A48A),
+    );
+
+    final NotificationDetails platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics);
+
+    switch (navTo) {
+      case 'tracking':
+        await flutterLocalNotificationsPlugin.show(
+          1, // Notification ID
+          title,
+          body,
+          platformChannelSpecifics,
+          payload: payload, // Include the payload to trigger navigation
+        );
+        break;
+      case 'chat':
+        await flutterLocalNotificationsPlugin.show(
+          2, // Notification ID
+          title,
+          body,
+          platformChannelSpecifics,
+          payload: payload, // Include the payload to trigger navigation
+        );
+        break;
+      default:
+        await flutterLocalNotificationsPlugin.show(
+          0, // Notification ID
+          title,
+          body,
+          platformChannelSpecifics,
+          payload: payload, // Include the payload to trigger navigation
+        );
+        break;
     }
   }
 }
