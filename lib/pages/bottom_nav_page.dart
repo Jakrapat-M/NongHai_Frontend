@@ -61,9 +61,11 @@ class _BottomNavPageState extends State<BottomNavPage> {
   Future<void> checkAllReadChat() async {
     try {
       final resp = await Caller.dio.get('/chat/hasUnreadMessage?userId=$uid');
-      setState(() {
-        hasUnreadMessages = resp.data['data'];
-      });
+      if (mounted) {
+        setState(() {
+          hasUnreadMessages = resp.data['data'];
+        });
+      }
     } on Exception catch (e) {
       debugPrint('Error checking unread messages: $e');
     }
@@ -72,9 +74,11 @@ class _BottomNavPageState extends State<BottomNavPage> {
   Future<void> checkAllReadNotification() async {
     try {
       final resp = await Caller.dio.get('/notification/hasUnreadNotification?userID=$uid');
-      setState(() {
-        hasUnreadNotifications = resp.data['data'];
-      });
+      if (mounted) {
+        setState(() {
+          hasUnreadNotifications = resp.data['data'];
+        });
+      }
     } on Exception catch (e) {
       debugPrint('Error checking unread notifications: $e');
     }
@@ -90,7 +94,6 @@ class _BottomNavPageState extends State<BottomNavPage> {
       NotificationService(navigatorKey: navigatorKey).handleMessage(message);
     });
   }
-
 
   Widget _buildIconWithBadge(IconData icon, bool showBadge) {
     return Stack(

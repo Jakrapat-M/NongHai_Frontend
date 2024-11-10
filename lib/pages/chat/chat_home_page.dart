@@ -93,6 +93,10 @@ class _ChatHomePageState extends State<ChatHomePage> {
               return const Center(child: CircularProgressIndicator());
             }
 
+            if (chatRoomUserIds.isEmpty) {
+              return const Center(child: Text('No chat room found'));
+            }
+
             // Filter the list of users
             List<Map<String, dynamic>> usersList = snapshot.data!;
 
