@@ -144,7 +144,7 @@ class NotificationService {
           bottom: MediaQuery.of(_navigatorKey.currentContext!).size.height -
               (MediaQuery.of(_navigatorKey.currentContext!).size.height * 0.12),
         ),
-        duration: const Duration(seconds: 10),
+        duration: const Duration(seconds: 3),
       );
 
       ScaffoldMessenger.of(_navigatorKey.currentContext!).showSnackBar(snackbar);
