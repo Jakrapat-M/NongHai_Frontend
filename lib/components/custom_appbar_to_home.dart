@@ -18,7 +18,7 @@ class CustomAppBarToHome extends StatelessWidget implements PreferredSizeWidget 
         ),
         centerTitle: Theme.of(context).appBarTheme.centerTitle,
         backgroundColor: Colors.transparent,
-        elevation: Theme.of(context).appBarTheme.elevation,
+        elevation: 0,
         iconTheme: Theme.of(context).appBarTheme.iconTheme,
         leadingWidth: MediaQuery.of(context).size.width * 0.2,
         leading: GestureDetector(
@@ -50,7 +50,7 @@ class CustomAppBarToHome extends StatelessWidget implements PreferredSizeWidget 
         title: Text(title, style: Theme.of(context).appBarTheme.titleTextStyle),
         centerTitle: Theme.of(context).appBarTheme.centerTitle,
         backgroundColor: Colors.transparent,
-        elevation: Theme.of(context).appBarTheme.elevation,
+        elevation: 0,
         iconTheme: Theme.of(context).appBarTheme.iconTheme,
         scrolledUnderElevation: 0.0,
       );
