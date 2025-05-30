@@ -11,33 +11,13 @@ class CustomButton1 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-        onTap: onTap,
-        child: FilledButton(
-          onPressed: onTap,
-          style: ButtonStyle(
-            backgroundColor: WidgetStateProperty.all(Theme.of(context).colorScheme.primary),
-            minimumSize: WidgetStateProperty.all(const Size(double.infinity, 50)),
-          ),
-          child: Text(text),
-        ));
-    // return GestureDetector(
-    //   onTap: onTap,
-
-    //   child: Container(
-    //     width: double.infinity,
-    //     padding: const EdgeInsets.all(10),
-    //     decoration: BoxDecoration(
-    //       color: Colors.deepPurple[300],
-    //       borderRadius: BorderRadius.circular(10),
-    //     ),
-    //     child: Center(
-    //       child: Text(
-    //         text,
-    //         style: TextStyle(color: Color.fromARGB(255, 255, 255, 255), fontSize: 20),
-    //       ),
-    //     ),
-    //   ),
-    // );
+    return FilledButton(
+      onPressed: onTap,
+      style: ButtonStyle(
+        backgroundColor: WidgetStateProperty.all(Theme.of(context).colorScheme.primary),
+        minimumSize: WidgetStateProperty.all(const Size(double.infinity, 40)),
+      ),
+      child: Text(text, style: Theme.of(context).textTheme.labelSmall?.copyWith(fontSize: 16)),
+    );
   }
 }
